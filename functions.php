@@ -3,7 +3,8 @@
 include __DIR__ . '/wp-helpers/wp-helpers.php';
 
 add_action('after_setup_theme', function() {
-	add_theme_support( 'post-thumbnails' );
+	add_theme_support('post-thumbnails');
+	add_theme_support('woocommerce');
 
 	register_nav_menus([
 		'primary' => 'Principal',
@@ -27,6 +28,7 @@ foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 		wp_enqueue_script('bootstrap', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js');
 		wp_enqueue_style('bootstrap', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
 		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+		wp_enqueue_style('animate-css', 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css');
 	});
 }
 
@@ -78,24 +80,31 @@ class Theme
 
 
 
-add_filter('woocommerce_checkout_fields', function($fields) {
-	foreach($fields as $field_type=>$field_fields) {
-		foreach($field_fields as $name=>$field) {
-			foreach($field['class'] as $class_index=>$class) {
-				if ($class=='form-row-first' OR $class=='form-row-last') {
-					unset($field['class'][$class_index]);
-					$field['class'][] = 'col-6';
-				}
-				else if ($class=='form-row-wide') {
-					unset($field['class'][$class_index]);
-					$field['class'][] = 'col-12';
-				}
-			}
-			$field['input_class'][] = 'form-control';
-			$field_fields[$name] = $field;
-		}
-		$fields[$field_type] = $field_fields;
-	}
+// add_filter('woocommerce_checkout_fields', function($fields) {
+// 	foreach($fields as $field_type=>$field_fields) {
+// 		foreach($field_fields as $name=>$field) {
+// 			foreach($field['class'] as $class_index=>$class) {
+// 				if ($class=='form-row-first' OR $class=='form-row-last') {
+// 					unset($field['class'][$class_index]);
+// 					$field['class'][] = 'col-6';
+// 				}
+// 				else if ($class=='form-row-wide') {
+// 					unset($field['class'][$class_index]);
+// 					$field['class'][] = 'col-12';
+// 				}
+// 			}
+// 			$field['input_class'][] = 'form-control';
+// 			$field_fields[$name] = $field;
+// 		}
+// 		$fields[$field_type] = $field_fields;
+// 	}
 	
-	return $fields;
-});
+// 	return $fields;
+// });
+
+
+add_action('wp_head', function() { ?>
+<style>
+.elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important;}
+</style>
+<?php });

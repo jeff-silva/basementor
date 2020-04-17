@@ -39,21 +39,6 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'default' => '<i class="fa fa-fw fa-shopping-cart"></i> - {{ cart.items_total }} item(ns) - {{ cart.price_total_format }}',
 			]);
 
-			$this->add_control('template_content', [
-				'label' => 'Template carrinho',
-				'type' => \Elementor\Controls_Manager::CODE,
-				'default' => '<div class="row align-items-center" v-for="i in cart.items">
-    <div class="col-4">
-        <img :src="i.thumbnail" style="width:100%;" />
-    </div>
-    
-    <div class="col">
-        <div><strong>{{ i.title }}</strong></div>
-        <div>{{ i.price_format }} &times; {{ i.quantity }}</div>
-    </div>
-</div>',
-			]);
-
 			$this->add_control('css', [
 				'label' => 'CSS',
 				'type' => \Elementor\Controls_Manager::CODE,
@@ -68,41 +53,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$set->id = uniqid('elementor-woocommerce-cart-');
 			$cart = WC()->cart;
 
-			$data = new stdClass;
-			
-			$data->cart = (object) [
-				'show_items' => false,
-				'items_total' => 0,
-				'price_total' => 0,
-				'price_total_format' => '',
-				'items' => [],
-			];
-
-			if ($cart) {
-				foreach($cart->get_cart() as $item=>$values) {
-					$prod =  wc_get_product($values['product_id']);
-					
-					$item = new stdClass;
-					$item->title = $prod->get_title();
-					$item->thumbnail = wp_get_attachment_url($prod->get_image_id());
-					$item->quantity = $values['quantity'];
-
-					$item->price = get_post_meta($values['product_id'] , '_price', true);
-					$item->price_format = 'R$ '. number_format($item->price, 2, ',', '.');
-
-					$item->regular_price = get_post_meta($values['product_id'] , '_regular_price', true);
-					$item->regular_price_format = 'R$ '. number_format($item->regular_price, 2, ',', '.');
-
-					$item->sale_price = get_post_meta($values['product_id'] , '_sale_price', true);
-					$item->sale_price_format = 'R$ '. number_format($item->sale_price, 2, ',', '.');
-
-					$data->cart->items[] = $item;
-					$data->cart->items_total += $item->quantity;
-					$data->cart->price_total += $item->price;
-				}
-			}
-
-			$data->cart->price_total_format = 'R$ '. number_format($data->cart->price_total, 2, ',', '.');
+			$data = (object) ['loading'=>false];
+			$data->cart = elementor_woocommerce_cart_data();
 
 			?>
 			<style><?php echo str_replace('$root', ".{$set->id}", $set->css); ?></style>
@@ -110,33 +62,93 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				<div style="cursor:pointer;" @click="cart.show_items=!cart.show_items;">
 					<?php echo $set->template_btn; ?>
 				</div>
-				<transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-					<div v-if="cart.show_items" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:99; animation-duration:200ms;" @click.self="cart.show_items=false;">
-						<div style="position:absolute; top:0px; right:0px; height:100%; max-width:300px; background:#fff;">
+				<transition name="custrom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+					<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:99; animation-duration:500ms;" @click.self="cart.show_items=false;">
+						<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; background:#fff; overflow:auto; animation-duration:2000ms;">
 							<div class="bg-primary p-3 text-light">
 								<a href="javascript:;" class="pull-right text-light" @click="cart.show_items=false;">&times;</a>
-								Cart
+								<i class="fa fa-fw fa-spin fa-spinner" v-if="loading"></i>
+								<span>Carrinho</span>
 							</div>
 							<br>
-							<?php echo $set->template_content; ?>
+							<div class="text-center text-muted" v-if="(cart.items||[]).length==0">
+								Nenhum item no carrinho
+							</div>
+
+							<div class="row no-gutters align-items-center" v-for="i in cart.items">
+							    <div class="col-3">
+							        <img :src="i.thumbnail" style="width:100%;" />
+							    </div>
+							    
+							    <div class="col">
+							        <div><strong>{{ i.title }}</strong></div>
+							        <div><input type="number" class="form-control form-control-sm" style="display:inline-block; width:70px;" v-model="i.quantity" @keyup="itemUpdate(i);"> &times; {{ i.price_format }}</div>
+							    </div>
+							    
+							    <div clas="col-3">
+							        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">&times;</a>
+							    </div>
+							</div>
 							<br>
 							<div class="row no-gutters">
-								<div class="col p-2">
+								<div class="col-12 p-2">
+									<div class="p-2 text-right"><strong>Total: {{ cart.price_total_format }}</strong></div>
 									<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-sm">Finalizar compra</a>
 								</div>
 							</div>
-					    </div>
+						</div>
 					</div>
 				</transition>
 			</div>
 			<script>new Vue({
 				el: "#<?php echo $set->id; ?>",
 				data: <?php echo json_encode($data); ?>,
+				methods: {
+					itemRemove(item) {
+						var $=jQuery, post=Object.assign({}, item);
+						post.quantity = 0;
+						this.itemUpdate(post);
+					},
+
+					itemUpdate(item) {
+						var $=jQuery, post=Object.assign({}, item);
+
+						if (window.elementorWoocommerceCartItemUpdateTimeout) {
+							clearTimeout(window.elementorWoocommerceCartItemUpdateTimeout);
+						}
+
+						window.elementorWoocommerceCartItemUpdateTimeout = setTimeout(() => {
+							this.loading = true;
+							$.post('?elementor-woocommerce-cart-item-update', post, (resp) => {
+								this.cart = resp;
+								this.cart.show_items = true;
+								this.loading = false;
+							}, "json");
+						}, 1000);
+					},
+
+					cartRefresh() {
+						var $=jQuery;
+
+						this.loading = true;
+						$.get('?elementor-woocommerce-cart-items', (resp) => {
+							this.cart = resp;
+							this.cart.show_items = true;
+							this.loading = false;
+						}, "json");
+					},
+				},
 				mounted() {
 					window.addEventListener('keyup', (ev) => {
 						if (ev.key=='Escape') {
 							this.cart.show_items = false;
 						}
+					});
+
+					jQuery(document).ready(($) => {
+						$(document.body).on('added_to_cart', (ev) => {
+							this.cartRefresh();
+						});
 					});
 				},
 			});</script>
@@ -149,3 +161,72 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 	$manager->register_widget_type(new \Elementor_Woocommerce_Cart());
 });
+
+
+if (! function_exists('elementor_woocommerce_cart_data')) {
+	function elementor_woocommerce_cart_data() {
+		$cart = WC()->cart;
+			
+		$data = (object) [
+			'show_items' => false,
+			'items_total' => 0,
+			'price_total' => 0,
+			'price_total_format' => '',
+			'items' => [],
+		];
+
+		if ($cart) {
+			foreach($cart->get_cart() as $key=>$values) {
+				$prod =  wc_get_product($values['product_id']);
+				
+				$item = new stdClass;
+				$item->key = $key;
+				$item->product_id = $values['product_id'];
+				$item->title = $prod->get_title();
+				$item->thumbnail = wp_get_attachment_url($prod->get_image_id());
+				$item->quantity = $values['quantity'];
+
+				$item->price = get_post_meta($values['product_id'] , '_price', true);
+				$item->price_format = 'R$ '. number_format($item->price, 2, ',', '.');
+
+				$item->regular_price = get_post_meta($values['product_id'] , '_regular_price', true);
+				$item->regular_price_format = 'R$ '. number_format($item->regular_price, 2, ',', '.');
+
+				$item->sale_price = get_post_meta($values['product_id'] , '_sale_price', true);
+				$item->sale_price_format = 'R$ '. number_format($item->sale_price, 2, ',', '.');
+
+				$data->items[] = $item;
+				$data->items_total += $item->quantity;
+				$data->price_total += ($item->price * $item->quantity);
+			}
+		}
+
+		$data->price_total_format = 'R$ '. number_format($data->price_total, 2, ',', '.');
+		return $data;
+	}
+}
+
+
+if (isset($_GET['elementor-woocommerce-cart-items'])) {
+	add_action('init', function() {
+		$data = elementor_woocommerce_cart_data();
+		echo json_encode($data); die;
+	});
+}
+
+if (isset($_GET['elementor-woocommerce-cart-item-update'])) {
+	add_action('init', function() {
+		$item = (object) $_POST;
+		if ($cart = WC()->instance()->cart) {
+			foreach($cart->get_cart() as $key=>$values) {
+				if ($key==$item->key) {
+					$cart->set_quantity($item->key, intval($item->quantity));
+					$data = elementor_woocommerce_cart_data();
+					$data->item = $item;
+					echo json_encode($data); die;
+				}
+			}
+		}
+		echo json_encode([]); die;
+	});
+}
