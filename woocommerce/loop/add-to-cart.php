@@ -37,7 +37,7 @@ global $product;
 
 ?>
 <a href="<?php echo $product->add_to_cart_url(); ?>"
-	class="btn btn-primary btn-block <?php echo isset( $args['class'] ) ? $args['class'] : 'button'; ?>"
+	class="<?php echo isset( $args['class'] ) ? $args['class'] : 'button'; ?> btn btn-primary btn-block"
 	data-quantity="<?php echo isset( $args['quantity'] ) ? $args['quantity'] : 1; ?>"
 	<?php echo isset( $args['attributes'] ) ? wc_implode_html_attributes( $args['attributes'] ) : ''; ?>
 ><?php echo $product->add_to_cart_text(); ?></a>

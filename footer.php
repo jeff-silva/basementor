@@ -1,3 +1,3 @@
-<?php Theme::elementor('footer'); ?>
+<?php Wpt::elementor('footer'); ?>
 <?php wp_footer(); ?>
 </body></html>

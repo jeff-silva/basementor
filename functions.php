@@ -23,17 +23,19 @@ add_action('after_setup_theme', function() {
 
 foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 	add_action($action, function() {
-		wp_enqueue_script('vue', 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js');
-		wp_enqueue_script('popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js');
-		wp_enqueue_script('bootstrap', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js');
-		wp_enqueue_style('bootstrap', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
-		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
-		wp_enqueue_style('animate-css', 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css');
+		wp_enqueue_script('vue', '//cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js');
+		wp_enqueue_script('popper', '//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js');
+		wp_enqueue_script('bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js');
+		wp_enqueue_style('bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
+		wp_enqueue_style('font-awesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+		wp_enqueue_style('animate-css', '//cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css');
+		wp_enqueue_script('slick', '//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js');
+		wp_enqueue_style('slick', '//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css');
 	});
 }
 
 
-class Theme
+class Wpt
 {
 	static function elementor($slug) {
 		$key = "theme-elementor-{$slug}";
@@ -76,35 +78,82 @@ class Theme
 
 		echo \Elementor\Plugin::$instance->frontend->get_builder_content($id, true);
 	}
+
+
+	static function checkbox($attrs=null, $label=null) {
+		echo "<label class='wpt-check'><input type='checkbox' {$attrs} /><div></div> {$label}</label>";
+	}
+
+	static function radio($attrs=null, $label=null) {
+		echo "<label class='wpt-check'><input type='radio' {$attrs} /><div></div> {$label}</label>";
+	}
 }
-
-
-
-// add_filter('woocommerce_checkout_fields', function($fields) {
-// 	foreach($fields as $field_type=>$field_fields) {
-// 		foreach($field_fields as $name=>$field) {
-// 			foreach($field['class'] as $class_index=>$class) {
-// 				if ($class=='form-row-first' OR $class=='form-row-last') {
-// 					unset($field['class'][$class_index]);
-// 					$field['class'][] = 'col-6';
-// 				}
-// 				else if ($class=='form-row-wide') {
-// 					unset($field['class'][$class_index]);
-// 					$field['class'][] = 'col-12';
-// 				}
-// 			}
-// 			$field['input_class'][] = 'form-control';
-// 			$field_fields[$name] = $field;
-// 		}
-// 		$fields[$field_type] = $field_fields;
-// 	}
-	
-// 	return $fields;
-// });
 
 
 add_action('wp_head', function() { ?>
 <style>
+/* Bugfixes */
 .elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important;}
-</style>
+.input-group .form-control {outline:0!important; box-shadow:none !important;}
+
+/* Customizations */
+.elementor-heading-title {color:#666 !important;}
+
+/* Classes */
+.wpt-cover {background:url() #eee center center no-repeat; background-size:cover;}
+.wpt-footer {}
+.wpt-footer .elementor-heading-title {color:#666 !important; text-transform:uppercase;}
+.wpt-footer .list-group {}
+.wpt-footer .list-group-item {border:none; background:none; padding:2px 0px; color:#888;}
+.wpt-footer .list-group-item > i {width:20px;}
+<?php
+
+$colors = [
+	'primary' => (object) ['default'=>'#F29422', 'dark'=>'#D07200', 'light'=>'#F4B644'],
+	'secondary' => (object) ['default'=>'#ff0000', 'dark'=>'#ff0000', 'light'=>'#ff0000'],
+	'success' => (object) ['default'=>'#00ff00', 'dark'=>'#00ff00', 'light'=>'#00ff00'],
+	'danger' => (object) ['default'=>'#ff0000', 'dark'=>'#ff0000', 'light'=>'#ff0000'],
+	'warning' => (object) ['default'=>'#ffff00', 'dark'=>'#ffff00', 'light'=>'#ffff00'],
+	'info' => (object) ['default'=>'#0000ff', 'dark'=>'#0000ff', 'light'=>'#0000ff'],
+];
+
+foreach($colors as $prefix=>$c): echo <<<EOF
+\n\n/* {$prefix}: default:{$c->default}, dark:{$c->dark}, light:{$c->light} */
+.text-{$prefix} {color:{$c->default};}
+.bg-{$prefix} {background-color:{$c->default} !important;}
+.btn-{$prefix} {background-color:{$c->default} !important; border-color:{$c->default};}
+.btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$c->dark} !important; border-color:{$c->dark};}
+.border-{$prefix} {border-color:{$c->default} !important;}
+EOF;
+endforeach;
+?></style> 
 <?php });
+
+
+add_action('woocommerce_product_query', function($query) {
+	$meta_query = $query->get('meta_query');
+	$tax_query = $query->get('tax_query');
+
+	// if (isset($_GET['product_cat'])) {
+	// 	$value = array_values(array_filter(explode(',', $_GET['product_cat']), 'strlen'));
+	// 	$meta_query[] = ['key'=>'product_cat', 'compare'=>'IN', 'value'=>$value];
+	// }
+
+	// foreach(wc_get_attribute_taxonomies() as $tax) {
+	// 	$key = "pa_{$tax->attribute_name}";
+
+	// 	if (isset($_GET[$key])) {
+	// 		$value = array_values(array_filter(explode(',', $_GET[$key]), 'strlen'));
+	// 		$tax_query[] = [
+	// 			'taxonomy' => $key,
+	// 			'field' => 'slug',
+	// 			'terms' => $value,
+	// 			'operator' => 'IN',
+	// 		];
+	// 	}
+	// }
+
+	$query->set('meta_query', $meta_query);
+	$query->set('tax_query', $tax_query);
+	echo '<!-- $tax_query: ', print_r($tax_query, true), '-->';
+});

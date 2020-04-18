@@ -16,7 +16,7 @@
  */
 
 defined( 'ABSPATH' ) || exit;
-global $wpdb;
+global $wpdb, $wp_query;
 
 
 function build_query_url($merge=[], $excepts=[]) {
@@ -80,6 +80,7 @@ get_header( 'shop' ); ?>
 	.wpt-product-search .list-group {margin:0px;}
 	.wpt-product-search .list-group-item {border:none; padding:5px;}
 	.wpt-product-search .list-group-item > .list-group {padding-left:15px;}
+	.wpt-product-search .list-group-item,
 	.wpt-product-search .list-group-item a {text-decoration:none !important; color:#666;}
 
 	.wpt-product-search .card-header {font-weight:bold; text-transform:uppercase; background:#f5f5f5;}
@@ -99,11 +100,8 @@ get_header( 'shop' ); ?>
 					'price' => [0, 1000],
 				], $_GET);
 
-				if (isset($_GET['price'])) {
-					$input['price'] = explode(',', $_GET['price']);
-					$input['price'][0] = isset($input['price'][0])? $input['price'][0]: 0;
-					$input['price'][1] = isset($input['price'][1])? $input['price'][1]: 99;
-				}
+				if (isset($_GET['min_price'])) { $input['price'][0] = $_GET['min_price']; }
+				if (isset($_GET['max_price'])) { $input['price'][1] = $_GET['max_price']; }
 
 				$data = new stdClass;
 				$data->id = uniqid('wpt-product-search-');
@@ -155,7 +153,8 @@ get_header( 'shop' ); ?>
 
 						<div class="card-header">Preço</div>
 						<div class="card-body">
-							<input type="hidden" name="price" :value="input.price.join(',')">
+							<input type="hidden" name="min_price" :value="input.price[0]">
+							<input type="hidden" name="max_price" :value="input.price[1]">
 							<vue-slider v-model="input.price" style="margin:40px 35px 0px 25px;" :min="0" :max="max_value" :step="50">
 								<template v-slot:tooltip="{ value, focus }">
 									<div class="vue-slider-dot-tooltip vue-slider-dot-tooltip-top vue-slider-dot-tooltip-show">
@@ -181,6 +180,9 @@ get_header( 'shop' ); ?>
 							</div>
 							<div class="card-body" v-if="sec.show">
 								<div class="list-group">
+									<a href="javascript:;" class="list-group-item" v-if="sec.selecteds.length>=5" @click="sec.selecteds=[];">
+										<i class="fa fa-fw fa-remove"></i> Limpar todos
+									</a>
 									<div class="list-group-item" v-for="c in sec.children">
 										<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':c.show}" v-if="c.children.length>0" @click="c.show=!c.show;"></a>
 										<a href="javascript:;">
@@ -286,6 +288,7 @@ get_header( 'shop' ); ?>
 	</form>
 
 	<?php do_action( 'woocommerce_after_main_content' ); ?>
+	<?php // dd($wp_query); ?>
 </div>
 
 <?php get_footer('shop'); ?>
