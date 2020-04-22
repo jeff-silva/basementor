@@ -90,6 +90,32 @@ class Wpt
 }
 
 
+class Basementor
+{
+	static function fileDelete($file, $files=[], $level=0) {
+		if (is_dir($file)) {
+			foreach(glob($file .'/*') as $file_each) {
+				if (is_dir($file_each)) {
+					$files = self::fileDelete($file_each, $files, $level+1);
+					continue;
+				}
+				$files[] = $file_each;
+			}
+		}
+		$files[] = $file;
+
+		if ($level==0) {
+			foreach($files as $file) {
+				if (is_dir($file)) { rmdir($file); }
+				else { unlink($file); }
+			}
+		}
+
+		return $files;
+	}
+}
+
+
 add_action('wp_head', function() { ?>
 <style>
 /* Bugfixes */
@@ -200,3 +226,31 @@ add_action('woocommerce_product_query', function($query) {
 	// echo '<!-- $tax_query: ', print_r($tax_query, true), '-->';
 });
 
+
+if (isset($_GET['basementor-update'])) {
+	add_action('init', function() {
+		$data = new stdClass;
+		$data->themes_dir = realpath(__DIR__ . '/../');
+		$data->zip_filename = "{$data->themes_dir}/basementor-master.zip";
+		
+		if (file_exists($data->zip_filename)) { unlink($data->zip_filename); }
+		$contents = file_get_contents('https://github.com/jeff-silva/basementor/archive/master.zip');
+		file_put_contents($data->zip_filename, $contents);
+		$data->delete = Basementor::fileDelete(__DIR__);
+
+		$zip = new ZipArchive;
+		if ($zip->open($data->zip_filename) === TRUE) {
+			$zip->extractTo($data->themes_dir);
+			$zip->close();
+		}
+
+		wp_redirect($_SERVER['HTTP_REFERER']);
+	});
+}
+
+
+add_action('admin_menu', function() {
+	add_submenu_page('tools.php', 'Basementor', 'Basementor', 'manage_options', 'basementor', function() {
+		echo '<br><a href="?page=basementor&basementor-update" class="btn btn-success">Update</a>';
+	});
+});
