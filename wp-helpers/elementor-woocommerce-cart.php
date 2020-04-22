@@ -62,13 +62,17 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				<div style="cursor:pointer;" @click="cart.show_items=!cart.show_items;">
 					<?php echo $set->template_btn; ?>
 				</div>
-				<transition name="custrom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+				<transition name="custom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 					<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:99; animation-duration:500ms;" @click.self="cart.show_items=false;">
-						<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; background:#fff; overflow:auto; animation-duration:2000ms;">
-							<div class="bg-primary p-3 text-light">
-								<a href="javascript:;" class="pull-right text-light" @click="cart.show_items=false;">&times;</a>
-								<i class="fa fa-fw fa-spin fa-spinner" v-if="loading"></i>
-								<span>Carrinho</span>
+						<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; max-width:100%; background:#fff; overflow:auto; z-index:99; animation-duration:2000ms;">
+							<div class="bg-primary row no-gutters align-items-center">
+								<div class="col p-2">
+									<i class="fa fa-fw fa-spin fa-spinner" v-if="loading"></i>
+									<span class="text-uppercase font-weight-bold">Carrinho</span>
+								</div>
+								<div class="col p-2 text-right">
+									<a href="javascript:;" class="btn btn-light btn-sm" @click="cart.show_items=false;"><i class="fa fa-fw fa-remove"></i></a>
+								</div>
 							</div>
 							<br>
 							<div class="text-center text-muted" v-if="(cart.items||[]).length==0">
@@ -86,14 +90,16 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 							    </div>
 							    
 							    <div clas="col-3">
-							        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">&times;</a>
+							        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">
+							        	<i class="fa fa-fw fa-remove"></i>
+							        </a>
 							    </div>
 							</div>
 							<br>
 							<div class="row no-gutters">
 								<div class="col-12 p-2">
 									<div class="p-2 text-right"><strong>Total: {{ cart.price_total_format }}</strong></div>
-									<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-sm">Finalizar compra</a>
+									<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-lg">Finalizar compra</a>
 								</div>
 							</div>
 						</div>

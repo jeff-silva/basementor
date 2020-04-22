@@ -93,8 +93,11 @@ class Wpt
 add_action('wp_head', function() { ?>
 <style>
 /* Bugfixes */
-.elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important;}
-.input-group .form-control {outline:0!important; box-shadow:none !important;}
+.elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important; margin:0px !important;}
+
+.input-group.border {border-radius:4px; overflow:hidden;}
+.input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
+.input-group.border .btn {border:none !important; border-radius:0 !important;}
 
 /* Customizations */
 .elementor-heading-title {color:#666 !important;}
@@ -106,27 +109,66 @@ add_action('wp_head', function() { ?>
 .wpt-footer .list-group {}
 .wpt-footer .list-group-item {border:none; background:none; padding:2px 0px; color:#888;}
 .wpt-footer .list-group-item > i {width:20px;}
+
+.wpt-products {}
+.wpt-products-each {position:relative; margin:0px 0px 25px 0px;}
+.wpt-products-each a {color:#363f4d; text-decoration:none !important;}
+.wpt-products-each .woocommerce-loop-product__title {font-size:14px; padding:0px; text-transform:uppercase; white-space:nowrap;}
+.wpt-products-each .added_to_cart {display:none !important;}
+
+.wpt-products-each-sale {position:absolute; top:0px; right:0px; background:red; color:#fff; font-size:12px; padding:0px 10px; border-radius:3px;}
+
+.wpt-products-each .price {display:block; clear:both; text-align:center; padding:3px 0px;}
+.wpt-products-each .price ins,
+.wpt-products-each .price .woocommerce-Price-amount {color:#e73d3d; font-weight:bold;}
+.wpt-products-each .price del {color:#999 !important; font-size:12px;}
+
+.wpt-products-each .star-rating {display:block; float:none; margin:0 auto; padding:0px 0px;}
+.wpt-products-each .star-rating:before,
+.wpt-products-each .star-rating span:before {color:#f9ba48; letter-spacing: 1px;  font-weight:100;}
+
+.wpt-products-each .btn {margin:5px 0px 0px 0px !important;}
 <?php
 
 $colors = [
-	'primary' => (object) ['default'=>'#F29422', 'dark'=>'#D07200', 'light'=>'#F4B644'],
-	'secondary' => (object) ['default'=>'#ff0000', 'dark'=>'#ff0000', 'light'=>'#ff0000'],
-	'success' => (object) ['default'=>'#00ff00', 'dark'=>'#00ff00', 'light'=>'#00ff00'],
-	'danger' => (object) ['default'=>'#ff0000', 'dark'=>'#ff0000', 'light'=>'#ff0000'],
-	'warning' => (object) ['default'=>'#ffff00', 'dark'=>'#ffff00', 'light'=>'#ffff00'],
-	'info' => (object) ['default'=>'#0000ff', 'dark'=>'#0000ff', 'light'=>'#0000ff'],
+	'primary' => ['r'=>242, 'g'=>148, 'b'=>34],
+	'facebook' => ['r'=>59, 'g'=>89, 'b'=>153],
+	'twitter' => ['r'=>85, 'g'=>172, 'b'=>238],
+	'linkedin' => ['r'=>0, 'g'=>119, 'b'=>181],
+	'vimeo' => ['r'=>26, 'g'=>183, 'b'=>234],
+	'tumblr' => ['r'=>52, 'g'=>70, 'b'=>93],
+	'pinterest' => ['r'=>189, 'g'=>8, 'b'=>28],
+	'youtube' => ['r'=>205, 'g'=>32, 'b'=>31],
+	'reddit' => ['r'=>255, 'g'=>87, 'b'=>0],
+	'quora' => ['r'=>185, 'g'=>43, 'b'=>39],
+	'soundcloud' => ['r'=>255, 'g'=>51, 'b'=>0],
+	'whatsapp' => ['r'=>37, 'g'=>211, 'b'=>102],
+	'instagram' => ['r'=>228, 'g'=>64, 'b'=>95],
 ];
 
-foreach($colors as $prefix=>$c): echo <<<EOF
-\n\n/* {$prefix}: default:{$c->default}, dark:{$c->dark}, light:{$c->light} */
-.text-{$prefix} {color:{$c->default};}
-.bg-{$prefix} {background-color:{$c->default} !important;}
-.btn-{$prefix} {background-color:{$c->default} !important; border-color:{$c->default};}
-.btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$c->dark} !important; border-color:{$c->dark};}
-.border-{$prefix} {border-color:{$c->default} !important;}
-EOF;
-endforeach;
-?></style> 
+$__add = function($color, $add=0) {
+	$color['r'] += $add;
+	$color['g'] += $add;
+	$color['b'] += $add;
+	return 'rgb('. implode(',', $color) .')';
+};
+
+$style = [];
+foreach($colors as $prefix=>$c) {
+	$default = $__add($c, 0);
+	$light = $__add($c, 10);
+	$dark = $__add($c, -10);
+
+	$style[] = ".text-{$prefix} {color:{$default};}";
+	$style[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
+	$style[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
+	$style[] = ".bg-{$prefix} {background-color:{$default} !important;}";
+	$style[] = ".btn-{$prefix} {background-color:{$default} !important; border-color:{$default};}";
+	$style[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
+	$style[] = ".border-{$prefix} {border-color:{$default} !important;}";
+}
+
+echo implode('', $style); ?></style> 
 <?php });
 
 
@@ -155,5 +197,6 @@ add_action('woocommerce_product_query', function($query) {
 
 	$query->set('meta_query', $meta_query);
 	$query->set('tax_query', $tax_query);
-	echo '<!-- $tax_query: ', print_r($tax_query, true), '-->';
+	// echo '<!-- $tax_query: ', print_r($tax_query, true), '-->';
 });
+

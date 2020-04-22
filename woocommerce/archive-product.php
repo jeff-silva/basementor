@@ -92,7 +92,6 @@ get_header( 'shop' ); ?>
 	<form action="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>">
 		<div class="row no-gutters">
 			<div class="col-12 col-md-4 col-lg-3 wpt-product-search">
-
 				<?php
 
 				$input = array_merge([
@@ -105,6 +104,7 @@ get_header( 'shop' ); ?>
 
 				$data = new stdClass;
 				$data->id = uniqid('wpt-product-search-');
+				$data->show_filter = false;
 				$data->max_value = $value = $wpdb->get_var("select max(cast(meta_value as unsigned)) as price from {$wpdb->prefix}postmeta where meta_key='_regular_price' limit 1");
 				$data->input = $input;
 				$data->sections = [];
@@ -137,79 +137,96 @@ get_header( 'shop' ); ?>
 
 				?>
 				<div id="<?php echo $data->id; ?>">
-					<div class="card">
-						<div class="card-header">Busca</div>
-						<div class="card-body">
-							<div class="input-group">
-								<input type="text" name="s" v-model="input.s" class="form-control">
-								<div class="input-group-btn">
-									<button type="submit" class="btn btn-default">
-										<i class="fa fa-fw fa-search"></i>
-									</button>
+					<div class="d-block d-md-none">
+						<a href="javascript:;" class="btn btn-block btn-primary" @click="show_filter=!show_filter;">
+							Filtrar
+						</a><br>
+					</div>
+					<div class="d-md-block" :class="{'d-none':!show_filter}">
+						<div class="card">
+							<div class="card-header">Busca</div>
+							<div class="card-body">
+								<div class="input-group">
+									<input type="text" name="s" v-model="input.s" class="form-control">
+									<div class="input-group-btn">
+										<button type="submit" class="btn btn-default">
+											<i class="fa fa-fw fa-search"></i>
+										</button>
+									</div>
 								</div>
 							</div>
-						</div>
 
 
-						<div class="card-header">Preço</div>
-						<div class="card-body">
-							<input type="hidden" name="min_price" :value="input.price[0]">
-							<input type="hidden" name="max_price" :value="input.price[1]">
-							<vue-slider v-model="input.price" style="margin:40px 35px 0px 25px;" :min="0" :max="max_value" :step="50">
-								<template v-slot:tooltip="{ value, focus }">
-									<div class="vue-slider-dot-tooltip vue-slider-dot-tooltip-top vue-slider-dot-tooltip-show">
-										<div class="vue-slider-dot-tooltip-inner vue-slider-dot-tooltip-inner-top">
-											<span class="vue-slider-dot-tooltip-text">R$ {{ value }},00</span>
+							<div class="card-header">Preço</div>
+							<div class="card-body">
+								<input type="hidden" name="min_price" :value="input.price[0]">
+								<input type="hidden" name="max_price" :value="input.price[1]">
+								<vue-slider v-model="input.price" style="margin:40px 35px 0px 25px;" :min="0" :max="max_value" :step="50">
+									<template v-slot:tooltip="{ value, focus }">
+										<div class="vue-slider-dot-tooltip vue-slider-dot-tooltip-top vue-slider-dot-tooltip-show">
+											<div class="vue-slider-dot-tooltip-inner vue-slider-dot-tooltip-inner-top">
+												<span class="vue-slider-dot-tooltip-text">R$ {{ value }},00</span>
+											</div>
 										</div>
-									</div>
-								</template>
-							</vue-slider>
-						</div>
-
-						<template v-for="sec in sections">
-							<input type="hidden" :name="sec.key" :value="sec.selecteds.join(',')">
-						</template>
-
-						<template v-for="sec in sections">
-							<div class="card-header">
-								<a href="javascript:;" @click="sec.show=!sec.show;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':sec.show}"></a>
-								<a href="javascript:;" @click="sec.show=!sec.show;">
-									<span v-html="sec.title"></span>
-									<span v-if="sec.selecteds.length>0"> ({{ sec.selecteds.length }})</span>
-								</a>
+									</template>
+								</vue-slider>
 							</div>
-							<div class="card-body" v-if="sec.show">
-								<div class="list-group">
-									<a href="javascript:;" class="list-group-item" v-if="sec.selecteds.length>=5" @click="sec.selecteds=[];">
-										<i class="fa fa-fw fa-remove"></i> Limpar todos
+
+							<template v-for="sec in sections">
+								<input type="hidden" :name="sec.key" :value="sec.selecteds.join(',')">
+							</template>
+
+							<template v-for="sec in sections">
+								<div class="card-header">
+									<a href="javascript:;" @click="sec.show=!sec.show;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':sec.show}"></a>
+									<a href="javascript:;" @click="sec.show=!sec.show;">
+										<span v-html="sec.title"></span>
+										<span v-if="sec.selecteds.length>0"> ({{ sec.selecteds.length }})</span>
 									</a>
-									<div class="list-group-item" v-for="c in sec.children">
-										<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':c.show}" v-if="c.children.length>0" @click="c.show=!c.show;"></a>
-										<a href="javascript:;">
-											<search-check :item="c" v-model="sec.selecteds"></search-check>
+								</div>
+								<div class="card-body" v-if="sec.show">
+									<div class="list-group">
+										<a href="javascript:;" class="list-group-item" v-if="sec.selecteds.length>=5" @click="sec.selecteds=[];">
+											<i class="fa fa-fw fa-remove"></i> Limpar todos
 										</a>
-										<div class="list-group" v-if="c.show && c.children.length>0">
-											<div class="list-group-item" v-for="cc in c.children">
-												<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':cc.show}" v-if="cc.children.length>0" @click="cc.show=!c.show;"></a>
-												<a href="javascript:;">
-													<search-check :item="cc" v-model="sec.selecteds"></search-check>
-												</a>
-												<div class="list-group" v-if="cc.show && cc.children.length>0">
-													<div class="list-group-item" v-for="ccc in cc.children">
-														<a href="javascript:;">
-															<search-check :item="ccc" v-model="sec.selecteds"></search-check>
-														</a>
+										<div class="list-group-item" v-for="c in sec.children">
+											<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':c.show}" v-if="c.children.length>0" @click="c.show=!c.show;"></a>
+											<a href="javascript:;">
+												<search-check :item="c" v-model="sec.selecteds"></search-check>
+											</a>
+											<div class="list-group" v-if="c.show && c.children.length>0">
+												<div class="list-group-item" v-for="cc in c.children">
+													<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':cc.show}" v-if="cc.children.length>0" @click="cc.show=!c.show;"></a>
+													<a href="javascript:;">
+														<search-check :item="cc" v-model="sec.selecteds"></search-check>
+													</a>
+													<div class="list-group" v-if="cc.show && cc.children.length>0">
+														<div class="list-group-item" v-for="ccc in cc.children">
+															<a href="javascript:;">
+																<search-check :item="ccc" v-model="sec.selecteds"></search-check>
+															</a>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-						</template>
-					</div>
+							</template>
+						</div>
 
-					<!-- <pre>$data: {{ $data }}</pre> -->
+						<br>
+						<div class="row">
+							<div class="col-6">
+								<a href="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>" class="btn btn-default btn-block">Limpar</a>
+							</div>
+
+							<div class="col-6">
+								<button type="submit" class="btn btn-primary btn-block">Buscar</button>
+							</div>
+						</div>
+						<br>
+					</div>
 				</div>
 
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
@@ -245,20 +262,7 @@ get_header( 'shop' ); ?>
 				});</script>
 
 				<style>#<?php echo $data->id; ?> * {transition: all 300ms ease;}</style>
-
-
-				<?php do_action('woocommerce_sidebar'); ?>
-
-				<br>
-				<div class="row">
-					<div class="col-12 col-md-6">
-						<a href="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>" class="btn btn-default">Limpar</a>
-					</div>
-
-					<div class="col-12 col-md-6">
-						<button type="submit" class="btn btn-primary btn-block">Buscar</button>
-					</div>
-				</div>
+				<?php // do_action('woocommerce_sidebar'); ?>
 			</div>
 
 			<div class="col-12 col-md-8 col-lg-9 pt-3 pt-md-0 pl-md-3">

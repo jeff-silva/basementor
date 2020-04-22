@@ -27,6 +27,8 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
         $field = apply_filters( 'woocommerce_form_field_args', $field, $key, $value );
 		$field = (object) $field;
 
+		if ($field->required) { $field->label .= ' *'; }
+
 		foreach($field->class as $i=>$class_value) {
 			if ($class_value=='form-row-first') { $class_value = 'col-12 col-md-6'; }
 			elseif ($class_value=='form-row-last') { $class_value = 'col-12 col-md-6'; }

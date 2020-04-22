@@ -48,13 +48,18 @@ if ( ! is_ajax() ) {
 
 		<?php do_action( 'woocommerce_review_order_before_submit' ); ?>
 
-		<?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $order_button_text ) . '" data-value="' . esc_attr( $order_button_text ) . '">' . esc_html( $order_button_text ) . '</button>' ); // @codingStandardsIgnoreLine ?>
+		<?php // echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $order_button_text ) . '" data-value="' . esc_attr( $order_button_text ) . '">' . esc_html( $order_button_text ) . '</button>' ); // @codingStandardsIgnoreLine ?> 
+		<button type="submit" class="btn btn-primary" name="woocommerce_checkout_place_order" id="place_order" value="<?php echo $order_button_text; ?>" data-value="<?php echo $order_button_text; ?>"><?php echo $order_button_text; ?></button>
 
 		<?php do_action( 'woocommerce_review_order_after_submit' ); ?>
 
 		<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
 	</div>
 </div>
+
+<script>jQuery(document).ready(function($) {
+	$("#pagseguro-payment-form :input").removeClass("input-text").addClass("form-control");
+});</script>
 <?php
 if ( ! is_ajax() ) {
 	do_action( 'woocommerce_review_order_after_payment' );
