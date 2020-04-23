@@ -185,7 +185,7 @@ foreach($colors as $prefix=>$c) {
 	$light = $__add($c, 10);
 	$dark = $__add($c, -10);
 
-	$style[] = ".text-{$prefix} {color:{$default};}";
+	$style[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$default} !important;}";
 	$style[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
 	$style[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
 	$style[] = ".bg-{$prefix} {background-color:{$default} !important;}";

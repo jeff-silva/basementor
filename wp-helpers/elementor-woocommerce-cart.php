@@ -59,107 +59,127 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			?>
 			<style><?php echo str_replace('$root', ".{$set->id}", $set->css); ?></style>
 			<div id="<?php echo $set->id; ?>">
-				<div style="cursor:pointer;" @click="cart.show_items=!cart.show_items;">
+				<div style="cursor:pointer;" @click="cartOpen();">
 					<?php echo $set->template_btn; ?>
 				</div>
-				<transition name="custom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-					<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:99; animation-duration:500ms;" @click.self="cart.show_items=false;">
-						<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; max-width:100%; background:#fff; overflow:auto; z-index:99; animation-duration:2000ms;">
-							<div class="bg-primary row no-gutters align-items-center">
-								<div class="col p-2">
-									<i class="fa fa-fw fa-spin fa-spinner" v-if="loading"></i>
-									<span class="text-uppercase font-weight-bold">Carrinho</span>
-								</div>
-								<div class="col p-2 text-right">
-									<a href="javascript:;" class="btn btn-light btn-sm" @click="cart.show_items=false;"><i class="fa fa-fw fa-remove"></i></a>
-								</div>
-							</div>
-							<br>
-							<div class="text-center text-muted" v-if="(cart.items||[]).length==0">
-								Nenhum item no carrinho
-							</div>
-
-							<div class="row no-gutters align-items-center" v-for="i in cart.items">
-							    <div class="col-3">
-							        <img :src="i.thumbnail" style="width:100%;" />
-							    </div>
-							    
-							    <div class="col">
-							        <div><strong>{{ i.title }}</strong></div>
-							        <div><input type="number" class="form-control form-control-sm" style="display:inline-block; width:70px;" v-model="i.quantity" @keyup="itemUpdate(i);"> &times; {{ i.price_format }}</div>
-							    </div>
-							    
-							    <div clas="col-3">
-							        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">
-							        	<i class="fa fa-fw fa-remove"></i>
-							        </a>
-							    </div>
-							</div>
-							<br>
-							<div class="row no-gutters">
-								<div class="col-12 p-2">
-									<div class="p-2 text-right"><strong>Total: {{ cart.price_total_format }}</strong></div>
-									<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-lg">Finalizar compra</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</transition>
 			</div>
 			<script>new Vue({
 				el: "#<?php echo $set->id; ?>",
 				data: <?php echo json_encode($data); ?>,
 				methods: {
-					itemRemove(item) {
-						var $=jQuery, post=Object.assign({}, item);
-						post.quantity = 0;
-						this.itemUpdate(post);
+					cartOpen() {
+						window.elementorWoocommerceCart.cart.show_items = true;
 					},
-
-					itemUpdate(item) {
-						var $=jQuery, post=Object.assign({}, item);
-
-						if (window.elementorWoocommerceCartItemUpdateTimeout) {
-							clearTimeout(window.elementorWoocommerceCartItemUpdateTimeout);
-						}
-
-						window.elementorWoocommerceCartItemUpdateTimeout = setTimeout(() => {
-							this.loading = true;
-							$.post('?elementor-woocommerce-cart-item-update', post, (resp) => {
-								this.cart = resp;
-								this.cart.show_items = true;
-								this.loading = false;
-							}, "json");
-						}, 1000);
-					},
-
-					cartRefresh() {
-						var $=jQuery;
-
-						this.loading = true;
-						$.get('?elementor-woocommerce-cart-items', (resp) => {
-							this.cart = resp;
-							this.cart.show_items = true;
-							this.loading = false;
-						}, "json");
-					},
-				},
-				mounted() {
-					window.addEventListener('keyup', (ev) => {
-						if (ev.key=='Escape') {
-							this.cart.show_items = false;
-						}
-					});
-
-					jQuery(document).ready(($) => {
-						$(document.body).on('added_to_cart', (ev) => {
-							this.cartRefresh();
-						});
-					});
 				},
 			});</script>
 			<!-- <?php dd($data); ?> -->
 			<?php
+
+			add_action('wp_footer', function() use($data) {
+				global $elementor_woocommerce_cart_footer;
+				if ($elementor_woocommerce_cart_footer) return;
+				$elementor_woocommerce_cart_footer = true;
+				?>
+				<div id="elementor-woocommerce-cart-footer">
+					<transition name="custom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+						<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:9999!important; animation-duration:500ms;" @click.self="cart.show_items=false;">
+							<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; max-width:100%; background:#fff; overflow:auto; animation-duration:2000ms;">
+								<div class="bg-primary row no-gutters align-items-center">
+									<div class="col p-2">
+										<i class="fa fa-fw fa-spin fa-spinner text-light" v-if="loading"></i>
+										<span class="text-uppercase font-weight-bold text-light">Carrinho</span>
+									</div>
+									<div class="col p-2 text-right">
+										<a href="javascript:;" class="btn btn-light btn-sm text-primary" @click="cart.show_items=false;"><i class="fa fa-fw fa-remove"></i></a>
+									</div>
+								</div>
+								<br>
+								<div class="text-center text-muted" v-if="(cart.items||[]).length==0">
+									Nenhum item no carrinho
+								</div>
+
+								<div class="row no-gutters align-items-center" v-for="i in cart.items">
+								    <div class="col-3">
+								        <img :src="i.thumbnail" style="width:100%;" />
+								    </div>
+								    
+								    <div class="col">
+								        <div><strong>{{ i.title }}</strong></div>
+								        <div><input type="number" class="form-control form-control-sm" style="display:inline-block; width:70px;" v-model="i.quantity" @keyup="itemUpdate(i);"> &times; {{ i.price_format }}</div>
+								    </div>
+								    
+								    <div clas="col-3">
+								        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">
+								        	<i class="fa fa-fw fa-remove"></i>
+								        </a>
+								    </div>
+								</div>
+								<br>
+								<div class="row no-gutters">
+									<div class="col-12 p-2">
+										<div class="p-2 text-right"><strong>Total: {{ cart.price_total_format }}</strong></div>
+										<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-lg">Finalizar compra</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</transition>
+				</div>
+
+				<script>window.elementorWoocommerceCart = new Vue({
+					el: "#elementor-woocommerce-cart-footer",
+					data: <?php echo json_encode($data); ?>,
+					methods: {
+						itemRemove(item) {
+							var $=jQuery, post=Object.assign({}, item);
+							post.quantity = 0;
+							this.itemUpdate(post);
+						},
+
+						itemUpdate(item) {
+							var $=jQuery, post=Object.assign({}, item);
+
+							if (window.elementorWoocommerceCartItemUpdateTimeout) {
+								clearTimeout(window.elementorWoocommerceCartItemUpdateTimeout);
+							}
+
+							window.elementorWoocommerceCartItemUpdateTimeout = setTimeout(() => {
+								this.loading = true;
+								$.post('?elementor-woocommerce-cart-item-update', post, (resp) => {
+									this.cart = resp;
+									this.cart.show_items = true;
+									this.loading = false;
+								}, "json");
+							}, 1000);
+						},
+
+						cartRefresh() {
+							var $=jQuery;
+
+							this.loading = true;
+							$.get('?elementor-woocommerce-cart-items', (resp) => {
+								this.cart = resp;
+								this.cart.show_items = true;
+								this.loading = false;
+							}, "json");
+						},
+					},
+					mounted() {
+						window.addEventListener('keyup', (ev) => {
+							if (ev.key=='Escape') {
+								this.cart.show_items = false;
+							}
+						});
+
+						jQuery(document).ready(($) => {
+							$(document.body).on('added_to_cart', (ev) => {
+								this.cartRefresh();
+							});
+						});
+					},
+				});</script>
+				<?php
+			});
 		}
 
 		protected function content_template() {}

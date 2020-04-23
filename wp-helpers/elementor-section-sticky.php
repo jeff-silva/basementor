@@ -17,24 +17,29 @@ add_action('elementor/frontend/section/after_render',function($element) {
 	<?php endif;
 });
 
+
 add_action('wp_footer', function() { ?><script>
 var elementorSectionStickyResizeHandle = function() {
-	var $=jQuery, elementorSectionStickyTop=0, mobileWidth=600;
+	var $=jQuery, stickyTop=0, spacerHeight=0, mobileWidth=600;
 
+	// 32px
 	if (window.innerWidth>mobileWidth && $('#wpadminbar').length==1) {
-		elementorSectionStickyTop += parseFloat($('#wpadminbar').outerHeight());
+		stickyTop += parseFloat($('#wpadminbar').outerHeight());
 	}
 
 
 	$('.elementor-section-sticky-top').each(function() {
 		var $element = $(this);
 		if ($element.is(':visible')) {
-			$element.css({position:"fixed", width:"100%", zIndex:99, top:elementorSectionStickyTop});
-			elementorSectionStickyTop += (parseFloat($element.outerHeight())-1);
+			$element.css({position:"fixed", width:"100%", zIndex:9, top:stickyTop});
+			var height = this.getBoundingClientRect().height;
+			stickyTop += height;
+			spacerHeight += height;
 		}
 	});
 
-	$("body").css({paddingTop:elementorSectionStickyTop});
+	$('.elementor-section-sticky-top-spacer').remove();
+	$('body').prepend(`<div class="elementor-section-sticky-top-spacer" style="height:${spacerHeight-1}px;"></div>`);
 };
 
 jQuery(document).ready(elementorSectionStickyResizeHandle);
