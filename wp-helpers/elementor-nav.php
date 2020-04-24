@@ -1,5 +1,7 @@
 <?php
 
+if (! BASEMENTOR_ELEMENTOR) return;
+
 add_action('elementor/widgets/widgets_registered', function($manager) {
 	class Elementor_Nav_Social_Walker extends Walker_Nav_Menu {
 		function start_el(&$output, $item, $depth=0, $args=[], $id=0) {

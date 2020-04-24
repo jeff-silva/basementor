@@ -1,5 +1,8 @@
 <?php
 
+define('BASEMENTOR_ELEMENTOR', did_action('elementor/loaded'));
+define('BASEMENTOR_WOOCOMMERCE', class_exists('WooCommerce'));
+
 spl_autoload_register(function($class) {
 	if ($include = realpath(str_replace('\\', '/', __DIR__ . "/{$class}.php"))) {
 		include $include;

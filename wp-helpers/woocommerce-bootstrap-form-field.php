@@ -1,5 +1,8 @@
 <?php
 
+if (! BASEMENTOR_ELEMENTOR) return;
+if (! BASEMENTOR_WOOCOMMERCE) return;
+
 if (! function_exists('woocommerce_bootstrap_form_field')) {
 	function woocommerce_bootstrap_form_field($key, $field, $value=null) {
 		$field = array_merge([

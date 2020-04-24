@@ -1,5 +1,7 @@
 <?php
 
+if (! BASEMENTOR_ELEMENTOR) return;
+
 add_action('elementor/widgets/widgets_registered', function($manager) {
 	class Elementor_Loader extends \Elementor\Widget_Base {
 

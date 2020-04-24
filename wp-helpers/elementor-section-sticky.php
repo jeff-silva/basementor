@@ -1,5 +1,7 @@
 <?php
 
+if (! BASEMENTOR_ELEMENTOR) return;
+
 add_action('elementor/frontend/section/before_render',function($element) {
 	// if('section' !== $element->get_name()) { return; }
 	$set = (object) $element->get_settings();

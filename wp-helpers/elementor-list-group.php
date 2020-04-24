@@ -1,5 +1,7 @@
 <?php
 
+if (! BASEMENTOR_ELEMENTOR) return;
+
 add_action('elementor/widgets/widgets_registered', function($manager) {
 	class Elementor_List_Group extends \Elementor\Widget_Base {
 
