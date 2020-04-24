@@ -287,6 +287,13 @@ get_header( 'shop' ); ?>
 					do_action('woocommerce_no_products_found');
 				}
 				?>
+
+				<br>
+				<div class="d-flex">
+					<div class="mx-auto">
+						<?php \Basementor\Ui::pagination($wp_query, get_permalink(wc_get_page_id('shop'))); ?>
+					</div>
+				</div>
 			</div>
 		</div>
 	</form>

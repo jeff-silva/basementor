@@ -41,40 +41,17 @@ add_action($action, function() { ?>
 .elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important; margin:0px !important;}
 .wp-admin .card {padding:0px;}
 [v-cloak] {display:none;}
+.wp-filter > * {line-height:3px; margin:0px !important;}
+.search-plugins {padding:5px 0px 0px 0px;}
+.search-plugins > * {vertical-align:top;}
+
+.pagination {}
+.pagination .page-item {}
+.pagination .page-link {width:40px; border:none; color:#888; text-align:center;}
 
 .input-group.border {border-radius:4px; overflow:hidden;}
 .input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
 .input-group.border .btn {border:none !important; border-radius:0 !important;}
-
-/* Customizations */
-.elementor-heading-title {color:#666 !important;}
-
-/* Classes */
-.wpt-cover {background:url() #eee center center no-repeat; background-size:cover;}
-.wpt-footer {}
-.wpt-footer .elementor-heading-title {color:#666 !important; text-transform:uppercase;}
-.wpt-footer .list-group {}
-.wpt-footer .list-group-item {border:none; background:none; padding:2px 0px; color:#888;}
-.wpt-footer .list-group-item > i {width:20px;}
-
-.wpt-products {}
-.wpt-products-each {position:relative; margin:0px 0px 25px 0px;}
-.wpt-products-each a {color:#363f4d; text-decoration:none !important;}
-.wpt-products-each .woocommerce-loop-product__title {font-size:14px; padding:0px; text-transform:uppercase; white-space:nowrap;}
-.wpt-products-each .added_to_cart {display:none !important;}
-
-.wpt-products-each-sale {position:absolute; top:0px; right:0px; background:red; color:#fff; font-size:12px; padding:0px 10px; border-radius:3px;}
-
-.wpt-products-each .price {display:block; clear:both; text-align:center; padding:3px 0px;}
-.wpt-products-each .price ins,
-.wpt-products-each .price .woocommerce-Price-amount {color:#e73d3d; font-weight:bold;}
-.wpt-products-each .price del {color:#999 !important; font-size:12px;}
-
-.wpt-products-each .star-rating {display:block; float:none; margin:0 auto; padding:0px 0px;}
-.wpt-products-each .star-rating:before,
-.wpt-products-each .star-rating span:before {color:#f9ba48; letter-spacing: 1px;  font-weight:100;}
-
-.wpt-products-each .btn {margin:5px 0px 0px 0px !important;}
 <?php
 
 $color_dark = \Basementor\Options::get('color_dark');
@@ -100,33 +77,30 @@ endforeach;
 
 
 
-add_action('woocommerce_product_query', function($query) {
-	$meta_query = $query->get('meta_query');
-	$tax_query = $query->get('tax_query');
 
-	// if (isset($_GET['product_cat'])) {
-	// 	$value = array_values(array_filter(explode(',', $_GET['product_cat']), 'strlen'));
-	// 	$meta_query[] = ['key'=>'product_cat', 'compare'=>'IN', 'value'=>$value];
-	// }
+/*
+add_filter('pre_get_posts', function($query) {
+	if (isset($query->query['post_type']) AND $query->query['post_type']=='product') {
+		$meta_query = $query->get('meta_query');
+		$tax_query = $query->get('tax_query');
+		$tax_query['relation'] = 'OR';
 
-	// foreach(wc_get_attribute_taxonomies() as $tax) {
-	// 	$key = "pa_{$tax->attribute_name}";
+		if (isset($query->query['product_cat'])) {
+			$values = array_values(array_filter(explode(',', $query->query['product_cat']), 'strlen'));
+			foreach($values as $value) {
+				$tax_query[] = ['taxonomy'=>'product_cat', 'field'=>'slug', 'value'=>$value];
+			}
+			unset($query->query['product_cat']);
+		}
 
-	// 	if (isset($_GET[$key])) {
-	// 		$value = array_values(array_filter(explode(',', $_GET[$key]), 'strlen'));
-	// 		$tax_query[] = [
-	// 			'taxonomy' => $key,
-	// 			'field' => 'slug',
-	// 			'terms' => $value,
-	// 			'operator' => 'IN',
-	// 		];
-	// 	}
-	// }
-
-	$query->set('meta_query', $meta_query);
-	$query->set('tax_query', $tax_query);
-	// echo '<!-- $tax_query: ', print_r($tax_query, true), '-->';
+		$query->set('meta_query', $meta_query);
+		$query->set('tax_query', $tax_query);
+		// dd($tax_query);
+	}
+	return $query;
 });
+*/
+
 
 
 if (isset($_GET['basementor-update'])) {

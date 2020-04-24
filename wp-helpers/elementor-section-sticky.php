@@ -31,7 +31,7 @@ var elementorSectionStickyResizeHandle = function() {
 	$('.elementor-section-sticky-top').each(function() {
 		var $element = $(this);
 		if ($element.is(':visible')) {
-			$element.css({position:"fixed", width:"100%", zIndex:9, top:stickyTop});
+			$element.css({position:"fixed", width:"100%", zIndex:99, top:stickyTop});
 			var height = this.getBoundingClientRect().height;
 			stickyTop += height;
 			spacerHeight += height;
