@@ -80,7 +80,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				if ($elementor_woocommerce_cart_footer) return;
 				$elementor_woocommerce_cart_footer = true;
 				?>
-				<div id="elementor-woocommerce-cart-footer">
+				<div id="elementor-woocommerce-cart-footer" style="display:none;">
 					<transition name="custom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 						<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:9999!important; animation-duration:500ms;" @click.self="cart.show_items=false;">
 							<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; max-width:100%; background:#fff; overflow:auto; animation-duration:2000ms;">
@@ -176,6 +176,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 								this.cartRefresh();
 							});
 						});
+
+						jQuery(this.$el).css({display:"block"});
 					},
 				});</script>
 				<?php

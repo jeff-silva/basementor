@@ -1,6 +1,14 @@
 <?php
 
+spl_autoload_register(function($class) {
+	if ($include = realpath(str_replace('\\', '/', __DIR__ . "/{$class}.php"))) {
+		include $include;
+	}
+});
+
+
 include __DIR__ . '/wp-helpers/wp-helpers.php';
+
 
 add_action('after_setup_theme', function() {
 	add_theme_support('post-thumbnails');
@@ -11,14 +19,6 @@ add_action('after_setup_theme', function() {
 		'socials' => 'Redes Sociais',
 	]);
 });
-
-
-/*
-	theme-elementor-header
-	theme-elementor-footer
-	theme-elementor-404
-*/
-
 
 
 foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
@@ -34,92 +34,13 @@ foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 	});
 }
 
-
-class Wpt
-{
-	static function elementor($slug) {
-		$key = "theme-elementor-{$slug}";
-		$id = get_option($key);
-
-		if (! $id) {
-			$postarr = [
-				'post_type' => 'elementor_library',
-				'post_title' => ucfirst($slug),
-				'post_status' => 'publish',
-				'meta_input' => [
-					'_elementor_edit_mode' => 'builder',
-					'_elementor_template_type' => 'page',
-				],
-			];
-
-			if ($slug=='header') {
-				$postarr['post_title'] = 'Cabeçalho';
-				$postarr['meta_input']['_elementor_template_type'] = 'section';
-				$postarr['meta_input']['_elementor_data'] = '[{"id":"b7a4845","elType":"section","settings":{"structure":"20"},"elements":[{"id":"2b0f9e6","elType":"column","settings":{"_column_size":50,"_inline_size":15.525999999999999801048033987171947956085205078125},"elements":[{"id":"619cb2c","elType":"widget","settings":{"title":"Site Name"},"elements":[],"widgetType":"heading"}],"isInner":false},{"id":"aa19766","elType":"column","settings":{"_column_size":50,"_inline_size":84.4740000000000037516656448133289813995361328125},"elements":[{"id":"bb601c1","elType":"widget","settings":{"editor":"Menu<\/p>"},"elements":[],"widgetType":"text-editor"}],"isInner":false}],"isInner":false}]';
-				$postarr['meta_input']['_elementor_controls_usage'] = 'a:4:{s:7:"heading";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:7:"content";a:1:{s:13:"section_title";a:1:{s:5:"title";i:1;}}}}s:6:"column";a:3:{s:5:"count";i:2;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:6:"layout";a:1:{s:6:"layout";a:1:{s:12:"_inline_size";i:2;}}}}s:11:"text-editor";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:7:"content";a:1:{s:14:"section_editor";a:1:{s:6:"editor";i:1;}}}}s:7:"section";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:6:"layout";a:1:{s:17:"section_structure";a:1:{s:9:"structure";i:1;}}}}}';
-			}
-			else if ($slug=='footer') {
-				$postarr['post_title'] = 'Rodapé';
-				$postarr['meta_input']['_elementor_template_type'] = 'section';
-				$postarr['meta_input']['_elementor_data'] = '[{"id":"b7a4845","elType":"section","settings":{"structure":"20"},"elements":[{"id":"2b0f9e6","elType":"column","settings":{"_column_size":50,"_inline_size":15.525999999999999801048033987171947956085205078125},"elements":[{"id":"619cb2c","elType":"widget","settings":{"title":"Site Name"},"elements":[],"widgetType":"heading"}],"isInner":false},{"id":"aa19766","elType":"column","settings":{"_column_size":50,"_inline_size":84.4740000000000037516656448133289813995361328125},"elements":[{"id":"bb601c1","elType":"widget","settings":{"editor":"Menu<\/p>"},"elements":[],"widgetType":"text-editor"}],"isInner":false}],"isInner":false}]';
-				$postarr['meta_input']['_elementor_controls_usage'] = 'a:4:{s:7:"heading";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:7:"content";a:1:{s:13:"section_title";a:1:{s:5:"title";i:1;}}}}s:6:"column";a:3:{s:5:"count";i:2;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:6:"layout";a:1:{s:6:"layout";a:1:{s:12:"_inline_size";i:2;}}}}s:11:"text-editor";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:7:"content";a:1:{s:14:"section_editor";a:1:{s:6:"editor";i:1;}}}}s:7:"section";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:6:"layout";a:1:{s:17:"section_structure";a:1:{s:9:"structure";i:1;}}}}}';
-			}
-			else if ($slug=='404') {
-				$postarr['post_title'] = 'Erro 404';
-				$postarr['meta_input']['_elementor_template_type'] = 'page';
-				$postarr['meta_input']['_elementor_data'] = '[{"id":"6b2e708","elType":"section","settings":[],"elements":[{"id":"8578271","elType":"column","settings":{"_column_size":100,"_inline_size":null},"elements":[{"id":"5004317","elType":"widget","settings":{"editor":"<h1>Erro 404<\/h1><p>A p\u00e1gina que voc\u00ea procura n\u00e3o existe ou mudou de endere\u00e7o.<\/p><p>Voltar para a <a href=\"\/\">p\u00e1gina inicial<\/a>.<\/p>"},"elements":[],"widgetType":"text-editor"}],"isInner":false}],"isInner":false}]';
-				$postarr['meta_input']['_elementor_controls_usage'] = 'a:3:{s:11:"text-editor";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:7:"content";a:1:{s:14:"section_editor";a:1:{s:6:"editor";i:1;}}}}s:6:"column";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:1:{s:6:"layout";a:1:{s:6:"layout";a:1:{s:12:"_inline_size";i:1;}}}}s:7:"section";a:3:{s:5:"count";i:1;s:15:"control_percent";i:0;s:8:"controls";a:0:{}}}';
-			}
-
-			$id = wp_insert_post($postarr);
-			update_option($key, $id);
-
-		}
-
-		echo \Elementor\Plugin::$instance->frontend->get_builder_content($id, true);
-	}
-
-
-	static function checkbox($attrs=null, $label=null) {
-		echo "<label class='wpt-check'><input type='checkbox' {$attrs} /><div></div> {$label}</label>";
-	}
-
-	static function radio($attrs=null, $label=null) {
-		echo "<label class='wpt-check'><input type='radio' {$attrs} /><div></div> {$label}</label>";
-	}
-}
-
-
-class Basementor
-{
-	static function fileDelete($file, $files=[], $level=0) {
-		if (is_dir($file)) {
-			foreach(glob($file .'/*') as $file_each) {
-				if (is_dir($file_each)) {
-					$files = self::fileDelete($file_each, $files, $level+1);
-					continue;
-				}
-				$files[] = $file_each;
-			}
-		}
-		$files[] = $file;
-
-		if ($level==0) {
-			foreach($files as $file) {
-				if (is_dir($file)) { rmdir($file); }
-				else { unlink($file); }
-			}
-		}
-
-		return $files;
-	}
-}
-
-
-add_action('wp_head', function() { ?>
+foreach(['wp_head', 'admin_head'] as $action):
+add_action($action, function() { ?>
 <style>
 /* Bugfixes */
 .elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important; margin:0px !important;}
+.wp-admin .card {padding:0px;}
+[v-cloak] {display:none;}
 
 .input-group.border {border-radius:4px; overflow:hidden;}
 .input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
@@ -156,46 +77,27 @@ add_action('wp_head', function() { ?>
 .wpt-products-each .btn {margin:5px 0px 0px 0px !important;}
 <?php
 
-$colors = [
-	'primary' => ['r'=>242, 'g'=>148, 'b'=>34],
-	'facebook' => ['r'=>59, 'g'=>89, 'b'=>153],
-	'twitter' => ['r'=>85, 'g'=>172, 'b'=>238],
-	'linkedin' => ['r'=>0, 'g'=>119, 'b'=>181],
-	'vimeo' => ['r'=>26, 'g'=>183, 'b'=>234],
-	'tumblr' => ['r'=>52, 'g'=>70, 'b'=>93],
-	'pinterest' => ['r'=>189, 'g'=>8, 'b'=>28],
-	'youtube' => ['r'=>205, 'g'=>32, 'b'=>31],
-	'reddit' => ['r'=>255, 'g'=>87, 'b'=>0],
-	'quora' => ['r'=>185, 'g'=>43, 'b'=>39],
-	'soundcloud' => ['r'=>255, 'g'=>51, 'b'=>0],
-	'whatsapp' => ['r'=>37, 'g'=>211, 'b'=>102],
-	'instagram' => ['r'=>228, 'g'=>64, 'b'=>95],
-];
-
-$__add = function($color, $add=0) {
-	$color['r'] += $add;
-	$color['g'] += $add;
-	$color['b'] += $add;
-	return 'rgb('. implode(',', $color) .')';
-};
-
+$color_dark = \Basementor\Options::get('color_dark');
+$color_light = \Basementor\Options::get('color_light');
 $style = [];
-foreach($colors as $prefix=>$c) {
-	$default = $__add($c, 0);
-	$light = $__add($c, 10);
-	$dark = $__add($c, -10);
+foreach(\Basementor\Options::get('colors') as $prefix=>$color) {
+	$c = (object) ['default' => $color];
+	$c->dark = \Basementor\Options::color($color, $color_dark);
+	$c->light = \Basementor\Options::color($color, $color_light);
 
-	$style[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$default} !important;}";
-	$style[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
-	$style[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
-	$style[] = ".bg-{$prefix} {background-color:{$default} !important;}";
-	$style[] = ".btn-{$prefix} {background-color:{$default} !important; border-color:{$default};}";
-	$style[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
-	$style[] = ".border-{$prefix} {border-color:{$default} !important;}";
+	$style[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$c->default} !important;}";
+	$style[] = ".bg-{$prefix}-light {background-color:{$c->light} !important;}";
+	$style[] = ".bg-{$prefix}-dark {background-color:{$c->dark} !important;}";
+	$style[] = ".bg-{$prefix} {background-color:{$c->default} !important;}";
+	$style[] = ".btn-{$prefix} {background-color:{$c->default} !important; border-color:{$c->default};}";
+	$style[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$c->dark} !important; border-color:{$c->dark};}";
+	$style[] = ".border-{$prefix} {border-color:{$c->default} !important;}";
 }
 
 echo implode('', $style); ?></style> 
 <?php });
+endforeach;
+
 
 
 add_action('woocommerce_product_query', function($query) {
@@ -236,7 +138,7 @@ if (isset($_GET['basementor-update'])) {
 		if (file_exists($data->zip_filename)) { unlink($data->zip_filename); }
 		$contents = file_get_contents('https://github.com/jeff-silva/basementor/archive/master.zip');
 		file_put_contents($data->zip_filename, $contents);
-		$data->delete = Basementor::fileDelete(__DIR__);
+		$data->delete = \Basementor\Basementor::file_delete(__DIR__);
 
 		$zip = new ZipArchive;
 		if ($zip->open($data->zip_filename) === TRUE) {

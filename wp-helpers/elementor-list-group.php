@@ -77,7 +77,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$set = json_decode(json_encode($this->get_settings()));
 			$set->id = uniqid('elementor-list-group-');
 			?>
-			<div class="list-group" class="<?php echo $set->id; ?>">
+			<div class="list-group <?php echo $set->id; ?>">
 				<?php foreach($set->options as $opt): ?>
 				<a href="<?php echo $opt->link->url; ?>" class="list-group-item" <?php echo $opt->link->is_external? 'target="_blank"': null; ?>>
 					<?php if ($opt->icon): ?>

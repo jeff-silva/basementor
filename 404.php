@@ -1,4 +1,4 @@
 <?php
 get_header();
-Wpt::elementor('404');
+\Basementor\Basementor::elementor('404');
 get_footer();

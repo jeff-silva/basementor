@@ -90,7 +90,10 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$this->add_control('css', [
 				'label' => 'CSS',
 				'type' => \Elementor\Controls_Manager::CODE,
-				'default' => "\$desktop {}\n\$mobile {}",
+				'default' => "\$desktop ul {list-style-type:none; padding:0px; margin:0px;}
+\$desktop > ul > li {display:inline-block;}
+\$desktop a {display:block; padding:5px 5px;}
+\$mobile ul {list-style-type:none; padding:0px; margin:0px;}",
 				'label_block' => true,
 			]);
 
