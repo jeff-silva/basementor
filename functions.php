@@ -55,26 +55,7 @@ add_action($action, function() { ?>
 .input-group.border {border-radius:4px; overflow:hidden;}
 .input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
 .input-group.border .btn {border:none !important; border-radius:0 !important;}
-<?php
-
-$color_dark = \Basementor\Options::get('color_dark');
-$color_light = \Basementor\Options::get('color_light');
-$style = [];
-foreach(\Basementor\Options::get('colors') as $prefix=>$color) {
-	$c = (object) ['default' => $color];
-	$c->dark = \Basementor\Options::color($color, $color_dark);
-	$c->light = \Basementor\Options::color($color, $color_light);
-
-	$style[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$c->default} !important;}";
-	$style[] = ".bg-{$prefix}-light {background-color:{$c->light} !important;}";
-	$style[] = ".bg-{$prefix}-dark {background-color:{$c->dark} !important;}";
-	$style[] = ".bg-{$prefix} {background-color:{$c->default} !important;}";
-	$style[] = ".btn-{$prefix} {background-color:{$c->default} !important; border-color:{$c->default};}";
-	$style[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$c->dark} !important; border-color:{$c->dark};}";
-	$style[] = ".border-{$prefix} {border-color:{$c->default} !important;}";
-}
-
-echo implode('', $style); ?></style> 
+</style> 
 <?php });
 endforeach;
 

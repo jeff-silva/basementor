@@ -1,7 +1,7 @@
 <?php
 
-if (! BASEMENTOR_ELEMENTOR) return;
-if (! BASEMENTOR_WOOCOMMERCE) return;
+if (! BASEMENTOR_ELEMENTOR) { return; }
+if (! BASEMENTOR_WOOCOMMERCE) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
 	class Elementor_Woocommerce_Products extends \Elementor\Widget_Base {

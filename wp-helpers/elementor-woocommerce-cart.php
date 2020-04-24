@@ -1,7 +1,7 @@
 <?php
 
-if (! BASEMENTOR_ELEMENTOR) return;
-if (! BASEMENTOR_WOOCOMMERCE) return;
+if (! BASEMENTOR_ELEMENTOR) { return; }
+if (! BASEMENTOR_WOOCOMMERCE) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
 	class Elementor_Woocommerce_Cart extends \Elementor\Widget_Base {
@@ -54,7 +54,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 		protected function render() {
 			$set = json_decode(json_encode($this->get_settings()));
 			$set->id = uniqid('elementor-woocommerce-cart-');
-			$cart = WC()->cart;
+			$cart = \WC()->cart;
 
 			$data = (object) ['loading'=>false];
 			$data->cart = elementor_woocommerce_cart_data();
@@ -75,7 +75,6 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 					},
 				},
 			});</script>
-			<!-- <?php dd($data); ?> -->
 			<?php
 
 			add_action('wp_footer', function() use($data) {
@@ -93,7 +92,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				</style>
 				<div class="elementor-woocommerce-cart" onclick="if (event.target==this) window.elementorWoocommerceCartToggle();">
 					<div class="elementor-woocommerce-cart-content">
-						<?php woocommerce_mini_cart(); ?>
+						<?php // woocommerce_mini_cart(); ?>
+						<?php wc_get_template_part('cart/mini-cart'); ?>
 					</div>
 				</div>
 
@@ -123,7 +123,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 if (! function_exists('elementor_woocommerce_cart_data')) {
 	function elementor_woocommerce_cart_data() {
-		$cart = WC()->cart;
+		$cart = \WC()->cart;
 			
 		$data = (object) [
 			'show_items' => false,
@@ -175,7 +175,7 @@ if (isset($_GET['elementor-woocommerce-cart-items'])) {
 if (isset($_GET['elementor-woocommerce-cart-item-update'])) {
 	add_action('init', function() {
 		$item = (object) $_POST;
-		if ($cart = WC()->instance()->cart) {
+		if ($cart = \WC()->instance()->cart) {
 			foreach($cart->get_cart() as $key=>$values) {
 				if ($key==$item->key) {
 					$cart->set_quantity($item->key, intval($item->quantity));
