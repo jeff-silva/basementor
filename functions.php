@@ -42,7 +42,7 @@ add_action($action, function() { ?>
 <style>
 /* Bugfixes */
 .elementor-column-gap-default>.elementor-row>.elementor-column>.elementor-element-populated {padding:0px !important; margin:0px !important;}
-.wp-admin .card {padding:0px;}
+.wp-admin .card {padding:0px; max-width:none;}
 [v-cloak] {display:none;}
 .wp-filter > * {line-height:3px; margin:0px !important;}
 .search-plugins {padding:5px 0px 0px 0px;}

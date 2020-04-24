@@ -71,7 +71,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				data: <?php echo json_encode($data); ?>,
 				methods: {
 					cartOpen() {
-						window.elementorWoocommerceCart.cart.show_items = true;
+						window.elementorWoocommerceCartToggle();
 					},
 				},
 			});</script>
@@ -83,105 +83,32 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				if ($elementor_woocommerce_cart_footer) return;
 				$elementor_woocommerce_cart_footer = true;
 				?>
-				<div id="elementor-woocommerce-cart-footer" style="display:none;">
-					<transition name="custom-transition-01" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-						<div v-if="cart.show_items" class="shadow-sm" style="position:fixed; top:0px; right:0px; width:100%; height:100%; background:#00000066; z-index:9999!important; animation-duration:500ms;" @click.self="cart.show_items=false;">
-							<div style="position:absolute; top:0px; right:0px; height:100%; width:400px; max-width:100%; background:#fff; overflow:auto; animation-duration:2000ms;">
-								<div class="bg-primary row no-gutters align-items-center">
-									<div class="col p-2">
-										<i class="fa fa-fw fa-spin fa-spinner text-light" v-if="loading"></i>
-										<span class="text-uppercase font-weight-bold text-light">Carrinho</span>
-									</div>
-									<div class="col p-2 text-right">
-										<a href="javascript:;" class="btn btn-light btn-sm text-primary" @click="cart.show_items=false;"><i class="fa fa-fw fa-remove"></i></a>
-									</div>
-								</div>
-								<br>
-								<div class="text-center text-muted" v-if="(cart.items||[]).length==0">
-									Nenhum item no carrinho
-								</div>
-
-								<div class="row no-gutters align-items-center" v-for="i in cart.items">
-								    <div class="col-3">
-								        <img :src="i.thumbnail" style="width:100%;" />
-								    </div>
-								    
-								    <div class="col">
-								        <div><strong>{{ i.title }}</strong></div>
-								        <div><input type="number" class="form-control form-control-sm" style="display:inline-block; width:70px;" v-model="i.quantity" @keyup="itemUpdate(i);"> &times; {{ i.price_format }}</div>
-								    </div>
-								    
-								    <div clas="col-3">
-								        <a href="javascript:;" class="btn btn-danger btn-sm" @click="itemRemove(i);">
-								        	<i class="fa fa-fw fa-remove"></i>
-								        </a>
-								    </div>
-								</div>
-								<br>
-								<div class="row no-gutters">
-									<div class="col-12 p-2">
-										<div class="p-2 text-right"><strong>Total: {{ cart.price_total_format }}</strong></div>
-										<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-primary btn-block btn-lg">Finalizar compra</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</transition>
+				<style>
+				.elementor-woocommerce-cart, .elementor-woocommerce-cart * {transition: all 500ms ease;}
+				.elementor-woocommerce-cart {visibility:hidden; opacity:0; position:fixed; top:0px; left:0px; width:100%; height:100%; background:#00000088; z-index:99;}
+				.elementor-woocommerce-cart-show {visibility:visible; opacity:1;}
+				.elementor-woocommerce-cart-content {position:absolute; top:0px; right:-100%; width:100%; height:100%; max-width:500px; background:#fff; padding:15px;}
+				.elementor-woocommerce-cart-show .elementor-woocommerce-cart-content {right:0px;}
+				.elementor-woocommerce-cart-content iframe {position:absolute; top:0px; left:0px; width:100%; height:100%; border:none;}
+				</style>
+				<div class="elementor-woocommerce-cart" onclick="if (event.target==this) window.elementorWoocommerceCartToggle();">
+					<div class="elementor-woocommerce-cart-content">
+						<?php woocommerce_mini_cart(); ?>
+					</div>
 				</div>
 
-				<script>window.elementorWoocommerceCart = new Vue({
-					el: "#elementor-woocommerce-cart-footer",
-					data: <?php echo json_encode($data); ?>,
-					methods: {
-						itemRemove(item) {
-							var $=jQuery, post=Object.assign({}, item);
-							post.quantity = 0;
-							this.itemUpdate(post);
-						},
+				<script>
+				window.elementorWoocommerceCartToggle = function(method) {
+					var $=jQuery;
+					method = method||"toggleClass";
+					$(".elementor-woocommerce-cart")[method]("elementor-woocommerce-cart-show");
+				};
 
-						itemUpdate(item) {
-							var $=jQuery, post=Object.assign({}, item);
-
-							if (window.elementorWoocommerceCartItemUpdateTimeout) {
-								clearTimeout(window.elementorWoocommerceCartItemUpdateTimeout);
-							}
-
-							window.elementorWoocommerceCartItemUpdateTimeout = setTimeout(() => {
-								this.loading = true;
-								$.post('?elementor-woocommerce-cart-item-update', post, (resp) => {
-									this.cart = resp;
-									this.cart.show_items = true;
-									this.loading = false;
-								}, "json");
-							}, 1000);
-						},
-
-						cartRefresh() {
-							var $=jQuery;
-
-							this.loading = true;
-							$.get('?elementor-woocommerce-cart-items', (resp) => {
-								this.cart = resp;
-								this.cart.show_items = true;
-								this.loading = false;
-							}, "json");
-						},
-					},
-					mounted() {
-						window.addEventListener('keyup', (ev) => {
-							if (ev.key=='Escape') {
-								this.cart.show_items = false;
-							}
-						});
-
-						jQuery(document).ready(($) => {
-							$(document.body).on('added_to_cart', (ev) => {
-								this.cartRefresh();
-							});
-						});
-
-						jQuery(this.$el).css({display:"block"});
-					},
+				jQuery(document).ready(function($) {
+					$(document.body).on('added_to_cart', function(ev, fragments) {
+						window.elementorWoocommerceCartToggle('addClass');
+						$(".elementor-woocommerce-cart-content").html(fragments['div.widget_shopping_cart_content']);
+					});
 				});</script>
 				<?php
 			});
