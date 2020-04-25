@@ -180,8 +180,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				left: 0px;
 				width: 100%;
 				height: 100%;
-				/*z-index: 999999 !important;*/
-				background:#ffffffdd;
+				z-index: 99 !important;
+				background:#ffffffee;
 			}
 
 			#<?php echo $set->navid; ?> ul {list-style-type:none;}

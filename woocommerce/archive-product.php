@@ -84,8 +84,9 @@ get_header( 'shop' ); ?>
 	.wpt-product-search .card {border: solid 1px #eee !important;}
 
 	.input-woocommerce-taxonomies {}
-	.input-woocommerce-taxonomies a {color:#666;}
+	.input-woocommerce-taxonomies a {color:#666; text-decoration:none!important;}
 	.input-woocommerce-taxonomies-each {}
+	.input-woocommerce-taxonomies-each-check {cursor:pointer; user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -o-user-select:none;}
 	.input-woocommerce-taxonomies-each-level-0 > 
 	.input-woocommerce-taxonomies-each-title {background:#eee; text-transform:uppercase; font-weight:600;}
 	.input-woocommerce-taxonomies-each-title {}
@@ -220,7 +221,7 @@ get_header( 'shop' ); ?>
 					methods: {
 						check(name, item) {
 							if (! name) return;
-							this.value[name] = item.value;
+							this.value[name] = (this.value[name]==item.value)? '': item.value;
 							this.emit(this.value);
 						},
 
@@ -238,7 +239,7 @@ get_header( 'shop' ); ?>
 
 						<div v-for="item in items" class="input-woocommerce-taxonomies-each" :class="'input-woocommerce-taxonomies-each-level-'+level">
 							<div class="row no-gutters p-2 input-woocommerce-taxonomies-each-title">
-								<div class="col-1"  v-if="level>0" @click="check(name, item);">
+								<div class="col-1 input-woocommerce-taxonomies-each-check"  v-if="level>0" @click="check(name, item);">
 									<i class="fa fa-fw fa-check-square-o"
 										v-if="value[item.key]==item.value"
 									></i>
@@ -247,7 +248,7 @@ get_header( 'shop' ); ?>
 										v-else
 									></i>
 								</div>
-								<div class="col pl-1">
+								<div class="col pl-1 input-woocommerce-taxonomies-each-check">
 									<a href="javascript:;"
 										v-if="level==0"
 										@click="item.show=!item.show;"
@@ -268,14 +269,21 @@ get_header( 'shop' ); ?>
 								</div>
 							</div>
 							<div class="pl-2">
-								<input-woocommerce-taxonomies
-									v-model="value"
-									:items="item.children"
-									:level="level+1"
-									:name="item.key"
-									v-if="item.show"
-									@change="emit(item);"
-								></input-woocommerce-taxonomies>
+								<transition
+									name="input-woocommerce-taxonomies-transition"
+									enter-active-class="animated fadeInUp"
+									leave-active-class="animated fadeOutDown"
+								>
+									<input-woocommerce-taxonomies
+										v-model="value"
+										:items="item.children"
+										:level="level+1"
+										:name="item.key"
+										v-if="item.show"
+										@change="emit(item);"
+										style="animation-duration:300ms;"
+									></input-woocommerce-taxonomies>
+								</transition>
 							</div>
 						</div>
 					</div>`,
