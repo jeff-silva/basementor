@@ -78,4 +78,33 @@ add_action('admin_menu', function() {
 		});</script>
 		<?php
 	});
+
+
+
+	add_submenu_page('basementor-settings-default', 'Update', 'Update', 'manage_options', 'basementor-settings-update', function() {
+		echo '<br><a href="?page=basementor&basementor-update" class="btn btn-success">Update</a>';
+	});
 });
+
+
+if (isset($_GET['basementor-update'])) {
+	add_action('init', function() {
+		$data = new stdClass;
+		$data->themes_dir = realpath(__DIR__ . '/../../');
+		$data->zip_filename = "{$data->themes_dir}/basementor-master.zip";
+		$data->theme_delete = realpath(__DIR__ . '/../');
+		
+		if (file_exists($data->zip_filename)) { unlink($data->zip_filename); }
+		$contents = file_get_contents('https://github.com/jeff-silva/basementor/archive/master.zip');
+		file_put_contents($data->zip_filename, $contents);
+		$data->delete = \Basementor\Basementor::file_delete($data->theme_delete);
+
+		$zip = new ZipArchive;
+		if ($zip->open($data->zip_filename) === TRUE) {
+			$zip->extractTo($data->themes_dir);
+			$zip->close();
+		}
+
+		wp_redirect($_SERVER['HTTP_REFERER']);
+	});
+}
