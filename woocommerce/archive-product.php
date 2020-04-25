@@ -31,8 +31,9 @@ function build_query_url($merge=[], $excepts=[]) {
 	return '?' . http_build_query($data);
 }
 
-function hierarchical_category_tree($cat=0, $level=0, $return=[]) {
-	foreach(get_terms('product_cat', "hide_empty=false&orderby=name&order=ASC&parent={$cat}") as $item) {
+function hierarchical_category_tree($cat=null, $level=0, $return=[]) {
+	$params = ['hide_empty'=>false, 'orderby'=>'name', 'order'=>'ASC', 'parent'=>$cat];
+	foreach(get_terms('product_cat', $params) as $item) {
 		$return[] = children_default([
 			'key' => 'product_cat',
 			'value' => $item->slug,
@@ -77,16 +78,17 @@ get_header( 'shop' ); ?>
 
 	<style>
 	.wpt-product-search {}
-	.wpt-product-search .list-group {margin:0px;}
-	.wpt-product-search .list-group-item {border:none; padding:5px;}
-	.wpt-product-search .list-group-item > .list-group {padding-left:15px;}
-	.wpt-product-search .list-group-item,
-	.wpt-product-search .list-group-item a {text-decoration:none !important; color:#666;}
-
 	.wpt-product-search .card-header {font-weight:bold; text-transform:uppercase; background:#f5f5f5;}
 	.wpt-product-search .card-header, .wpt-product-search .card-header * {color:#444; text-decoration:none !important;}
 	.wpt-product-search .card-body {padding:10px 10px; border:none !important; max-height:400px; overflow:auto;}
 	.wpt-product-search .card {border: solid 1px #eee !important;}
+
+	.input-woocommerce-taxonomies {}
+	.input-woocommerce-taxonomies a {color:#666;}
+	.input-woocommerce-taxonomies-each {}
+	.input-woocommerce-taxonomies-each-level-0 > 
+	.input-woocommerce-taxonomies-each-title {background:#eee; text-transform:uppercase; font-weight:600;}
+	.input-woocommerce-taxonomies-each-title {}
 	</style>
 
 	<form action="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>">
@@ -176,43 +178,11 @@ get_header( 'shop' ); ?>
 								<input type="hidden" :name="sec.key" :value="sec.selecteds.join(',')">
 							</template>
 
-							<template v-for="sec in sections">
-								<div class="card-header">
-									<a href="javascript:;" @click="sec.show=!sec.show;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':sec.show}"></a>
-									<a href="javascript:;" @click="sec.show=!sec.show;">
-										<span v-html="sec.title"></span>
-										<span v-if="sec.selecteds.length>0"> ({{ sec.selecteds.length }})</span>
-									</a>
-								</div>
-								<div class="card-body" v-if="sec.show">
-									<div class="list-group">
-										<a href="javascript:;" class="list-group-item" v-if="sec.selecteds.length>=5" @click="sec.selecteds=[];">
-											<i class="fa fa-fw fa-remove"></i> Limpar todos
-										</a>
-										<div class="list-group-item" v-for="c in sec.children">
-											<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':c.show}" v-if="c.children.length>0" @click="c.show=!c.show;"></a>
-											<a href="javascript:;">
-												<search-check :item="c" v-model="sec.selecteds"></search-check>
-											</a>
-											<div class="list-group" v-if="c.show && c.children.length>0">
-												<div class="list-group-item" v-for="cc in c.children">
-													<a href="javascript:;" class="pull-right fa fa-fw fa-chevron-left" :class="{'fa-rotate-270':cc.show}" v-if="cc.children.length>0" @click="cc.show=!c.show;"></a>
-													<a href="javascript:;">
-														<search-check :item="cc" v-model="sec.selecteds"></search-check>
-													</a>
-													<div class="list-group" v-if="cc.show && cc.children.length>0">
-														<div class="list-group-item" v-for="ccc in cc.children">
-															<a href="javascript:;">
-																<search-check :item="ccc" v-model="sec.selecteds"></search-check>
-															</a>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</template>
+							<input-woocommerce-taxonomies
+								:items="sections"
+								v-model="input"
+								@change="input = $event;"
+							></input-woocommerce-taxonomies>
 						</div>
 
 						<br>
@@ -232,32 +202,90 @@ get_header( 'shop' ); ?>
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
 				<script src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
 
-				<script>new Vue({
+				<script>
+				Vue.component('input-woocommerce-taxonomies', {
+					props: {
+						value: {default: () => ([])},
+						items: {default: () => ([])},
+						level: {default:0},
+						name: {default:''},
+					},
+
+					data() {
+						return {
+							// props: Object.assign({}, this.$props),
+						};
+					},
+
+					methods: {
+						check(name, item) {
+							if (! name) return;
+							this.value[name] = item.value;
+							this.emit(this.value);
+						},
+
+						emit(value) {
+							console.log('emit', value);
+						},
+					},
+
+					template: `<div class="input-woocommerce-taxonomies">
+						<template v-if="level==0">
+							<template v-for="item in items">
+								<input type="hidden" :name="item.key" v-model="value[item.key]" />
+							</template>
+						</template>
+
+						<div v-for="item in items" class="input-woocommerce-taxonomies-each" :class="'input-woocommerce-taxonomies-each-level-'+level">
+							<div class="row no-gutters p-2 input-woocommerce-taxonomies-each-title">
+								<div class="col-1"  v-if="level>0" @click="check(name, item);">
+									<i class="fa fa-fw fa-check-square-o"
+										v-if="value[item.key]==item.value"
+									></i>
+
+									<i class="fa fa-fw fa-square-o"
+										v-else
+									></i>
+								</div>
+								<div class="col pl-1">
+									<a href="javascript:;"
+										v-if="level==0"
+										@click="item.show=!item.show;"
+									>{{ item.title }}</a>
+
+									<span v-else
+										@click="check(name, item);"
+									>{{ item.title }}</span>
+								</div>
+								<div class="col-1 text-right">
+									<a href="javascript:;">
+										<i class="fa fa-fw fa-chevron-left"
+											:class="{'fa-rotate-270':item.show}"
+											@click="item.show=!item.show;"
+											v-if="item.children.length>0"
+										></i>
+									</a>
+								</div>
+							</div>
+							<div class="pl-2">
+								<input-woocommerce-taxonomies
+									v-model="value"
+									:items="item.children"
+									:level="level+1"
+									:name="item.key"
+									v-if="item.show"
+									@change="emit(item);"
+								></input-woocommerce-taxonomies>
+							</div>
+						</div>
+					</div>`,
+				});
+
+				new Vue({
 					el: "#<?php echo $data->id; ?>",
 					data: <?php echo json_encode($data); ?>,
 					components: {
 						vueSlider: window['vue-slider-component'],
-						searchCheck: {
-							props: {
-								value: {default:() => []},
-								item: {default:() => {}},
-							},
-							methods: {
-								select() {
-									var index = this.value.indexOf(this.item.value);
-									if (index>=0) { this.value.splice(index, 1); }
-									else { this.value.push(this.item.value); }
-									this.$emit('value', this.value);
-									this.$emit('input', this.value);
-									this.$emit('change', this.value);
-								},
-							},
-							template: `<div style="display:inline-block;" @click="select();">
-								<i class="fa fa-fw fa-check-square-o" v-if="value.indexOf(item.value)>=0"></i>
-								<i class="fa fa-fw fa-square-o" v-else></i>
-								<span v-html="item.title"></span>
-							</div>`,
-						},
 					},
 				});</script>
 

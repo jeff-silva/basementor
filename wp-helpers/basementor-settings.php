@@ -1,18 +1,5 @@
 <?php
 
-\Basementor\Basementor::action('basementor-settings-save', function($post) {
-	$post->colors = stripslashes($post->colors);
-	$post->colors = json_decode($post->colors);
-
-	\Basementor\Options::set('color_dark', $post->color_dark);
-	\Basementor\Options::set('color_light', $post->color_light);
-	\Basementor\Options::set('colors', $post->colors);
-	\Basementor\Options::save();
-
-	wp_redirect($_SERVER['HTTP_REFERER']);
-	return $post;
-});
-
 add_action('admin_menu', function() {
 	add_menu_page('Theme Settings', 'Theme Settings', 'manage_options', 'basementor-settings-default', function() { ?>
 	<br><div>Configurações do tema</div>
