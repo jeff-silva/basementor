@@ -41,6 +41,30 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'default' => '',
 			]);
 
+			$repeater = new \Elementor\Repeater();
+
+			$repeater->add_control('font', [
+				'label' => 'Fonte',
+				'type' => \Elementor\Controls_Manager::FONT,
+				'default' => '',
+				'label_block' => true,
+			]);
+
+			$repeater->add_control('selector', [
+				'label' => 'Fonte',
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => '',
+				'label_block' => true,
+			]);
+
+			$this->add_control('fonts', [
+				'label' => 'Fontes',
+				'type' => \Elementor\Controls_Manager::REPEATER,
+				'fields' => $repeater->get_controls(),
+				'default' => [],
+				'title_field' => '{{{ font }}}',
+			]);
+
 			$this->end_controls_section();
 
 
@@ -93,7 +117,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$this->add_control('loader_content', [
 				'label' => 'Visualizar loader',
 				'type' => \Elementor\Controls_Manager::WYSIWYG,
-				'default' => '<div style="text-align:center;">Carregando... <br>{{ loader }}</div>',
+				'default' => '',
 			]);
 
 			$this->add_control('loader_test', [
@@ -113,6 +137,18 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'label' => 'Colors',
 			]);
 
+			$this->add_control('color_dark', [
+				'label' => 'Qtde. escurecimento cor',
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'default' => '-50',
+			]);
+
+			$this->add_control('color_light', [
+				'label' => 'Qtde. clareamento cor',
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'default' => '50',
+			]);
+
 			$repeater = new \Elementor\Repeater();
 
 			$repeater->add_control('prefix', [
@@ -123,7 +159,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			]);
 
 			$repeater->add_control('color', [
-				'label' => 'Ícone',
+				'label' => 'Cor',
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'default' => '',
 				'label_block' => true,
@@ -172,11 +208,20 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			<style><?php
 
 			$lines = [];
+
+			foreach($set->fonts as $font) {
+				$lines[] = "@import url('https://fonts.googleapis.com/css?family={$font->font}&display=swap');";
+			}
+
+			foreach($set->fonts as $font) {
+				$lines[] = "{$font->selector} {font-family:'{$font->font}';}";
+			}
+
 			foreach($set->prefixes as $p) {
 				$prefix = $p->prefix;
 				$color = $p->color;
-				$dark = $p->color;
-				$light = $p->color;
+				$dark = $this->color($p->color, $set->color_dark);
+				$light = $this->color($p->color, $set->color_light);
 				$lines[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$color} !important;}";
 				$lines[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
 				$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
@@ -186,8 +231,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
 			}
 
-			echo implode('', $lines) . $set->css; ?>
-			</style>
+			echo implode('', $lines) . $set->css; ?></style>
 
 			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:999; display:flex; align-items:center; justify-content:center;">
 				<div>
@@ -259,6 +303,22 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 		}
 
 		protected function content_template() {}
+
+
+		public function color($hex, $add=null) {
+			if ($add!==null) {
+				$hex = preg_replace('/[^0-9a-zA-Z]/', '', $hex);
+				$hex = str_split($hex, 2);
+				$hex = array_map(function($val) use($add) {
+					$val = hexdec($val);
+					$val += intval($add);
+					$val = min(max($val, 0), 255);
+					return str_pad(dechex($val), 2, '0', STR_PAD_LEFT);
+				}, $hex);
+				$hex = '#'. implode('', $hex);
+			}
+			return $hex;
+		}
 	}
 
 	$manager->register_widget_type(new \Elementor_Bootstrap_Custom());

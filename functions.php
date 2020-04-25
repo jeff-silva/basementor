@@ -47,6 +47,7 @@ add_action($action, function() { ?>
 .wp-filter > * {line-height:3px; margin:0px !important;}
 .search-plugins {padding:5px 0px 0px 0px;}
 .search-plugins > * {vertical-align:top;}
+.btn, .btn:active, .btn:focus, .form-control, .form-control:active, .form-control:focus {box-shadow:none !important; outline:none !important;}
 
 .pagination {}
 .pagination .page-item {}
