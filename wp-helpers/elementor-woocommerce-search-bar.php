@@ -83,7 +83,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 					</select>
 					<input type="text" name="s" value="<?php echo $input->s; ?>" class="form-control" placeholder="<?php echo $set->placeholder; ?>" >
 					<div class="input-group-btn">
-						<button type="submit" class="btn btn-primary">
+						<button type="submit" class="btn btn-primary-dark text-light">
 							<i class="fa fa-fw fa-search"></i>
 						</button>
 					</div>

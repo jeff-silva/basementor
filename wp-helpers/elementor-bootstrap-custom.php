@@ -41,6 +41,36 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'default' => '',
 			]);
 
+			$this->add_control('bootswatch', [
+				'label' => 'Bootswatch',
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'label_block' => true,
+				'default' => '',
+				'options' => [
+					'cerulean' => 'Cerulean',
+					'cosmo' => 'Cosmo',
+					'cyborg' => 'Cyborg',
+					'darkly' => 'Darkly',
+					'flatly' => 'Flatly',
+					'journal' => 'Journal',
+					'litera' => 'Litera',
+					'lumen' => 'Lumen',
+					'lux' => 'Lux',
+					'materia' => 'Materia',
+					'minty' => 'Minty',
+					'pulse' => 'Pulse',
+					'sandstone' => 'Sandstone',
+					'simplex' => 'Simplex',
+					'sketchy' => 'Sketchy',
+					'slate' => 'Slate',
+					'solar' => 'Solar',
+					'spacelab' => 'Spacelab',
+					'superhero' => 'Superhero',
+					'united' => 'United',
+					'yeti' => 'Yeti',
+				],
+			]);
+
 			$repeater = new \Elementor\Repeater();
 
 			$repeater->add_control('font', [
@@ -209,8 +239,12 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 			$lines = [];
 
+			if ($set->bootswatch) {
+				$lines[] = "@import url('https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.4.1/{$set->bootswatch}/bootstrap.min.css');\n";
+			}
+
 			foreach($set->fonts as $font) {
-				$lines[] = "@import url('https://fonts.googleapis.com/css?family={$font->font}&display=swap');";
+				$lines[] = "@import url('https://fonts.googleapis.com/css?family={$font->font}&display=swap');\n";
 			}
 
 			foreach($set->fonts as $font) {
@@ -227,11 +261,13 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
 				$lines[] = ".bg-{$prefix} {background-color:{$color} !important;}";
 				$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color};}";
+				$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light};}";
+				$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
 			}
 
-			echo implode('', $lines) . $set->css; ?></style>
+			echo "\n". implode('', $lines) . $set->css; ?></style>
 
 			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:999; display:flex; align-items:center; justify-content:center;">
 				<div>

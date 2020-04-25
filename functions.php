@@ -53,9 +53,9 @@ add_action($action, function() { ?>
 .pagination .page-item {}
 .pagination .page-link {width:40px; border:none; color:#888; text-align:center;}
 
-.input-group.border {border-radius:4px; overflow:hidden;}
+.input-group.border {border-radius:4px; overflow:hidden; position:relative;}
 .input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
-.input-group.border .btn {border:none !important; border-radius:0 !important;}
+.input-group.border .btn {position:relative; border:none !important; border-radius:0 !important; height:100%;}
 </style> 
 <?php });
 endforeach;
