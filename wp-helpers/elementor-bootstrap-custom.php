@@ -81,8 +81,15 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			]);
 
 			$repeater->add_control('selector', [
-				'label' => 'Fonte',
+				'label' => 'Seletor',
 				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => '',
+				'label_block' => true,
+			]);
+
+			$repeater->add_control('important', [
+				'label' => 'Importante',
+				'type' => \Elementor\Controls_Manager::SWATCHER,
 				'default' => '',
 				'label_block' => true,
 			]);
@@ -248,7 +255,9 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			}
 
 			foreach($set->fonts as $font) {
-				$lines[] = "{$font->selector} {font-family:'{$font->font}';}";
+				if (! $font->selector) continue;
+				$important = $font->important? '!important': null;
+				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important};}";
 			}
 
 			foreach($set->prefixes as $p) {

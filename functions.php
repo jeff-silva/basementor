@@ -59,30 +59,3 @@ add_action($action, function() { ?>
 </style> 
 <?php });
 endforeach;
-
-
-
-
-/*
-add_filter('pre_get_posts', function($query) {
-	if (isset($query->query['post_type']) AND $query->query['post_type']=='product') {
-		$meta_query = $query->get('meta_query');
-		$tax_query = $query->get('tax_query');
-		$tax_query['relation'] = 'OR';
-
-		if (isset($query->query['product_cat'])) {
-			$values = array_values(array_filter(explode(',', $query->query['product_cat']), 'strlen'));
-			foreach($values as $value) {
-				$tax_query[] = ['taxonomy'=>'product_cat', 'field'=>'slug', 'value'=>$value];
-			}
-			unset($query->query['product_cat']);
-		}
-
-		$query->set('meta_query', $meta_query);
-		$query->set('tax_query', $tax_query);
-		// dd($tax_query);
-	}
-	return $query;
-});
-*/
-
