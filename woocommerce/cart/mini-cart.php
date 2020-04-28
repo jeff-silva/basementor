@@ -76,20 +76,34 @@ do_action( 'woocommerce_before_mini_cart' ); ?>
 			<?php do_action('woocommerce_mini_cart_contents'); ?>
 		</div>
 
+		<?php /*
 		<div class="text-right py-3">
 			<?php do_action('woocommerce_widget_shopping_cart_total'); ?>
+		</div>
+		*/ ?>
+
+		<div class="mt-3">
+			<?php echo do_shortcode('[woocommerce-shipping-calculator]'); ?>
+		</div>
+
+		<div class="mt-3">
+			<?php wc_get_template_part('cart/cart-totals'); ?>
 		</div>
 
 		<?php do_action('woocommerce_widget_shopping_cart_before_buttons'); ?>
 		<?php /*<p class="woocommerce-mini-cart__buttons buttons"><?php do_action('woocommerce_widget_shopping_cart_buttons'); ?></p>*/ ?>
 		
 		<br>
+
+		<?php /*
 		<div class="row">
 			<div class="col-6"></div>
 			<div class="col-6">
 				<a href="<?php echo wc_get_checkout_url(); ?>" class="btn btn-success btn-block">Finalizar compra</a>
 			</div>
 		</div>
+		*/ ?>
+
 		<?php do_action('woocommerce_widget_shopping_cart_after_buttons'); ?>
 	</div>
 	<?php endif; ?>

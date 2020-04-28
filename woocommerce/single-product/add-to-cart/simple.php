@@ -32,7 +32,7 @@ if ( $product->is_in_stock() ) : ?>
 	<form class="cart" action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>" method="post" enctype='multipart/form-data'>
 		<?php do_action( 'woocommerce_before_add_to_cart_button' ); ?>
 		<?php do_action( 'woocommerce_before_add_to_cart_quantity' ); ?>
-		<div class="input-group border border-primary" style="max-width:300px;">
+		<div class="input-group" style="max-width:300px;">
 			<?php woocommerce_quantity_input([
 				'min_value'   => apply_filters( 'woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product ),
 				'max_value'   => apply_filters( 'woocommerce_quantity_input_max', $product->get_max_purchase_quantity(), $product ),
