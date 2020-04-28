@@ -35,6 +35,12 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'label' => 'CSS',
 			]);
 
+			$this->add_control('border_radius', [
+				'label' => 'Border Radius',
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'default' => 0,
+			]);
+
 			$this->add_control('css', [
 				'label' => 'CSS',
 				'type' => \Elementor\Controls_Manager::CODE,
@@ -71,6 +77,12 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				],
 			]);
 
+			$this->add_control('bootswatch_preview', [
+				'label' => 'Bootswatch preview elements',
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'default' => '',
+			]);
+
 			$repeater = new \Elementor\Repeater();
 
 			$repeater->add_control('font', [
@@ -89,7 +101,14 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 			$repeater->add_control('important', [
 				'label' => 'Importante',
-				'type' => \Elementor\Controls_Manager::SWATCHER,
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'default' => '',
+				'label_block' => true,
+			]);
+
+			$repeater->add_control('style', [
+				'label' => 'Style',
+				'type' => \Elementor\Controls_Manager::CODE,
 				'default' => '',
 				'label_block' => true,
 			]);
@@ -99,7 +118,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'type' => \Elementor\Controls_Manager::REPEATER,
 				'fields' => $repeater->get_controls(),
 				'default' => [],
-				'title_field' => '{{{ font }}}',
+				'title_field' => '{{{ selector }}}',
 			]);
 
 			$this->end_controls_section();
@@ -202,34 +221,41 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'label_block' => true,
 			]);
 
+			$repeater->add_control('color_inverse', [
+				'label' => 'Cor inversa',
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'default' => '',
+				'label_block' => true,
+			]);
+
 			$this->add_control('prefixes', [
 				'label' => 'Prefixos & Cores',
 				'type' => \Elementor\Controls_Manager::REPEATER,
 				'fields' => $repeater->get_controls(),
 				'default' => [
-					['color'=>'#007bff', 'prefix'=>'primary'],
-					['color'=>'#6c757d', 'prefix'=>'secondary'],
-					['color'=>'#28a745', 'prefix'=>'success'],
-					['color'=>'#dc3545', 'prefix'=>'danger'],
-					['color'=>'#ffc107', 'prefix'=>'warning'],
-					['color'=>'#17a2b8', 'prefix'=>'info'],
-					['color'=>'#3b5999', 'prefix'=>'facebook'],
-					['color'=>'#55acee', 'prefix'=>'twitter'],
-					['color'=>'#0077b5', 'prefix'=>'linkedin'],
-					['color'=>'#00aff0', 'prefix'=>'skype'],
-					['color'=>'#007ee5', 'prefix'=>'dropbox'],
-					['color'=>'#21759b', 'prefix'=>'wordpress'],
-					['color'=>'#1ab7ea', 'prefix'=>'vimeo'],
-					['color'=>'#4c75a3', 'prefix'=>'vk'],
-					['color'=>'#34465d', 'prefix'=>'tumblr'],
-					['color'=>'#410093', 'prefix'=>'yahoo'],
-					['color'=>'#bd081c', 'prefix'=>'pinterest'],
-					['color'=>'#cd201f', 'prefix'=>'youtube'],
-					['color'=>'#ff5700', 'prefix'=>'reddit'],
-					['color'=>'#b92b27', 'prefix'=>'quora'],
-					['color'=>'#ff3300', 'prefix'=>'soundcloud'],
-					['color'=>'#25d366', 'prefix'=>'whatsapp'],
-					['color'=>'#e4405f', 'prefix'=>'instagram'],
+					['color'=>'#007bff', 'color_inverse'=>'#ffffff', 'prefix'=>'primary'],
+					['color'=>'#6c757d', 'color_inverse'=>'#666666', 'prefix'=>'secondary'],
+					['color'=>'#28a745', 'color_inverse'=>'#ffffff', 'prefix'=>'success'],
+					['color'=>'#dc3545', 'color_inverse'=>'#ffffff', 'prefix'=>'danger'],
+					['color'=>'#ffc107', 'color_inverse'=>'#ffffff', 'prefix'=>'warning'],
+					['color'=>'#17a2b8', 'color_inverse'=>'#ffffff', 'prefix'=>'info'],
+					['color'=>'#3b5999', 'color_inverse'=>'#ffffff', 'prefix'=>'facebook'],
+					['color'=>'#55acee', 'color_inverse'=>'#ffffff', 'prefix'=>'twitter'],
+					['color'=>'#0077b5', 'color_inverse'=>'#ffffff', 'prefix'=>'linkedin'],
+					['color'=>'#00aff0', 'color_inverse'=>'#ffffff', 'prefix'=>'skype'],
+					['color'=>'#007ee5', 'color_inverse'=>'#ffffff', 'prefix'=>'dropbox'],
+					['color'=>'#21759b', 'color_inverse'=>'#ffffff', 'prefix'=>'wordpress'],
+					['color'=>'#1ab7ea', 'color_inverse'=>'#ffffff', 'prefix'=>'vimeo'],
+					['color'=>'#4c75a3', 'color_inverse'=>'#ffffff', 'prefix'=>'vk'],
+					['color'=>'#34465d', 'color_inverse'=>'#ffffff', 'prefix'=>'tumblr'],
+					['color'=>'#410093', 'color_inverse'=>'#ffffff', 'prefix'=>'yahoo'],
+					['color'=>'#bd081c', 'color_inverse'=>'#ffffff', 'prefix'=>'pinterest'],
+					['color'=>'#cd201f', 'color_inverse'=>'#ffffff', 'prefix'=>'youtube'],
+					['color'=>'#ff5700', 'color_inverse'=>'#ffffff', 'prefix'=>'reddit'],
+					['color'=>'#b92b27', 'color_inverse'=>'#ffffff', 'prefix'=>'quora'],
+					['color'=>'#ff3300', 'color_inverse'=>'#ffffff', 'prefix'=>'soundcloud'],
+					['color'=>'#25d366', 'color_inverse'=>'#ffffff', 'prefix'=>'whatsapp'],
+					['color'=>'#e4405f', 'color_inverse'=>'#ffffff', 'prefix'=>'instagram'],
 				],
 				'title_field' => '{{{ prefix }}}',
 			]);
@@ -241,8 +267,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$set = json_decode(json_encode($this->get_settings()));
 			$set->id = uniqid('elementor-bootstrap-custom-');
 			$set->edit_mode = \Elementor\Plugin::$instance->editor->is_edit_mode();
-			?>
-			<style><?php
+			?><style><?php
 
 			$lines = [];
 
@@ -254,29 +279,76 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = "@import url('https://fonts.googleapis.com/css?family={$font->font}&display=swap');\n";
 			}
 
+			$lines[] = ".btn, .input-group, .form-control {border-radius:{$set->border_radius}px !important;}";
+			$lines[] = ".input-group .btn, .input-group .form-control {border-radius:0px !important;}";
+			$lines[] = ".input-group {overflow:hidden;}";
+
 			foreach($set->fonts as $font) {
 				if (! $font->selector) continue;
 				$important = $font->important? '!important': null;
-				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important};}";
+				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important}; {$font->style}}";
 			}
 
 			foreach($set->prefixes as $p) {
 				$prefix = $p->prefix;
 				$color = $p->color;
+				$inverse = $p->color_inverse;
 				$dark = $this->color($p->color, $set->color_dark);
 				$light = $this->color($p->color, $set->color_light);
 				$lines[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$color} !important;}";
 				$lines[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
 				$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
-				$lines[] = ".bg-{$prefix} {background-color:{$color} !important;}";
+				$lines[] = ".bg-{$prefix} {background-color:{$color} !important; color:{$inverse};}";
 				$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color};}";
 				$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light};}";
 				$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
+				$lines[] = ".alert-{$prefix} {background-color:{$light}; color:{$dark};}";
 			}
 
 			echo "\n". implode('', $lines) . $set->css; ?></style>
+
+			<?php if ($set->edit_mode && $set->bootswatch_preview): ?>
+			<br>
+			<div class="row">
+				<div class="col-3">
+					<input type="text" class="form-control">
+				</div>
+
+				<div class="col-3">
+					<div class="input-group">
+						<input type="text" class="form-control">
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-primary">
+								<i class="fa fa-fw fa-search"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12 py-2"><hr></div>
+
+				<?php foreach($set->prefixes as $p): ?>
+				<div class="col-3">
+					<div class="card border-<?php echo $p->prefix; ?>">
+						<div class="card-header bg-<?php echo $p->prefix; ?>"><?php echo $p->prefix; ?></div>
+						<div class="card-body">
+							<a href="javascript:;" class="btn btn-<?php echo $p->prefix; ?> btn-block">btn btn-<?php echo $p->prefix; ?></a>
+							<br>
+							<div class="border border-<?php echo $p->prefix; ?> p-1">
+								<div class="bg-<?php echo $p->prefix; ?> p-2">
+									text
+								</div>
+							</div>
+							<br>
+							<div class="alert alert-<?php echo $p->prefix; ?>">alert alert-<?php echo $p->prefix; ?></div>
+						</div>
+					</div><br>
+				</div>
+				<?php endforeach; ?>
+			</div>
+			<?php endif; ?>
 
 			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:999; display:flex; align-items:center; justify-content:center;">
 				<div>
