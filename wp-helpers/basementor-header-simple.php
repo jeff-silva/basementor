@@ -226,7 +226,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 					</a>
 					<?php endif; ?>
 
-					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#<?php echo $set->id; ?>" aria-controls="<?php echo $set->id; ?>" aria-expanded="false" aria-label="Toggle navigation">
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#<?php echo $set->id; ?>" aria-controls="<?php echo $set->id; ?>" style="outline:none!important; border:none;">
 						<span class="navbar-toggler-icon"></span>
 					</button>
 
@@ -238,48 +238,60 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 							'walker' => new Basementor_Header_Simple_Walker(),
 						]); ?></ul>
 
-						<form class="form-inline my-2 my-lg-0">
-							<div class="input-group border border-primary" style="background:#fff;">
-								<input class="form-control" type="search" placeholder="Pesquisar..." aria-label="Search" style="border:none; background:none;">
-								<div class="input-group-btn">
-									<button type="submit" class="btn btn-primary" style="border:none; border-radius:0px;">
-										<i class="fa fa-fw fa-search"></i>
+						<div class="row no-gutters align-items-center">
+							<div class="col">
+								<form class="form-inline my-2 my-lg-0">
+									<div class="input-group border border-primary" style="background:#fff;">
+										<input class="form-control" type="search" placeholder="Pesquisar..." aria-label="Search" style="border:none; background:none;">
+										<div class="input-group-btn">
+											<button type="submit" class="btn btn-primary" style="border:none; border-radius:0px;">
+												<i class="fa fa-fw fa-search"></i>
+											</button>
+										</div>
+									</div>
+								</form>
+							</div>
+
+							<?php $user = wp_get_current_user(); if ($user->ID):
+							$user->data->avatar = get_avatar_url($user->ID);
+
+							$options = [];
+
+							if (in_array('administrator', $user->roles)) {
+								$options[] = (object) ['title'=>'Admin', 'url'=>admin_url()];
+							}
+
+							if (BASEMENTOR_WOOCOMMERCE) {
+								if ($page = wc_get_page_id('myaccount')) {
+									$page = get_post($page);
+									$options[] = (object) ['title'=>$page->post_title, 'url'=>get_the_permalink($page)];
+								}
+							}
+
+							if (!empty($options)): ?>
+							<div class="col-3 text-right">
+								<div class="dropdown ml-3">
+									<button class="dropdown-toggle" type="button" data-toggle="dropdown" style="background:none; border:none; box-shadow:none!important; outline:none!important; padding:0px;">
+										<img src="<?php echo $user->data->avatar; ?>" alt="" style="height:40px;">
 									</button>
+									<div class="dropdown-menu dropdown-menu-right p-0">
+										<div class="dropdown-item bg-primary"><?php echo $user->data->display_name; ?></div>
+
+										<?php foreach($options as $opt): ?>
+										<a class="dropdown-item" href="<?php echo $opt->url; ?>"><?php echo $opt->title; ?></a>
+										<?php endforeach; ?>
+
+										<a class="dropdown-item" href="<?php echo wp_logout_url(); ?>" onclick="return confirm('Tem certeza que deseja sair?');">Logout</a>
+									</div>
 								</div>
 							</div>
-						</form>
+							<?php endif; endif; ?>
+						</div>
+
 					</div>
+
 				</div>
 			</nav>
-
-			<?php /*
-			<div class="<?php echo $set->id; ?>">
-				<div class="row align-items-center py-1">
-					<?php if ($set->logo->url): ?>
-					<div class="col-2">
-						<a href="<?php echo site_url(); ?>">
-							<img src="<?php echo $set->logo->url; ?>" alt="" style="width:100%;">
-						</a>
-					</div>
-					<?php endif; ?>
-
-					<div class="col">
-						<ul class="<?php echo $set->id; ?>-nav"><?php wp_nav_menu([
-							'menu' => $set->nav,
-							'container' => '',
-							'items_wrap' => '%3$s',
-						]); ?></ul>
-					</div>
-				</div>
-			</div>
-			<style>
-			.<?php echo $set->id; ?> {}
-			.<?php echo $set->id; ?>-nav {list-style-type:none; margin:0px; padding:0px; display:inline-block;}
-			.<?php echo $set->id; ?>-nav > li {display:inline-block;}
-			<?php echo str_replace('$root', $set->id, $set->css); ?>
-			</style>
-			*/ ?>
-
 			<?php
 		}
 
