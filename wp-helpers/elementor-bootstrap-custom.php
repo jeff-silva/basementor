@@ -279,10 +279,6 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = "@import url('https://fonts.googleapis.com/css?family={$font->font}&display=swap');\n";
 			}
 
-			$lines[] = ".btn, .input-group, .form-control {border-radius:{$set->border_radius}px !important;}";
-			$lines[] = ".input-group .btn, .input-group .form-control {border-radius:0px !important;}";
-			$lines[] = ".input-group {overflow:hidden;}";
-
 			foreach($set->fonts as $font) {
 				if (! $font->selector) continue;
 				$important = $font->important? '!important': null;
@@ -304,7 +300,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
 				$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
-				$lines[] = ".alert-{$prefix} {background-color:{$light}; color:{$dark};}";
+				$lines[] = ".alert-{$prefix} {background-color:{$light};}";
 			}
 
 			echo "\n". implode('', $lines) . $set->css; ?></style>
@@ -350,7 +346,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			</div>
 			<?php endif; ?>
 
-			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:999; display:flex; align-items:center; justify-content:center;">
+			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:99999!important; display:flex; align-items:center; justify-content:center;">
 				<div>
 					<?php echo $set->loader_content; ?>
 					

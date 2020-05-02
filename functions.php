@@ -56,6 +56,18 @@ add_action($action, function() { ?>
 .input-group.border {border-radius:4px; overflow:hidden; position:relative;}
 .input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
 .input-group.border .btn {position:relative; border:none !important; border-radius:0 !important; height:100%;}
-</style> 
+</style>
+
+<?php if (is_user_logged_in()): ?>
+<script>jQuery(document).ready(function($) {
+	var height = parseFloat( $("#wpadminbar").height() );
+	$(".fixed-top").each(function() {
+		var top = parseFloat( $(this).css("top") );
+		var hh = parseFloat( $(this).height() );
+		$(this).css({top: top+height});
+		$('body').prepend(`<div style="height:${hh}px;"></div>`);
+	});
+});</script>
+<?php endif; ?>
 <?php });
 endforeach;

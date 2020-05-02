@@ -217,7 +217,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$set = json_decode(json_encode($this->get_settings()));
 			$set->id = uniqid('basementor-header-simple-');
 			?>
-			<nav class="<?php echo $set->id; ?> navbar navbar-expand-lg navbar-light bg-light shadow">
+			<nav class="<?php echo $set->id; ?> navbar navbar-expand-lg navbar-light bg-light shadow fixed-top">
 				<div class="container">
 
 					<?php if ($set->logo->url): ?>
