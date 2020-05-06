@@ -3,6 +3,8 @@
 if (! BASEMENTOR_ELEMENTOR) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
+	if (class_exists('Elementor_Nav')) return;
+	
 	class Elementor_Nav_Social_Walker extends Walker_Nav_Menu {
 		function start_el(&$output, $item, $depth=0, $args=[], $id=0) {
 			$socials = [

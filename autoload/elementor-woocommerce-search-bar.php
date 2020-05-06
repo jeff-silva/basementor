@@ -4,6 +4,8 @@ if (! BASEMENTOR_ELEMENTOR) { return; }
 if (! BASEMENTOR_WOOCOMMERCE) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
+	if (class_exists('Elementor_Woocommerce_Search_Bar')) return;
+	
 	class Elementor_Woocommerce_Search_Bar extends \Elementor\Widget_Base {
 
 		public function get_name() {

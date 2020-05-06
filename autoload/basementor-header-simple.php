@@ -3,6 +3,7 @@
 if (! BASEMENTOR_ELEMENTOR) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
+	if (class_exists('Basementor_Header_Simple')) return;
 
 	class Basementor_Header_Simple_Walker extends Walker_Nav_Menu {
 	    private $dropdown = false;
@@ -151,7 +152,6 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 	        }
 	      }
 	    }
-
 	}
 
 

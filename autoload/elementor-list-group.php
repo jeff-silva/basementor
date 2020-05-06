@@ -3,6 +3,8 @@
 if (! BASEMENTOR_ELEMENTOR) { return; }
 
 add_action('elementor/widgets/widgets_registered', function($manager) {
+	if (class_exists('Elementor_List_Group')) return;
+	
 	class Elementor_List_Group extends \Elementor\Widget_Base {
 
 		public function get_name() {
