@@ -39,10 +39,11 @@ function basementor_autoload_generate() {
 			$file[] = '';
 			foreach(glob("{$autoload}/*") as $filename) {
 				$filename = str_replace($themepath, '', $filename);
-				$file[] = "include __DIR__ . '{$filename}';";
+				$file[] = "@ include __DIR__ . '{$filename}';";
 			}
 			$file[] = '';
 			$file = implode("\n", $file);
+			
 			file_put_contents("{$themepath}/autoload.php", $file);
 
 			if (isset($_GET['autoload'])) {
@@ -65,19 +66,42 @@ function basementor_autoload_generate() {
 }
 
 
-$autoload = realpath(__DIR__ . '/autoload.php');
 
-if (isset($_GET['autoload']) AND $autoload AND is_user_logged_in()) {
-	@unlink($autoload);
-	$autoload = false;
+if (isset($_GET['basementor-autoload']) AND is_user_logged_in()) {
+	basementor_autoload_generate();
+	wp_redirect($_SERVER['HTTP_REFERER']); die;
 }
 
+$autoload = realpath(__DIR__ . '/autoload.php');
 if (! $autoload) {
 	basementor_autoload_generate();
 	$autoload = realpath(__DIR__ . '/autoload.php');
 }
 
 include $autoload;
+
+add_action('admin_bar_menu', function($admin_bar) {
+	$menu_id = 'basementor';
+	$admin_bar->add_menu([
+		'id'    => 'basementor',
+		'title' => 'Tema',
+		'href'  => 'javascript:;',
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-settings',
+		'title' => 'Configurações',
+		'href'  => admin_url('admin.php?page=basementor-settings-default'),
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-autoload',
+		'title' => 'Refresh autoload',
+		'href'  => '?basementor-autoload',
+	]);
+}, 100);
 
 
 
@@ -86,15 +110,6 @@ remove_action('wp_head', 'print_emoji_detection_script', 7);
 remove_action('wp_print_styles', 'print_emoji_styles');
 remove_action('admin_print_scripts', 'print_emoji_detection_script');
 remove_action('admin_print_styles', 'print_emoji_styles');
-
-
-/* Enqueue scripts and styles in admin and website */
-foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
-	add_action($action, function() {
-		wp_enqueue_script('vue', 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js');
-		wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
-	});
-}
 
 
 
@@ -109,6 +124,7 @@ add_action('after_setup_theme', function() {
 });
 
 
+/* Enqueue scripts and styles in admin and website */
 foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 	add_action($action, function() {
 		wp_enqueue_script('vue', '//cdn.jsdelivr.net/npm/vue/dist/vue.min.js');
@@ -121,6 +137,8 @@ foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 		wp_enqueue_style('slick', '//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css');
 	});
 }
+
+
 
 foreach(['wp_head', 'admin_head'] as $action):
 add_action($action, function() { ?>
@@ -158,15 +176,14 @@ add_action($action, function() { ?>
 endforeach;
 
 
+
+
 add_action('admin_head', function() { ?><style>
 ul.subsubsub {}
 ul.subsubsub li {padding:0px 5px;}
 ul.subsubsub li a {color:inherit !important;}
 
-.tablenav select,
-.tablenav input,
-.tablenav button,
-ul.subsubsub li {
+.tablenav select, .tablenav input, .tablenav button, ul.subsubsub li {
 	background: #eee !important;
 	border: solid 1px #ddd !important;
 	color: #555 !important;
@@ -174,6 +191,11 @@ ul.subsubsub li {
 	border-radius: 3px;
 	padding: 0px 8px !important;
 	margin: 0px 5px 0px 0px !important;
+}
+
+.tablenav select:hover, .tablenav input:hover, .tablenav button:hover, ul.subsubsub li:hover {
+	background: #f5f5f5 !important;
+	text-decoration: none !important;
 }
 
 
@@ -184,4 +206,3 @@ ul.subsubsub li {
 .wp-list-table tfoot th, .wp-list-table tfoot td {background:#eee; color:#666 !important;}
 .wp-list-table thead a, .wp-list-table tfoot a {color:inherit; font-weight:600;}
 </style><?php });
-

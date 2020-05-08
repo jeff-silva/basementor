@@ -15,9 +15,7 @@
  * @version 3.8.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined('ABSPATH') or exit;
 
 /**
  * Filter tabs and allow third parties to add their own.
@@ -29,28 +27,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 $product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 
 if ( ! empty( $product_tabs ) ) : ?>
-
-	<div class="woocommerce-tabs wc-tabs-wrapper">
-		<ul class="tabs wc-tabs" role="tablist">
-			<?php foreach ( $product_tabs as $key => $product_tab ) : ?>
-				<li class="<?php echo esc_attr( $key ); ?>_tab" id="tab-title-<?php echo esc_attr( $key ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $key ); ?>">
-					<a href="#tab-<?php echo esc_attr( $key ); ?>">
-						<?php echo wp_kses_post( apply_filters( 'woocommerce_product_' . $key . '_tab_title', $product_tab['title'], $key ) ); ?>
-					</a>
-				</li>
+	
+	<div class="basementor-product-tabs">
+		<ul class="nav nav-tabs mb-3">
+			<?php foreach ($product_tabs as $key => $product_tab): ?>
+			<li class="nav-item">
+				<a href="javascript:;" class="nav-link" data-basementor-product-tab="<?php echo $key; ?>">
+					<?php echo $product_tab['title']; ?>
+				</a>
+			</li>
 			<?php endforeach; ?>
 		</ul>
-		<?php foreach ( $product_tabs as $key => $product_tab ) : ?>
-			<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $key ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $key ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $key ); ?>">
-				<?php
-				if ( isset( $product_tab['callback'] ) ) {
-					call_user_func( $product_tab['callback'], $key, $product_tab );
-				}
-				?>
-			</div>
-		<?php endforeach; ?>
 
-		<?php do_action( 'woocommerce_product_after_tabs' ); ?>
+		<?php foreach($product_tabs as $key => $product_tab): ?>
+		<div class="basementor-product-tab-content" data-basementor-product-tab-content="<?php echo $key; ?>">
+			<?php if (isset($product_tab['callback'])) {
+				call_user_func( $product_tab['callback'], $key, $product_tab );
+			} ?>
+		</div>
+		<?php endforeach; ?>
 	</div>
+	<script>jQuery(document).ready(function($) {
+		$("[data-basementor-product-tab]").on("click", function() {
+			$(".basementor-product-tabs .nav-tabs a").removeClass("active");
+			$(this).addClass("active");
+			$(".basementor-product-tab-content").hide();
+			var selector = $(this).attr("data-basementor-product-tab");
+			$(`[data-basementor-product-tab-content=${selector}]`).fadeIn(200);
+		});
+
+		$(".basementor-product-tabs .nav-tabs li:eq(0) a").trigger("click");
+	});</script>
 
 <?php endif; ?>

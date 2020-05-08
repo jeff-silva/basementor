@@ -286,6 +286,9 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$important = $font->important? '!important': null;
 				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important}; {$font->style}}";
 			}
+			
+			$lines[] = ".input-group {border:solid 1px #ced4da;}";
+			$lines[] = ".input-group .form-control, .input-group .btn, .input-group-text {border:none;}";
 
 			foreach($set->prefixes as $p) {
 				$prefix = $p->prefix;
