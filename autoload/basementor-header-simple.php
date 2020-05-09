@@ -242,9 +242,9 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 							<div class="col">
 								<form class="form-inline my-2 my-lg-0">
 									<div class="input-group border border-primary" style="background:#fff;">
-										<input class="form-control" type="search" placeholder="Pesquisar..." aria-label="Search" style="border:none; background:none;">
+										<input class="form-control" type="search" placeholder="Pesquisar..." aria-label="Search">
 										<div class="input-group-btn">
-											<button type="submit" class="btn btn-primary" style="border:none; border-radius:0px;">
+											<button type="submit" class="btn btn-primary">
 												<i class="fa fa-fw fa-search"></i>
 											</button>
 										</div>
@@ -258,13 +258,12 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 							$options = [];
 
 							if (in_array('administrator', $user->roles)) {
-								$options[] = (object) ['title'=>'Admin', 'url'=>admin_url()];
+								$options[] = (object) ['title'=>'WP Admin', 'url'=>admin_url()];
 							}
 
-							if (BASEMENTOR_WOOCOMMERCE) {
-								if ($page = wc_get_page_id('myaccount')) {
-									$page = get_post($page);
-									$options[] = (object) ['title'=>$page->post_title, 'url'=>get_the_permalink($page)];
+							if (function_exists('wc_get_account_menu_items')) {
+								foreach(wc_get_account_menu_items() as $endpoint=>$label) {
+									$options[] = (object) ['title'=>$label, 'url'=>wc_get_account_endpoint_url($endpoint)];
 								}
 							}
 
@@ -274,14 +273,12 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 									<button class="dropdown-toggle" type="button" data-toggle="dropdown" style="background:none; border:none; box-shadow:none!important; outline:none!important; padding:0px;">
 										<img src="<?php echo $user->data->avatar; ?>" alt="" style="height:40px;">
 									</button>
-									<div class="dropdown-menu dropdown-menu-right p-0">
+									<div class="dropdown-menu dropdown-menu-right p-0 animated fadeInRight" style="animation-duration:300ms;">
 										<div class="dropdown-item bg-primary"><?php echo $user->data->display_name; ?></div>
 
 										<?php foreach($options as $opt): ?>
 										<a class="dropdown-item" href="<?php echo $opt->url; ?>"><?php echo $opt->title; ?></a>
 										<?php endforeach; ?>
-
-										<a class="dropdown-item" href="<?php echo wp_logout_url(); ?>" onclick="return confirm('Tem certeza que deseja sair?');">Logout</a>
 									</div>
 								</div>
 							</div>

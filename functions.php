@@ -7,6 +7,7 @@ define('BASEMENTOR_WOOCOMMERCE', class_exists('WooCommerce'));
 /* Print data: dd($data1, $data2, $data3); */
 if (! function_exists('dd')) { function dd() { foreach(func_get_args() as $data) { echo '<pre>'. print_r($data, true) .'</pre>'; }}}
 
+
 spl_autoload_register(function($class) {
 	if ($include = realpath(str_replace('\\', '/', __DIR__ . "/{$class}.php"))) {
 		include $include;
@@ -155,10 +156,6 @@ add_action($action, function() { ?>
 .pagination {}
 .pagination .page-item {}
 .pagination .page-link {width:40px; border:none; color:#888; text-align:center;}
-
-.input-group.border {border-radius:4px; overflow:hidden; position:relative;}
-.input-group.border .form-control {border:none !important; background:none !important; border-radius:0 !important; outline:0!important; box-shadow:none !important;}
-.input-group.border .btn {position:relative; border:none !important; border-radius:0 !important; height:100%;}
 </style>
 
 <?php if (is_user_logged_in()): ?>
@@ -206,3 +203,9 @@ ul.subsubsub li a {color:inherit !important;}
 .wp-list-table tfoot th, .wp-list-table tfoot td {background:#eee; color:#666 !important;}
 .wp-list-table thead a, .wp-list-table tfoot a {color:inherit; font-weight:600;}
 </style><?php });
+
+
+remove_action('woocommerce_before_shop_loop_item_title', 'woocommerce_template_loop_product_thumbnail', 10);
+add_action('woocommerce_before_shop_loop_item_title', function() {
+	wc_get_template_part('loop/thumbnail');
+}, 10);

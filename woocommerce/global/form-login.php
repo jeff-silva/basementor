@@ -7,9 +7,13 @@ $input = (object) array_merge([
 	'email' => '',
 ], $_POST);
 
+$woocommerce_enable_myaccount_registration = get_option('woocommerce_enable_myaccount_registration');
+$wrapper_style = $woocommerce_enable_myaccount_registration=='yes'? '': 'max-width:400px; margin:0 auto;';
+
 do_action( 'woocommerce_before_customer_login_form' ); ?>
 
-<div class="row">
+
+<div class="row" style="<?php echo $wrapper_style; ?>">
 	<div class="col">
 		<div class="card">
 			<div class="card-header text-uppercase font-weight-bold">
@@ -51,7 +55,7 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 		</div>
 	</div>
 
-	<?php if ( 'yes' === get_option( 'woocommerce_enable_myaccount_registration' ) ) : ?>
+	<?php if ('yes' === $woocommerce_enable_myaccount_registration) : ?>
 	<div class="col">
 		<div class="card">
 			<div class="card-header text-uppercase font-weight-bold">

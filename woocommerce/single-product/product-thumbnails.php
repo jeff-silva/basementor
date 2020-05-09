@@ -1,4 +1,4 @@
-<?php
+<?php echo __FILE__; return;
 /**
  * Single Product Thumbnails
  *

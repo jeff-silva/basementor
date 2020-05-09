@@ -287,8 +287,11 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important}; {$font->style}}";
 			}
 			
-			$lines[] = ".input-group {border:solid 1px #ced4da;}";
-			$lines[] = ".input-group .form-control, .input-group .btn, .input-group-text {border:none;}";
+			$lines[] = ".input-group {border:solid 1px #ced4da; background:#fff;}";
+			$lines[] = ".input-group .form-control {border:none; background:none;}";
+			$lines[] = ".input-group .btn, .input-group-text {border-color:transparent; border-radius:0px!important;}";
+			$lines[] = ".basementor-woocommerce-price del {}";
+			$lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
 
 			foreach($set->prefixes as $p) {
 				$prefix = $p->prefix;
@@ -443,10 +446,6 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 });
 
 
-/*
-
-Fonts
-Colors
-Loader
-
-*/
+add_filter('woocommerce_get_price_html', function($price, $product) {
+	return '<div class="basementor-woocommerce-price">'. $price .'</div>';
+}, 100, 2);

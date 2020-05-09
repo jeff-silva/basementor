@@ -87,13 +87,15 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 					</button>
 				</div>
 			</div>
-			
-			<div class="alert alert-success p-0 mt-2" v-if="resp">
-				<div class="row align-items-center p-2" v-for="v in resp.values" :key="v">
-					<div class="col">{{ v.title }}</div>
-					<div class="col-6">R$ {{ v.value }}</div>
-				</div>
-			</div>
+
+			<table class="table table-bordered mt-2">
+				<tbody>
+					<tr v-for="v in resp.values" :key="v">
+						<td>{{ v.title }}</td>
+						<td>R$ {{ v.value }}</td>
+					</tr>
+				</tbody>
+			</table>
 		</form>
 	</div>
 
