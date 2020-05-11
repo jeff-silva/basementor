@@ -287,9 +287,9 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				$lines[] = "{$font->selector} {font-family:'{$font->font}'{$important}; {$font->style}}";
 			}
 			
-			$lines[] = ".input-group {border:solid 1px #ced4da; background:#fff;}";
-			$lines[] = ".input-group .form-control {border:none; background:none;}";
-			$lines[] = ".input-group .btn, .input-group-text {border-color:transparent; border-radius:0px!important;}";
+			$lines[] = ".input-group.form-control {padding:0px;}";
+			$lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";
+			$lines[] = ".input-group.form-control .form-control, .input-group.form-control .input-group-text {border:transparent!important; background:none; border-radius:0px;}";
 			$lines[] = ".basementor-woocommerce-price del {}";
 			$lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
 

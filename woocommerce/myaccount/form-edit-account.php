@@ -53,7 +53,7 @@ do_action( 'woocommerce_before_edit_account_form' ); ?>
 			<div style="max-width:600px;">
 				<div class="form-group">
 					<label><?php esc_html_e( 'Current password (leave blank to leave unchanged)', 'woocommerce' ); ?></label>
-					<div class="input-group">
+					<div class="input-group form-control">
 						<input type="password" class="form-control" name="password_current" autocomplete="off">
 						<div class="input-group-btn">
 							<button type="button" class="btn btn-default" onclick="this.form.password_current.type = this.form.password_current.type=='password'? 'text': 'password';">
@@ -65,7 +65,7 @@ do_action( 'woocommerce_before_edit_account_form' ); ?>
 
 				<div class="form-group">
 					<label><?php esc_html_e( 'New password (leave blank to leave unchanged)', 'woocommerce' ); ?></label>
-					<div class="input-group">
+					<div class="input-group form-control">
 						<input type="password" class="form-control" name="password_1" autocomplete="off">
 						<div class="input-group-btn">
 							<button type="button" class="btn btn-default" onclick="this.form.password_1.type = this.form.password_1.type=='password'? 'text': 'password';">
@@ -77,7 +77,7 @@ do_action( 'woocommerce_before_edit_account_form' ); ?>
 
 				<div class="form-group">
 					<label><?php esc_html_e( 'Confirm new password', 'woocommerce' ); ?></label>
-					<div class="input-group">
+					<div class="input-group form-control">
 						<input type="password" class="form-control" name="password_2" autocomplete="off">
 						<div class="input-group-btn">
 							<button type="button" class="btn btn-default" onclick="this.form.password_2.type = this.form.password_2.type=='password'? 'text': 'password';">

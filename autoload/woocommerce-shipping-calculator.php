@@ -78,7 +78,7 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 	?>
 	<div id="<?php echo $data->id; ?>">
 		<form action="" @submit.prevent="calculate();">
-			<div class="input-group border border-primary" style="max-width:300px;">
+			<div class="input-group form-control border border-primary" style="max-width:300px;">
 				<input type="text" class="form-control" placeholder="Calcular frete" v-model="post.postcode">
 				<div class="input-group-btn">
 					<button type="submit" class="btn btn-primary">

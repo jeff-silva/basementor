@@ -240,8 +240,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 						<div class="row no-gutters align-items-center">
 							<div class="col">
-								<form class="form-inline my-2 my-lg-0">
-									<div class="input-group border border-primary" style="background:#fff;">
+								<form>
+									<div class="input-group form-control border border-primary">
 										<input class="form-control" type="search" placeholder="Pesquisar..." aria-label="Search">
 										<div class="input-group-btn">
 											<button type="submit" class="btn btn-primary">
