@@ -142,7 +142,7 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 
 			$this->add_control('loader_type', [
 				'label' => 'Tipo de loader',
-				'type' => \Elementor\Controls_Manager::SELECT2,
+				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => 'lds-default',
 				'options' => [
 					'lds-default' => 'Default',
@@ -223,8 +223,8 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'label_block' => true,
 			]);
 
-			$repeater->add_control('color_inverse', [
-				'label' => 'Cor inversa',
+			$repeater->add_control('color_text', [
+				'label' => 'Texto',
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'default' => '',
 				'label_block' => true,
@@ -235,29 +235,29 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 				'type' => \Elementor\Controls_Manager::REPEATER,
 				'fields' => $repeater->get_controls(),
 				'default' => [
-					['color'=>'#007bff', 'color_inverse'=>'#ffffff', 'prefix'=>'primary'],
-					['color'=>'#6c757d', 'color_inverse'=>'#666666', 'prefix'=>'secondary'],
-					['color'=>'#28a745', 'color_inverse'=>'#ffffff', 'prefix'=>'success'],
-					['color'=>'#dc3545', 'color_inverse'=>'#ffffff', 'prefix'=>'danger'],
-					['color'=>'#ffc107', 'color_inverse'=>'#ffffff', 'prefix'=>'warning'],
-					['color'=>'#17a2b8', 'color_inverse'=>'#ffffff', 'prefix'=>'info'],
-					['color'=>'#3b5999', 'color_inverse'=>'#ffffff', 'prefix'=>'facebook'],
-					['color'=>'#55acee', 'color_inverse'=>'#ffffff', 'prefix'=>'twitter'],
-					['color'=>'#0077b5', 'color_inverse'=>'#ffffff', 'prefix'=>'linkedin'],
-					['color'=>'#00aff0', 'color_inverse'=>'#ffffff', 'prefix'=>'skype'],
-					['color'=>'#007ee5', 'color_inverse'=>'#ffffff', 'prefix'=>'dropbox'],
-					['color'=>'#21759b', 'color_inverse'=>'#ffffff', 'prefix'=>'wordpress'],
-					['color'=>'#1ab7ea', 'color_inverse'=>'#ffffff', 'prefix'=>'vimeo'],
-					['color'=>'#4c75a3', 'color_inverse'=>'#ffffff', 'prefix'=>'vk'],
-					['color'=>'#34465d', 'color_inverse'=>'#ffffff', 'prefix'=>'tumblr'],
-					['color'=>'#410093', 'color_inverse'=>'#ffffff', 'prefix'=>'yahoo'],
-					['color'=>'#bd081c', 'color_inverse'=>'#ffffff', 'prefix'=>'pinterest'],
-					['color'=>'#cd201f', 'color_inverse'=>'#ffffff', 'prefix'=>'youtube'],
-					['color'=>'#ff5700', 'color_inverse'=>'#ffffff', 'prefix'=>'reddit'],
-					['color'=>'#b92b27', 'color_inverse'=>'#ffffff', 'prefix'=>'quora'],
-					['color'=>'#ff3300', 'color_inverse'=>'#ffffff', 'prefix'=>'soundcloud'],
-					['color'=>'#25d366', 'color_inverse'=>'#ffffff', 'prefix'=>'whatsapp'],
-					['color'=>'#e4405f', 'color_inverse'=>'#ffffff', 'prefix'=>'instagram'],
+					['color'=>'#007bff', 'color_text'=>'#ffffff', 'prefix'=>'primary'],
+					['color'=>'#6c757d', 'color_text'=>'#666666', 'prefix'=>'secondary'],
+					['color'=>'#28a745', 'color_text'=>'#ffffff', 'prefix'=>'success'],
+					['color'=>'#dc3545', 'color_text'=>'#ffffff', 'prefix'=>'danger'],
+					['color'=>'#ffc107', 'color_text'=>'#ffffff', 'prefix'=>'warning'],
+					['color'=>'#17a2b8', 'color_text'=>'#ffffff', 'prefix'=>'info'],
+					['color'=>'#3b5999', 'color_text'=>'#ffffff', 'prefix'=>'facebook'],
+					['color'=>'#55acee', 'color_text'=>'#ffffff', 'prefix'=>'twitter'],
+					['color'=>'#0077b5', 'color_text'=>'#ffffff', 'prefix'=>'linkedin'],
+					['color'=>'#00aff0', 'color_text'=>'#ffffff', 'prefix'=>'skype'],
+					['color'=>'#007ee5', 'color_text'=>'#ffffff', 'prefix'=>'dropbox'],
+					['color'=>'#21759b', 'color_text'=>'#ffffff', 'prefix'=>'wordpress'],
+					['color'=>'#1ab7ea', 'color_text'=>'#ffffff', 'prefix'=>'vimeo'],
+					['color'=>'#4c75a3', 'color_text'=>'#ffffff', 'prefix'=>'vk'],
+					['color'=>'#34465d', 'color_text'=>'#ffffff', 'prefix'=>'tumblr'],
+					['color'=>'#410093', 'color_text'=>'#ffffff', 'prefix'=>'yahoo'],
+					['color'=>'#bd081c', 'color_text'=>'#ffffff', 'prefix'=>'pinterest'],
+					['color'=>'#cd201f', 'color_text'=>'#ffffff', 'prefix'=>'youtube'],
+					['color'=>'#ff5700', 'color_text'=>'#ffffff', 'prefix'=>'reddit'],
+					['color'=>'#b92b27', 'color_text'=>'#ffffff', 'prefix'=>'quora'],
+					['color'=>'#ff3300', 'color_text'=>'#ffffff', 'prefix'=>'soundcloud'],
+					['color'=>'#25d366', 'color_text'=>'#ffffff', 'prefix'=>'whatsapp'],
+					['color'=>'#e4405f', 'color_text'=>'#ffffff', 'prefix'=>'instagram'],
 				],
 				'title_field' => '{{{ prefix }}}',
 			]);
@@ -296,62 +296,83 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			foreach($set->prefixes as $p) {
 				$prefix = $p->prefix;
 				$color = $p->color;
-				$inverse = $p->color_inverse;
+				$text = $p->color_text;
 				$dark = $this->color($p->color, $set->color_dark);
 				$light = $this->color($p->color, $set->color_light);
 				$lines[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$color} !important;}";
 				$lines[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
 				$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
-				$lines[] = ".bg-{$prefix} {background-color:{$color} !important; color:{$inverse};}";
-				$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color};}";
-				$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light};}";
-				$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark};}";
-				$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark};}";
+				$lines[] = ".bg-{$prefix} {background-color:{$color} !important; color:{$text};}";
+				$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color}; color:{$text};}";
+				$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light}; color:{$text};}";
+				$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+				$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+				$lines[] = ".btn-outline-{$prefix} {border-color:{$color} !important; color:{$color};}";
+				$lines[] = ".btn-outline-{$prefix}:hover {background-color:{$color} !important; color:{$text};}";
 				$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
-				$lines[] = ".alert-{$prefix} {background-color:{$light};}";
+				$lines[] = ".alert-{$prefix} {background-color:{$light}; color:{$text};}";
+				$lines[] = ".badge-{$prefix} {background-color:{$color}; color:{$text};}";
 			}
 
 			echo "\n". implode('', $lines) . $set->css; ?></style>
 
-			<?php if ($set->edit_mode && $set->bootswatch_preview): ?>
-			<br>
-			<div class="row">
-				<div class="col-3">
-					<input type="text" class="form-control">
-				</div>
+			<?php if ($set->edit_mode && $set->bootswatch_preview):
 
-				<div class="col-3">
-					<div class="input-group">
-						<input type="text" class="form-control">
-						<div class="input-group-btn">
-							<button type="button" class="btn btn-primary">
-								<i class="fa fa-fw fa-search"></i>
-							</button>
-						</div>
+			$test = (object) ['prefix'=>'', 'prefixes'=>[]];
+			foreach($set->prefixes as $prefix) {
+				if (! $test->prefix) { $test->prefix = $prefix->prefix; }
+				$test->prefixes[ $prefix->prefix ] = ucwords($prefix->prefix);
+			}
+
+			?>
+			<br><br><br>
+			<div id="bootswatch_preview" class="container">
+				<select v-model="prefix" class="form-control mp-2" style="max-width:300px;">
+					<option :value="prefix" v-for="(name, prefix) in prefixes">{{ name }}</option>
+				</select><br>
+
+				<nav class="navbar navbar-expand-lg navbar-dark mb-2" :class="`bg-${prefix}`"><a href="#" class="navbar-brand">{{ prefix }}</a> <button type="button" data-toggle="collapse" data-target="#navbar-color-primary" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> <div id="navbar-color-primary" class="collapse navbar-collapse"><ul class="navbar-nav mr-auto"><li class="nav-item active"><a href="#" class="nav-link">Home <span class="sr-only">(current)</span></a></li> <li class="nav-item"><a href="#" class="nav-link">Features</a></li> <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li> <li class="nav-item"><a href="#" class="nav-link">About</a></li></ul> 
+					<form class="input-group form-control border border-secondary" style="max-width:300px;"><input type="text" placeholder="Search" class="form-control mr-sm-2"><div class="input-group-btn"><button type="button" class="btn btn-secondary"><i class="fa fa-fw fa-search"></i></button></div></form>
+				</div></nav>
+				
+				<div class="alert alert-dismissible mb-2" :class="`alert-${prefix}`"><button type="button" data-dismiss="alert" class="close">×</button> <h4 class="alert-heading">Warning!</h4> <p class="mb-0">Lorem ipsum dolor sit amet, odit magni cum qui doloribus  <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p></div>
+				
+				<div class="mp-2 p-3">
+					<span class="badge" :class="`badge-${prefix}`">{{ prefix }}</span>
+					<span class="badge badge-pill" :class="`badge-${prefix}`">{{ prefix }}</span>
+				</div>
+				
+				<div class="row mb-2">
+					<div class="col"><button type="button" class="btn btn-block" :class="`btn-${prefix}`">Test</button></div>
+					<div class="col"><button type="button" class="btn btn-block" :class="`btn-outline-${prefix}`">Test</button></div>
+				</div>
+				
+				<div class="row mb-2">
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" class="progress-bar" :class="`bg-${prefix}`" style="width: 25%;"></div></div>
+					</div>
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped" :class="`bg-${prefix}`" style="width: 10%;"></div></div>
+					</div>
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped progress-bar-animated" :class="`bg-${prefix}`" style="width: 75%;"></div></div>
 					</div>
 				</div>
 
-				<div class="col-12 py-2"><hr></div>
-
-				<?php foreach($set->prefixes as $p): ?>
-				<div class="col-3">
-					<div class="card border-<?php echo $p->prefix; ?>">
-						<div class="card-header bg-<?php echo $p->prefix; ?>"><?php echo $p->prefix; ?></div>
-						<div class="card-body">
-							<a href="javascript:;" class="btn btn-<?php echo $p->prefix; ?> btn-block">btn btn-<?php echo $p->prefix; ?></a>
-							<br>
-							<div class="border border-<?php echo $p->prefix; ?> p-1">
-								<div class="bg-<?php echo $p->prefix; ?> p-2">
-									text
-								</div>
-							</div>
-							<br>
-							<div class="alert alert-<?php echo $p->prefix; ?>">alert alert-<?php echo $p->prefix; ?></div>
-						</div>
-					</div><br>
+				<div class="row mb-2">
+					<div class="col">
+						<div class="card text-white" :class="`bg-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+					</div>
+					<div class="col">
+						<div class="card" :class="`border-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+					</div>
 				</div>
-				<?php endforeach; ?>
 			</div>
+
+			<script>new Vue({
+				el: "#bootswatch_preview",
+				data: <?php echo json_encode($test); ?>,
+			});</script>
 			<?php endif; ?>
 
 			<div id="<?php echo $set->id; ?>" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:<?php echo $set->loader_bg; ?>; z-index:99999!important; display:flex; align-items:center; justify-content:center;">

@@ -1,6 +1,13 @@
 <?php
 
-defined( 'ABSPATH' ) or exit;
+/**
+ * @see https://docs.woocommerce.com/document/template-structure/
+ * @package WooCommerce/Templates
+ * @version 3.9.0
+ */
+
+defined( 'ABSPATH' ) || exit;
+
 if (! $notices) return;
 
 ?>
