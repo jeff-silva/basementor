@@ -367,6 +367,20 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 						<div class="card" :class="`border-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
 					</div>
 				</div>
+
+				<div class="d-flex">
+					<div class="mx-auto">
+						<nav aria-label="Page navigation example">
+							<ul class="pagination">
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/1/">1</a></li>
+								<li class="page-item"><a class="page-link bg-primary text-light" href="https://zpet.com.br/loja/page/2/">2</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/3/">3</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/4/">4</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/5/">5</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
 			</div>
 
 			<script>new Vue({
