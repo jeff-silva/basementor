@@ -46,8 +46,6 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 	}
 }
 
-dd($data);
-
 ?>
 
 <style>
@@ -68,6 +66,8 @@ dd($data);
 	<?php endforeach; ?>
 </div>
 
+
+<?php if (sizeof($images)>1): ?>
 <br>
 <div class="basementor-product-carousel-dots text-center">
 	<?php foreach($images as $i=>$image): ?>
@@ -76,6 +76,8 @@ dd($data);
 	</a>
 	<?php endforeach; ?>
 </div>
+<?php endif; ?>
+
 
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>

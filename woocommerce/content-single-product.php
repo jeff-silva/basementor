@@ -41,7 +41,7 @@ if ( post_password_required() ) {
 					<?php wc_get_template_part('single-product/product-image'); ?>
 				</div>
 
-				<div class="col-12 col-md-6">
+				<div class="col-12 col-md-6 pb-3">
 					<?php wc_get_template_part('single-product/title'); ?>
 					<?php wc_get_template_part('single-product/rating'); ?>
 					<?php wc_get_template_part('single-product/short-description'); ?>
