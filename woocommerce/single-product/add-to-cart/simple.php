@@ -9,10 +9,8 @@
 defined( 'ABSPATH' ) || exit;
 
 global $product;
-
-if ( ! $product->is_purchasable() ) {
-	return;
-}
+if (! $product->is_type('simple')) return;
+if (! $product->is_purchasable()) return;
 
 echo wc_get_stock_html( $product ); // WPCS: XSS ok.
 

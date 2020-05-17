@@ -15,8 +15,9 @@
  * @version    1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
+defined('ABSPATH') || exit;
 
-the_title( '<h1 class="product_title entry-title">', '</h1>' );
+?>
+<h1 class="font-weight-bold text-uppercase m-0 p-0">
+	<?php echo get_the_title(); ?>
+</h1>

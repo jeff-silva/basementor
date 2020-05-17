@@ -15,14 +15,17 @@
  * @version 3.4.0
  */
 
+global $product;
+
 defined( 'ABSPATH' ) || exit;
+if (! $product->is_type('external')) return;
 
 do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
 <form class="cart" action="<?php echo esc_url( $product_url ); ?>" method="get">
 	<?php do_action( 'woocommerce_before_add_to_cart_button' ); ?>
 
-	<button type="submit" class="single_add_to_cart_button button alt"><?php echo esc_html( $button_text ); ?></button>
+	<button type="submit" class="single_add_to_cart_button btn btn-primary"><?php echo esc_html( $button_text? $button_text: 'Comprar' ); ?></button>
 
 	<?php wc_query_string_form_fields( $product_url ); ?>
 

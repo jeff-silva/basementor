@@ -1,39 +1,5 @@
 <?php
 
-if (isset($_GET['test'])) {
-	add_action('init', function() {
-		$postcode_start = intval(get_option('woocommerce_store_postcode'));
-		$values = [];
-
-		add_filter('woocommerce_correios_shipping_args', function($args) {
-			$args['nVlPeso'] = 1;
-			$args['nVlDiametro'] = 2;
-			return $args;
-		});
-
-		$package = [
-			'destination' => ['postcode'=>$postcode_final, 'country'=>'BR'],
-			'contents' => [],
-		];
-
-		if ($zone = WC_Shipping_Zones::get_zone_matching_package($package)) {
-			foreach($zone->get_shipping_methods() as $method) {
-				$method->calculate_shipping($package);
-				foreach($method->rates as $rate) {
-					$values[] = [
-						'title' => $rate->get_label(),
-						'value' => $rate->get_cost(),
-					];
-				}
-			}
-		}
-
-		dd($values);
-		die;
-	});
-}
-
-
 \Basementor\Basementor::action('woocommerce-shipping-calculator', function($post) {
 	$post->postcode_start = get_option('woocommerce_store_postcode');
 	$post->values = [];
@@ -56,9 +22,12 @@ if (isset($_GET['test'])) {
 		foreach($zone->get_shipping_methods() as $method) {
 			$method->calculate_shipping($package);
 			foreach($method->rates as $rate) {
+				$days = $rate->get_meta_data();
+				$days = isset($days['_delivery_forecast'])? $days['_delivery_forecast']: 0;
 				$post->values[] = [
 					'title' => $rate->get_label(),
 					'value' => $rate->get_cost(),
+					'days' => $days,
 				];
 			}
 		}
@@ -79,7 +48,7 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 	<div id="<?php echo $data->id; ?>">
 		<form action="" @submit.prevent="calculate();">
 			<div class="input-group form-control border border-primary" style="max-width:300px;">
-				<input type="text" class="form-control" placeholder="Calcular frete" v-model="post.postcode">
+				<input type="text" class="form-control" placeholder="Calcular frete" v-model="post.postcode" v-mask="'#####-###'">
 				<div class="input-group-btn">
 					<button type="submit" class="btn btn-primary">
 						<i class="fa fa-fw fa-spin fa-spinner" v-if="loading"></i>
@@ -93,12 +62,14 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 					<tr v-for="v in resp.values" :key="v">
 						<td>{{ v.title }}</td>
 						<td>R$ {{ v.value }}</td>
+						<td v-if="v.days">{{ v.days }} dias</td>
 					</tr>
 				</tbody>
 			</table>
 		</form>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/vue-the-mask@0.11.1"></script>
 	<script>new Vue({
 		el: "#<?php echo $data->id; ?>",
 		data: <?php echo json_encode($data); ?>,
@@ -113,8 +84,4 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 		},
 	});</script>
 	<?php
-});
-
-add_action('woocommerce_after_add_to_cart_form', function() {
-	echo do_shortcode('[woocommerce-shipping-calculator]');
 });

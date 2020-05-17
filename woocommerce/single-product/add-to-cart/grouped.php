@@ -18,6 +18,8 @@
 defined( 'ABSPATH' ) || exit;
 
 global $product, $post;
+if (! $product->is_type('grouped')) return;
+
 
 do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 

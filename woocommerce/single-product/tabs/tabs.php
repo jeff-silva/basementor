@@ -28,35 +28,11 @@ $product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 
 if ( ! empty( $product_tabs ) ) : ?>
 	
-	<div class="basementor-product-tabs">
-		<ul class="nav nav-tabs mb-3">
-			<?php foreach ($product_tabs as $key => $product_tab): ?>
-			<li class="nav-item">
-				<a href="javascript:;" class="nav-link" data-basementor-product-tab="<?php echo $key; ?>">
-					<?php echo $product_tab['title']; ?>
-				</a>
-			</li>
-			<?php endforeach; ?>
-		</ul>
-
-		<?php foreach($product_tabs as $key => $product_tab): ?>
-		<div class="basementor-product-tab-content" data-basementor-product-tab-content="<?php echo $key; ?>">
-			<?php if (isset($product_tab['callback'])) {
-				call_user_func( $product_tab['callback'], $key, $product_tab );
-			} ?>
-		</div>
-		<?php endforeach; ?>
-	</div>
-	<script>jQuery(document).ready(function($) {
-		$("[data-basementor-product-tab]").on("click", function() {
-			$(".basementor-product-tabs .nav-tabs a").removeClass("active");
-			$(this).addClass("active");
-			$(".basementor-product-tab-content").hide();
-			var selector = $(this).attr("data-basementor-product-tab");
-			$(`[data-basementor-product-tab-content=${selector}]`).fadeIn(200);
-		});
-
-		$(".basementor-product-tabs .nav-tabs li:eq(0) a").trigger("click");
-	});</script>
+	<?php foreach($product_tabs as $key=>$tab): ?>
+	<div class="border border-primary border-bottom-0"></div>
+	<div class="py-3"><?php if (isset($tab['callback'])) {
+		call_user_func($tab['callback'], $key, $tab);
+	} ?></div>
+	<?php endforeach; ?>
 
 <?php endif; ?>

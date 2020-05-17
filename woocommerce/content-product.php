@@ -34,7 +34,11 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 
 
 	do_action('woocommerce_before_shop_loop_item');
+	
+	echo '<div style="position:absolute; z-index:1; right:20px;">';
 	wc_get_template_part('loop/sale-flash');
+	echo '</div>';
+
 	wc_get_template_part('loop/thumbnail');
 	wc_get_template_part('loop/title');
 	do_action('woocommerce_after_shop_loop_item_title');

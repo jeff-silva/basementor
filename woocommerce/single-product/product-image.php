@@ -52,7 +52,7 @@ dd($data);
 
 <style>
 .basementor-product-carousel-align {display: flex; align-items: center; justify-content: center;}
-.basementor-product-carousel {position:relative;}
+.basementor-product-carousel {position:relative; background:#eee;}
 .basementor-product-carousel .slick-arrow {position:absolute; top:0px; height:100%; z-index:2; background:none; border:none; font-size:40px; outline:0!important; box-shadow:none !important;}
 .basementor-product-carousel .slick-prev {left:0px;}
 .basementor-product-carousel .slick-next {right:0px;}
@@ -61,13 +61,8 @@ dd($data);
 <div class="basementor-product-carousel">
 	<?php foreach($images as $image): ?>
 	<div>
-		<div class="basementor-product-carousel-align" style="height:300px; padding:0px 50px;">
-			<img src="<?php echo $image->url; ?>"
-				alt=""
-				xoriginal="<?php echo $image->url; ?>"
-				xpreview="<?php echo $image->url; ?>"
-				style="width:100%; max-width:100%;"
-			>
+		<div class="basementor-product-carousel-align" style="height:300px; padding:0px 50px; text-align:center;">
+			<img src="<?php echo $image->url; ?>" alt="" style="height:100%;">
 		</div>
 	</div>
 	<?php endforeach; ?>
