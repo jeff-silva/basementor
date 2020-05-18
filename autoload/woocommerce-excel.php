@@ -24,12 +24,24 @@ function elementor_excel_products() {
 
 	$products = array_map(function($prod) {
 		$prod->_permalink = get_the_permalink($prod);
+
 		$prod->meta_input = new \stdClass;
 		$prod->meta_input->_thumbnail_id = get_post_meta($prod->ID, '_thumbnail_id', true);
 		$prod->meta_input->_sku = get_post_meta($prod->ID, '_sku', true);
 		$prod->meta_input->_regular_price = get_post_meta($prod->ID, '_regular_price', true);
 		$prod->meta_input->_sale_price = get_post_meta($prod->ID, '_sale_price', true);
 		$prod->meta_input->_product_image_gallery = get_post_meta($prod->ID, '_product_image_gallery', true);
+
+		$prod->tax_input = new \stdClass;
+		foreach(get_object_taxonomies(['post_type' => 'product']) as $taxo) {
+			$prod->tax_input->{$taxo} = [];
+			if ($terms = get_the_terms($prod->ID, $taxo) AND is_array($terms)) {
+				$prod->tax_input->{$taxo} = array_map(function($term) {
+					return $term->term_id;
+				}, $terms);
+			}
+		}
+
 		return $prod;
 	}, $products);
 
@@ -54,6 +66,55 @@ add_action('admin_menu', function() {
 		$data->product = false;
 
 		$data->products = elementor_excel_products();
+
+
+		/*
+		public function taxonomyTerms($taxonomy, $parent=0, $prefix='•', $terms=[], $return=[], $level=0) {
+			if (empty($terms)) {
+				$terms = get_terms([
+					'taxonomy' => $taxonomy,
+					'orderby' => 'name',
+					'hide_empty' => false,
+					'hierarchical' => 1,
+				]);
+			}
+
+			foreach($terms as $term) {
+				if ($term->parent==$parent) {
+					$term->name = ltrim(str_repeat($prefix, $level) ." {$term->name}");
+					$return[] = $term;
+					$return = $this->taxonomyTerms($taxonomy, $term->term_id, $prefix, $terms, $return, $level+1);
+				}
+			}
+
+			return $return;
+		}
+
+
+		public function taxonomies() {
+			$not = [
+				'product_type',
+				'product_visibility',
+				'product_shipping_class',
+				'product_tag',
+			];
+
+			$return = [];
+			foreach(get_object_taxonomies(['post_type' => $this->post_type]) as $taxo) {
+				if (in_array($taxo, $not)) continue;
+				
+				$taxo = get_taxonomy($taxo);
+				$return[] = (object) [
+					'slug' => $taxo->name,
+					'name' => $taxo->label,
+					'terms' => $this->taxonomyTerms($taxo->name),
+				];
+			}
+			return $return;
+		}
+		*/
+
+
 
 		?><br><div id="<?php echo $data->id; ?>">
 			<div class="list-inline text-right">
@@ -143,6 +204,8 @@ add_action('admin_menu', function() {
 				</table>
 				<input type="submit" style="display:none;">
 			</form>
+
+			<!-- <pre>$data: {{ $data }}</pre> -->
 		</div>
 
 		<script>Vue.component("media-picker", {

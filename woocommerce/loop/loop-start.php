@@ -5,6 +5,13 @@
  * @version     3.3.0
  */
 
-defined('ABSPATH') || exit; ?>
+defined('ABSPATH') || exit;
 
-<div class="row wpt-products" style="list-style-type:none; padding:0px; margin:0px;">
+$args = isset($args)? $args: [];
+$args = array_merge([
+	'row' => '',
+], $args);
+
+?>
+
+<div class="row basementor-products <?php echo $args['row']; ?>" style="list-style-type:none; padding:0px; margin:0px;">

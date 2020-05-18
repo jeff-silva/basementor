@@ -16,31 +16,12 @@
  * @see         woocommerce_breadcrumb()
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined('ABSPATH') || exit; ?>
 
-if ( ! empty( $breadcrumb ) ) {
-
-	echo $wrap_before;
-
-	foreach ( $breadcrumb as $key => $crumb ) {
-
-		echo $before;
-
-		if ( ! empty( $crumb[1] ) && sizeof( $breadcrumb ) !== $key + 1 ) {
-			echo '<a href="' . esc_url( $crumb[1] ) . '">' . esc_html( $crumb[0] ) . '</a>';
-		} else {
-			echo esc_html( $crumb[0] );
-		}
-
-		echo $after;
-
-		if ( sizeof( $breadcrumb ) !== $key + 1 ) {
-			echo $delimiter;
-		}
-	}
-
-	echo $wrap_after;
-
-}
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<?php foreach($breadcrumb as $i => $crumb): ?>
+		<li class="breadcrumb-item"><a href="<?php echo $crumb[1]; ?>"><?php echo $crumb[0]; ?></a></li>
+		<?php endforeach; ?>
+	</ol>
+</nav>

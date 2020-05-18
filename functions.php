@@ -1,5 +1,14 @@
 <?php
 
+/*
+[ ] - Make "basementor-vue" action to global register components
+	[ ] - Make wp_editor component for vue
+[ ] - Create "clone" action in posts actions list
+[ ] - Make "Post excel mode" work in all post types
+[ ] - Make Woocommerce filters customizable
+[ ] - Put title inside thumbnail for loop elements height bugfix
+*/
+
 define('BASEMENTOR_DIR', get_stylesheet_directory());
 define('BASEMENTOR_ELEMENTOR', did_action('elementor/loaded'));
 define('BASEMENTOR_WOOCOMMERCE', class_exists('WooCommerce'));
@@ -113,6 +122,17 @@ remove_action('admin_print_scripts', 'print_emoji_detection_script');
 remove_action('admin_print_styles', 'print_emoji_styles');
 
 
+/* Disable Woocommerce Stylesheet */
+add_filter('woocommerce_enqueue_styles', '__return_false' );
+// add_filter('woocommerce_enqueue_styles', function( $enqueue_styles ) {
+// 	unset( $enqueue_styles['woocommerce-general'] );
+// 	unset( $enqueue_styles['woocommerce-layout'] );
+// 	unset( $enqueue_styles['woocommerce-smallscreen'] );
+// 	return $enqueue_styles;
+// });
+
+
+
 
 add_action('after_setup_theme', function() {
 	add_theme_support('post-thumbnails');
@@ -204,3 +224,9 @@ ul.subsubsub li a {color:inherit !important;}
 .wp-list-table thead a, .wp-list-table tfoot a {color:inherit; font-weight:600;}
 </style><?php });
 
+
+
+add_action('wp_enqueue_scripts', function() {
+	wp_enqueue_style('aaa', get_template_directory_uri().'/style.css');
+	wp_enqueue_style('bbb', get_stylesheet_directory_uri().'/style.css');
+});

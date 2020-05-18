@@ -302,7 +302,19 @@ get_header( 'shop' ); ?>
 			</div>
 
 			<div class="col-12 col-md-8 col-lg-9 pt-3 pt-md-0 pl-md-3">
-				<div><?php do_action( 'woocommerce_before_shop_loop' ); ?></div>
+				<div class="row no-gutters align-items-center">
+					<div class="col-12 col-md-8">
+						<?php wc_get_template('loop/result-count.php', [
+							'total'    => wc_get_loop_prop('total'),
+							'per_page' => wc_get_loop_prop('per_page'),
+							'current'  => wc_get_loop_prop('current_page'),
+						]); ?>
+					</div>
+					<div class="col-12 col-md-4 text-right">
+						<?php // include 'loop/orderby' passing $catalog_orderby_options params
+						woocommerce_catalog_ordering(); ?>
+					</div>
+				</div>
 				<br><br>
 				<div class="clearfix"></div>
 

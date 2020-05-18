@@ -18,6 +18,6 @@
 defined('ABSPATH') || exit;
 
 ?>
-<h1 class="font-weight-bold text-uppercase m-0 p-0">
+<h1 class="font-weight-bold text-uppercase m-0 p-0 h4">
 	<?php echo get_the_title(); ?>
 </h1>

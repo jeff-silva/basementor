@@ -60,7 +60,7 @@ $elementor_typeform_validations = [
 
 
 function elementor_typeform_post($post=[]) {
-	dd($post); die;
+	// dd($post); die;
 	global $elementor_typeform_validations;
 
 	$post = (object) array_merge([

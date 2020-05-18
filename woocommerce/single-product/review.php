@@ -21,8 +21,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 ?>
-<li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>">
+<li <?php comment_class('mb-3'); ?> id="li-comment-<?php comment_ID(); ?>">
 
+	<div class="card" id="comment-<?php comment_ID(); ?>">
+		<div class="card-body p-2">
+			<div class="row no-gutters">
+				<div class="col-2 col-md-1">
+					<?php do_action('woocommerce_review_before', $comment); ?>
+				</div>
+
+				<div class="col">
+					<?php do_action('woocommerce_review_before_comment_meta', $comment); ?>	
+					<?php do_action('woocommerce_review_meta', $comment); ?>
+					<?php do_action('woocommerce_review_before_comment_text', $comment); ?>
+					<?php do_action('woocommerce_review_comment_text', $comment); ?>
+					<?php do_action('woocommerce_review_after_comment_text', $comment); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<?php return; ?>
 	<div id="comment-<?php comment_ID(); ?>" class="comment_container">
 
 		<?php

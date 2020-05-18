@@ -3,4 +3,4 @@
 global $product, $post;
 
 ?>
-<h5><?php the_title(); ?></h5>
+<h2 class="text-uppercase h6 m-0 p-0 font-weight-bold"><?php the_title(); ?></h2>

@@ -49,31 +49,30 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 ?>
 
 <style>
-.basementor-product-carousel-align {display: flex; align-items: center; justify-content: center;}
-.basementor-product-carousel {position:relative; background:#eee;}
-.basementor-product-carousel .slick-arrow {position:absolute; top:0px; height:100%; z-index:2; background:none; border:none; font-size:40px; outline:0!important; box-shadow:none !important;}
+/*.basementor-product-carousel-align {display: flex; align-items: center; justify-content: center;}*/
+.basementor-product-carousel {position:relative;}
+.basementor-product-carousel .slick-arrow {position:absolute; top:0px; width:50px; height:100%; z-index:2; text-align:center; padding:0px; background:none; border:none; text-shadow:0px 0px #fff; font-size:30px; outline:0!important; box-shadow:none !important;}
 .basementor-product-carousel .slick-prev {left:0px;}
 .basementor-product-carousel .slick-next {right:0px;}
+.basementor-product-carousel .slick-dots {list-style-type:none; margin:0px; padding:0px; text-align:center;}
+.basementor-product-carousel .slick-dots li {display:inline-block;}
+.basementor-product-carousel .slick-dots li.slick-active {}
+.basementor-product-carousel .slick-dots li button {border:none; background:#eee; color:#eee; border:solid 1px #444; font-size:0px; padding:0px; width:10px; height:10px; margin-right:5px; border-radius:50%;}
+.basementor-product-carousel .slick-dots li.slick-active button {background:#444; color:#444;}
 </style>
 
-<div class="basementor-product-carousel">
+<div class="basementor-product-carousel basementor-product-carousel-big" data-slick-settings='{slidesToShow:1, slidesToScroll:1, fade:true, adaptiveHeight:true, asNavFor:".basementor-product-carousel-small"}'>
 	<?php foreach($images as $image): ?>
-	<div>
-		<div class="basementor-product-carousel-align" style="height:300px; padding:0px 50px; text-align:center;">
-			<img src="<?php echo $image->url; ?>" alt="" style="height:100%;">
-		</div>
-	</div>
+	<div><img src="<?php echo $image->url; ?>" alt="" style="width:100%;"></div>
 	<?php endforeach; ?>
 </div>
 
 
 <?php if (sizeof($images)>1): ?>
 <br>
-<div class="basementor-product-carousel-dots text-center">
-	<?php foreach($images as $i=>$image): ?>
-	<a href="javascript:;" class="basementor-product-carousel-align border" style="display:inline-flex; vertical-align:middle; margin:5px 5px 0px 5px; width:70px; height:70px;" data-basementor-product-carousel-goto="<?php echo $i; ?>">
-		<img src="<?php echo $image->url; ?>" alt="" style="width:90%;">
-	</a>
+<div class="basementor-product-carousel basementor-product-carousel-small" data-slick-settings='{slidesToShow:3, slidesToScroll:1, arrows:false, asNavFor:".basementor-product-carousel-big", dots:true, centerMode:true, focusOnSelect:true}'>
+	<?php foreach($images as $image): ?>
+	<div class="px-1"><img src="<?php echo $image->url; ?>" alt="" style="width:100%;"></div>
 	<?php endforeach; ?>
 </div>
 <?php endif; ?>
@@ -82,19 +81,12 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script>jQuery(document).ready(function($) {
-	$(".basementor-product-carousel").slick({
-		prevArrow: `<button type="button" class="slick-arrow slick-prev"><i class="fa fa-fw fa-chevron-left"></i></button>`,
-		nextArrow: `<button type="button" class="slick-arrow slick-next"><i class="fa fa-fw fa-chevron-right"></i></button>`,
-	});
-
-	$(".basementor-product-carousel").on("setPosition", function(event, slick, direction) {
-		$(".basementor-product-carousel-dots a").removeClass("border-primary");
-		$(".basementor-product-carousel-dots a").eq(slick.currentSlide).addClass("border-primary");
-	});
-
-	$("[data-basementor-product-carousel-goto]").on("click", function() {
-		var index = $(this).attr("data-basementor-product-carousel-goto")||0;
-		$(".basementor-product-carousel").slick('slickGoTo', parseInt(index));
+	$("[data-slick-settings]").each(function() {
+		var sets = $(this).attr("data-slick-settings")||"{}";
+		try { eval('sets = '+sets); } catch(e) { sets = {}; }
+		sets.prevArrow = sets.prevArrow||`<button type="button" class="slick-arrow slick-prev"><i class="fa fa-fw fa-chevron-left"></i></button>`;
+		sets.nextArrow = sets.nextArrow||`<button type="button" class="slick-arrow slick-next"><i class="fa fa-fw fa-chevron-right"></i></button>`;
+		$(this).slick(sets);
 	});
 });</script>
 

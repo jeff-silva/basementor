@@ -37,12 +37,12 @@ if ( post_password_required() ) {
 	<div class="row no-gutters">
 		<div class="col-12 col-md-9">
 			<div class="row no-gutters">
-				<div class="col-12 col-md-6 pr-md-3">
+				<div class="col-12 col-md-5 pr-md-3">
 					<?php wc_get_template_part('single-product/product-image'); ?>
 				</div>
 
-				<div class="col-12 col-md-6 pb-3">
-					<?php wc_get_template_part('single-product/title'); ?>
+				<div class="col-12 col-md-7 pb-3">
+					<div class="mb-3"><?php wc_get_template_part('single-product/title'); ?></div>
 					<?php wc_get_template_part('single-product/rating'); ?>
 					<?php wc_get_template_part('single-product/short-description'); ?>
 					<?php wc_get_template_part('single-product/stock'); ?>
@@ -101,21 +101,22 @@ if ( post_password_required() ) {
 				if (isset($section['query']['post__in']) AND !$section['query']['post__in']) continue;
 				$loop = new WP_Query($section['query']);
 				if ($loop->have_posts()): ?>
-					<div class="row mb-3">
-						<div class="col-12">
-							<h4 class="font-weight-bold text-uppercase m-0 p-0"><?php echo $section['title']; ?></h4>		
-						</div>
-						
-						<?php while($loop->have_posts()): $loop->the_post(); ?>
-						<div class="col-12 mt-3">
-							<a href="<?php echo get_the_permalink(); ?>" class="d-block">
-								<?php wc_get_template_part('loop/thumbnail'); ?>
-								<?php wc_get_template_part('loop/title'); ?>
-								<?php wc_get_template_part('loop/add-to-cart'); ?>
-							</a>
-						</div>
-						<?php endwhile; ?>
-					</div>
+
+					<div class="border border-primary border-bottom-0 mt-4 mb-2"></div>
+					<h3 class="font-weight-bold h4 text-uppercase m-0 mb-3 p-0"><?php echo $section['title']; ?></h3>		
+
+					<?php wc_get_template('loop/loop-start.php', [
+						'row' => 'no-gutters',
+					]); ?>
+
+					<?php while($loop->have_posts()): $loop->the_post(); ?>
+					<?php wc_get_template('content-product.php', [
+						'col' => 'col-12',
+					]); ?>
+					<?php endwhile; ?>
+
+					<?php wc_get_template('loop/loop-end.php', []); ?>
+					
 				<?php endif;; ?>
 			<?php endforeach; ?>
 		</div>
