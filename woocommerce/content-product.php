@@ -32,19 +32,14 @@ $args = array_merge([
 
 ?>
 <div <?php wc_product_class("text-center mb-3 basementor-products-each {$args['col']}", $product ); ?>>
-	<div class="mb-3 text-left" style="position:relative; border-radius:5px; overflow:hidden;">
-		<a href="<?php the_permalink(); ?>">
-			<?php wc_get_template_part('loop/thumbnail'); ?>
-		</a>
-		
-		<div style="position:absolute; top:0px; right:5px;">
-			<?php wc_get_template_part('loop/sale-flash'); ?>
-		</div>
-
-		<div class="p-2 text-light" style="position:absolute; bottom:0px; left:0px; width:100%; background:#00000099;">
-			<a href="<?php the_permalink(); ?>" class="d-block pb-1 text-light"><?php wc_get_template_part('loop/title'); ?></a>
-			<div class="pb-1"><?php wc_get_template_part('loop/price'); ?></div>
-			<div><?php wc_get_template_part('loop/add-to-cart'); ?></div>
+	<div class="basementor-products-each">
+		<a href="<?php the_permalink(); ?>" class="basementor-products-cover" style="background-image:url(<?php echo get_the_post_thumbnail_url($post->ID); ?>);"></a>
+		<div class="basementor-products-description">
+			<a href="<?php the_permalink(); ?>" class="d-block mt-1">
+				<?php wc_get_template_part('loop/title'); ?>
+			</a>
+			<div class="mt-1"><?php wc_get_template_part('loop/price'); ?></div>
+			<div class="mt-1"><?php wc_get_template_part('loop/add-to-cart'); ?></div>
 		</div>
 	</div>
 	<?php

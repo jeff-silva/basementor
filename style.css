@@ -7,3 +7,35 @@ Description: WP Theme Quick Start
 Version: 1.0.0
 */
 
+.basementor-products-each {
+	height: 400px;
+	display: -webkit-box;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	flex-direction: column;
+}
+
+.basementor-products-cover {
+	display: -webkit-box;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	justify-content: center;
+	-webkit-box-flex: 1;
+	flex: 1;
+	background:url() center center no-repeat #eee;
+	background-size: cover;
+}
+
+.basementor-products-description {
+	display: -webkit-box;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	justify-content: center;
+}
