@@ -9,9 +9,11 @@
 [ ] - Put title inside thumbnail for loop elements height bugfix
 */
 
-define('BASEMENTOR_DIR', get_stylesheet_directory());
 define('BASEMENTOR_ELEMENTOR', did_action('elementor/loaded'));
 define('BASEMENTOR_WOOCOMMERCE', class_exists('WooCommerce'));
+define('BASEMENTOR_PARENT', get_template_directory());
+define('BASEMENTOR_CHILD', get_stylesheet_directory());
+
 
 /* Print data: dd($data1, $data2, $data3); */
 if (! function_exists('dd')) { function dd() { foreach(func_get_args() as $data) { echo '<pre>'. print_r($data, true) .'</pre>'; }}}
@@ -111,7 +113,39 @@ add_action('admin_bar_menu', function($admin_bar) {
 		'title' => 'Refresh autoload',
 		'href'  => '?basementor-autoload',
 	]);
+
+	if (BASEMENTOR_PARENT == BASEMENTOR_CHILD) {
+		$admin_bar->add_menu([
+			'parent' => $menu_id,
+			'id'    => 'basementor-theme-child',
+			'title' => 'Criar tema filho',
+			'href'  => '?basementor-theme-child',
+		]);
+	}
 }, 100);
+
+
+if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
+	add_action('init', function() {
+		$folder = wp_get_current_user();
+		$folder = $folder->data->user_login;
+		$theme_folder = get_theme_root() ."/{$folder}";
+		@mkdir($theme_folder, 0755, true);
+		@mkdir($theme_folder.'/autoload', 0755, true);
+		file_put_contents("{$theme_folder}/style.css", implode("\n", [
+			'/*',
+			"Theme Name:     {$folder} theme",
+			"Description:    {$folder} Theme",
+			'Author:         Jeferson Siqueira',
+			'Author URI:     https://jsiqueira.com',
+			'Template:       basementor-master',
+			'Version:        1.0',
+			'*/',
+		]));
+
+		wp_redirect($_SERVER['HTTP_REFERER']); die;
+	});
+}
 
 
 
