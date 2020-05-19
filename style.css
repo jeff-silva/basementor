@@ -8,7 +8,7 @@ Version: 1.0.0
 */
 
 .basementor-products-each {
-	height: 400px;
+	height: 350px;
 	display: -webkit-box;
 	display: flex;
 	-webkit-box-orient: vertical;
@@ -28,6 +28,7 @@ Version: 1.0.0
 	flex: 1;
 	background:url() center center no-repeat #eee;
 	background-size: cover;
+	border-radius:6px 6px 0px 0px;
 }
 
 .basementor-products-description {

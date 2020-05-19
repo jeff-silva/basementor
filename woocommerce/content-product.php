@@ -31,14 +31,18 @@ $args = array_merge([
 ], $args);
 
 ?>
-<div <?php wc_product_class("text-center mb-3 basementor-products-each {$args['col']}", $product ); ?>>
+<div <?php wc_product_class("text-center mb-5 basementor-products-each {$args['col']}", $product ); ?>>
+	<div style="position:absolute; top:0px; right:20px;">
+		<?php wc_get_template_part('loop/sale-flash'); ?>
+	</div>
 	<div class="basementor-products-each">
 		<a href="<?php the_permalink(); ?>" class="basementor-products-cover" style="background-image:url(<?php echo get_the_post_thumbnail_url($post->ID); ?>);"></a>
 		<div class="basementor-products-description">
-			<a href="<?php the_permalink(); ?>" class="d-block mt-1">
+			<a href="<?php the_permalink(); ?>" class="d-block mt-2">
 				<?php wc_get_template_part('loop/title'); ?>
 			</a>
 			<div class="mt-1"><?php wc_get_template_part('loop/price'); ?></div>
+			<div class="mt-1"><?php wc_get_template_part('loop/rating'); ?></div>
 			<div class="mt-1"><?php wc_get_template_part('loop/add-to-cart'); ?></div>
 		</div>
 	</div>

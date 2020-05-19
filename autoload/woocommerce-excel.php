@@ -57,6 +57,115 @@ function elementor_excel_products() {
 });
 
 
+
+\Basementor\Basementor::action('wooxcel-faker', function($post) {
+
+	$_word = function($len=10) {
+		$word = array_merge(range('a', 'z'), range('A', 'Z'));
+		shuffle($word);
+		return ucwords(strtolower(substr(implode($word), 0, $len)));
+	};
+
+	$_words = function($words=5) use($_word) {
+		$return = [];
+		for($w=0; $w<=$words; $w++) {
+			$return[] = $_word(rand(5, 10));
+		}
+		return implode(' ', $return);
+	};
+
+	$_download_image = function($url) {
+		require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		include_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+		$data = new \stdClass;
+		$data->url = $url;
+		$data->filename = md5($url) .'.jpg';
+		$uploaddir = wp_upload_dir();
+		$data->uploadfile = $uploaddir['path'] . '/' . $data->filename;
+		file_put_contents($data->uploadfile, file_get_contents($url));
+		// dd($data); die;
+
+		$wp_filetype = wp_check_filetype(basename($data->filename), null );
+		$attach_id = wp_insert_attachment([
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title' => $data->filename,
+			'post_content' => '',
+			'post_status' => 'inherit'
+		], $data->uploadfile);
+
+		$imagenew = get_post( $attach_id );
+		$fullsizepath = get_attached_file( $imagenew->ID );
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $fullsizepath );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
+		update_post_meta($imagenew->ID, 'basementor-faker', 1);
+		return $imagenew->ID;
+	};
+
+
+	$inserts = [];
+	for($n=0; $n<=$post->quantity; $n++) {
+		$prod = [
+			'post_title' => $_words(rand(3, 7)),
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			'post_content' => $_words(rand(20, 30)),
+			'meta_input' => [
+				'basementor-faker' => 1,
+				'_regular_price' => number_format(rand(10, 999), 2, '.', ''),
+				'_sale_price' => number_format(rand(0, 999), 2, '.', ''),
+				'_thumbnail_id' => $_download_image('https://picsum.photos/300/300?rand='.rand(0, 999)),
+			],
+		];
+
+		if ($prod['meta_input']['_sale_price'] >= $prod['meta_input']['_regular_price']) {
+			unset($prod['meta_input']['_sale_price']);
+		}
+
+		wp_insert_post($prod);
+		$inserts[] = $prod;
+	}
+
+	return [
+		'inserts' => $inserts,
+		'products' => elementor_excel_products(),
+	];
+});
+
+
+
+\Basementor\Basementor::action('wooxcel-faker-delete', function($post) {
+	global $wpdb;
+
+	$deletes = [];
+
+	$products = get_posts([
+		'post_type' => ['product', 'attachment'],
+		'post_status' => 'any',
+		'posts_per_page' => -1,
+		'meta_query' => [
+			[
+				'key' => 'basementor-faker',
+				'compare' => 'EXISTS',
+			],
+		],
+	]);
+
+	foreach($products as $prod) {
+		wp_delete_post($prod->ID, true);
+		$deletes[] = $prod->ID;
+		$deletes[] = "delete from {$wpdb->postmeta} where post_id='{$prod->ID}'; ";
+		$deletes[] = "delete from {$wpdb->post} where post_parent='{$prod->ID}'; ";
+	}
+
+	return [
+		'deletes' => $deletes,
+		'products' => elementor_excel_products(),
+	];
+});
+
+
+
 add_action('admin_menu', function() {
 	// add_submenu_page('woocommerce', 'Woo Excel', 'Woo Excel', 'manage_options', 'wooxcel', 'wooxcel_search');
 	add_submenu_page('edit.php?post_type=product', 'Woo Excel', 'Woo Excel', 'manage_options', 'wooxcel', function() {
@@ -64,8 +173,8 @@ add_action('admin_menu', function() {
 		$data->id = uniqid('wooxcel-');
 		$data->saving = false;
 		$data->product = false;
-
 		$data->products = elementor_excel_products();
+		$data->faker = false;
 
 
 		/*
@@ -116,7 +225,7 @@ add_action('admin_menu', function() {
 
 
 
-		?><br><div id="<?php echo $data->id; ?>">
+		?><br><div id="<?php echo $data->id; ?>" class="pr-2">
 			<div class="list-inline text-right">
 				<div class="list-inline-item">
 					<a href="javascript:;" class="btn btn-outline-primary btn-sm">Baixar modelo excel</a>
@@ -125,7 +234,27 @@ add_action('admin_menu', function() {
 				<div class="list-inline-item">
 					<a href="javascript:;" class="btn btn-outline-primary btn-sm">Importar excel</a>
 				</div>
+
+				<div class="list-inline-item">
+					<a href="javascript:;" class="btn btn-outline-primary btn-sm" @click="faker={};">Faker</a>
+				</div>
 			</div><br>
+
+			<div v-if="faker" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:#00000044; z-index:9; display: flex; align-items: center; justify-content: center;" @click.self="faker=false;">
+				<div class="card">
+					<div class="card-header">Gerador de produtos fake</div>
+					<div class="card-body">
+						<div class="form-group">
+							<label>Quantos produtos devem ser gerados?</label>
+							<input type="number" class="form-control" v-model="faker.quantity" @keyup.enter="fakerGenerate();">
+						</div>
+					</div>
+					<div class="card-footer text-right">
+						<button type="button" class="btn btn-danger pull-left" @click="fakerDelete();">Deletar fakes</button>
+						<button type="button" class="btn btn-primary" @click="fakerGenerate();">Gerar</button>
+					</div>
+				</div>
+			</div>
 
 			<form action="" @submit.prevent="productSave();">
 				<table class="table table-bordered table-striped">
@@ -300,6 +429,23 @@ add_action('admin_menu', function() {
 						this.saving == false;
 						this.products = resp.products;
 						console.log(resp);
+					}, "json");
+				},
+
+				fakerGenerate() {
+					var $=jQuery;
+					$.post("<?php echo \Basementor\Basementor::action('wooxcel-faker'); ?>", this.faker, (resp) => {
+						console.clear();
+						console.log(JSON.stringify(resp, 2, ' '));
+						this.products = resp.products;
+					}, "json");
+				},
+
+				fakerDelete() {
+					if (! confirm('Tem certeza que deseja deletar fakes?')) return;
+					var $=jQuery;
+					$.post("<?php echo \Basementor\Basementor::action('wooxcel-faker-delete'); ?>", this.faker, (resp) => {
+						this.products = resp.products;
 					}, "json");
 				},
 			},
