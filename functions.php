@@ -157,7 +157,7 @@ remove_action('admin_print_styles', 'print_emoji_styles');
 
 
 /* Disable Woocommerce Stylesheet */
-add_filter('woocommerce_enqueue_styles', '__return_false' );
+// add_filter('woocommerce_enqueue_styles', '__return_false' );
 // add_filter('woocommerce_enqueue_styles', function( $enqueue_styles ) {
 // 	unset( $enqueue_styles['woocommerce-general'] );
 // 	unset( $enqueue_styles['woocommerce-layout'] );

@@ -50,6 +50,11 @@ function elementor_excel_products() {
 
 
 \Basementor\Basementor::action('wooxcel-save', function($post) {
+	$post->meta_input['_price'] = $post->meta_input['_regular_price'];
+	if (isset($post->meta_input['_sale_price']) AND !empty($post->meta_input['_sale_price'])) {
+		$post->meta_input['_price'] = $post->meta_input['_sale_price'];
+	}
+
 	return [
 		'saved' => wp_insert_post($post),
 		'products' => elementor_excel_products(),
@@ -120,6 +125,12 @@ function elementor_excel_products() {
 
 		if ($prod['meta_input']['_sale_price'] >= $prod['meta_input']['_regular_price']) {
 			unset($prod['meta_input']['_sale_price']);
+		}
+
+		$prod['meta_input']['_price'] = $prod['meta_input']['_regular_price'];
+
+		if (isset($prod['meta_input']['_sale_price']) AND !empty($prod['meta_input']['_sale_price'])) {
+			$prod['meta_input']['_price'] = $prod['meta_input']['_sale_price'];
 		}
 
 		wp_insert_post($prod);
@@ -246,12 +257,16 @@ add_action('admin_menu', function() {
 					<div class="card-body">
 						<div class="form-group">
 							<label>Quantos produtos devem ser gerados?</label>
-							<input type="number" class="form-control" v-model="faker.quantity" @keyup.enter="fakerGenerate();">
+							<div class="input-group border border-primary">
+								<input type="number" class="form-control" v-model="faker.quantity" @keyup.enter="fakerGenerate();">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-primary" @click="fakerGenerate();">Gerar</button>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="card-footer text-right">
 						<button type="button" class="btn btn-danger pull-left" @click="fakerDelete();">Deletar fakes</button>
-						<button type="button" class="btn btn-primary" @click="fakerGenerate();">Gerar</button>
 					</div>
 				</div>
 			</div>

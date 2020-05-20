@@ -99,19 +99,6 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 			</div>
 		</div>
 
-		<?php elseif ($field->type=='tel'): ?>
-		<div class="form-group <?php echo implode(' ', $field->class); ?>">
-			<label><?php echo $field->label; ?></label>
-			<div class="input-group">
-				<div class="input-group-prepend"><div class="input-group-text"><i class="fa fa-fw fa-phone"></i></div></div>
-				<input type="<?php echo $field->type; ?>"
-					class="form-control"
-					placeholder="<?php echo $field->placeholder; ?>"
-					name="<?php echo $key; ?>"
-					value="<?php echo $value; ?>">
-			</div>
-		</div>
-
 		<?php else: ?>
 		<div class="form-group <?php echo implode(' ', $field->class); ?>">
 			<label><?php echo $field->label; ?></label>
