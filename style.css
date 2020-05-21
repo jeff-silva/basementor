@@ -40,3 +40,9 @@ Version: 1.0.0
 	-webkit-box-pack: center;
 	justify-content: center;
 }
+
+
+/* Single Product */
+.single-product-price {}
+.single-product-price del {display:block; font-size: 16pt;}
+.single-product-price ins {display:block; font-size: 25pt;}

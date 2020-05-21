@@ -46,7 +46,9 @@ if ( post_password_required() ) {
 					<?php wc_get_template_part('single-product/rating'); ?>
 					<?php wc_get_template_part('single-product/short-description'); ?>
 					<?php wc_get_template_part('single-product/stock'); ?>
-					<?php wc_get_template_part('single-product/share'); ?>
+					<div class="text-right">
+						<?php wc_get_template_part('single-product/share'); ?>
+					</div>
 				</div>
 
 				<div class="col-12 col-md-12">
@@ -59,7 +61,9 @@ if ( post_password_required() ) {
 
 		<div class="col-12 col-md-3 pl-md-3">
 			<?php wc_get_template_part('single-product/sale-flash'); ?>
-			<?php wc_get_template_part('single-product/price'); ?>
+			<div class="single-product-price">
+				<?php wc_get_template_part('single-product/price'); ?>
+			</div>
 			<?php wc_get_template_part('cart/shipping-calculator'); ?>
 			<?php wc_get_template_part('single-product/add-to-cart/external'); ?>
 			<?php wc_get_template_part('single-product/add-to-cart/grouped'); ?>

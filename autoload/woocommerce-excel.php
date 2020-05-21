@@ -5,9 +5,9 @@ Name: Wooxcel
 */
 
 
-if (isset($_GET['media'])) {
+if (isset($_GET['woocommerce-excel-media'])) {
 	add_action('init', function() {
-		if (! $media_url = wp_get_attachment_url($_GET['media'])) {
+		if (! $media_url = wp_get_attachment_url($_GET['woocommerce-excel-media'])) {
 			$media_url = 'https://www.ice-shop.dk/media/catalog/product/cache/1/image/378x380/9df78eab33525d08d6e5fb8d27136e95/placeholder/default/no_image_placeholder_6.png';
 		}
 		wp_redirect($media_url); die;
@@ -65,18 +65,33 @@ function elementor_excel_products() {
 
 \Basementor\Basementor::action('wooxcel-faker', function($post) {
 
-	$_word = function($len=10) {
-		$word = array_merge(range('a', 'z'), range('A', 'Z'));
-		shuffle($word);
-		return ucwords(strtolower(substr(implode($word), 0, $len)));
+	$_rand = function($items) {
+		return $items[ array_rand($items) ];
 	};
 
-	$_words = function($words=5) use($_word) {
-		$return = [];
-		for($w=0; $w<=$words; $w++) {
-			$return[] = $_word(rand(5, 10));
+
+	$_silab = function() use($_rand) {
+		$return = $_rand(str_split('          abcdefghijklmnopqrstuvwxyz'));
+		$return .= $_rand(str_split('aeiou'));
+		$return .= $_rand(str_split('          lmrsxz'));
+		return trim($return);
+	};
+
+
+	$_word = function($len=3) use($_silab) {
+		$silabs = [];
+		for($x=1; $x<=$len; $x++) {
+			$silabs[] = $_silab(rand(1, 5));
 		}
-		return implode(' ', $return);
+		return implode('', $silabs);
+	};
+
+	$_words = function($len=5) use($_word) {
+		$words = [];
+		for($x=1; $x<=$len; $x++) {
+			$words[] = $_word();
+		}
+		return implode(' ', $words);
 	};
 
 	$_download_image = function($url) {
@@ -114,7 +129,8 @@ function elementor_excel_products() {
 			'post_title' => $_words(rand(3, 7)),
 			'post_type' => 'product',
 			'post_status' => 'publish',
-			'post_content' => $_words(rand(20, 30)),
+			'post_excerpt' => $_words(rand(30, 30)),
+			'post_content' => $_words(rand(50, 200)),
 			'meta_input' => [
 				'basementor-faker' => 1,
 				'_regular_price' => number_format(rand(10, 999), 2, '.', ''),
@@ -188,54 +204,6 @@ add_action('admin_menu', function() {
 		$data->faker = false;
 
 
-		/*
-		public function taxonomyTerms($taxonomy, $parent=0, $prefix='•', $terms=[], $return=[], $level=0) {
-			if (empty($terms)) {
-				$terms = get_terms([
-					'taxonomy' => $taxonomy,
-					'orderby' => 'name',
-					'hide_empty' => false,
-					'hierarchical' => 1,
-				]);
-			}
-
-			foreach($terms as $term) {
-				if ($term->parent==$parent) {
-					$term->name = ltrim(str_repeat($prefix, $level) ." {$term->name}");
-					$return[] = $term;
-					$return = $this->taxonomyTerms($taxonomy, $term->term_id, $prefix, $terms, $return, $level+1);
-				}
-			}
-
-			return $return;
-		}
-
-
-		public function taxonomies() {
-			$not = [
-				'product_type',
-				'product_visibility',
-				'product_shipping_class',
-				'product_tag',
-			];
-
-			$return = [];
-			foreach(get_object_taxonomies(['post_type' => $this->post_type]) as $taxo) {
-				if (in_array($taxo, $not)) continue;
-				
-				$taxo = get_taxonomy($taxo);
-				$return[] = (object) [
-					'slug' => $taxo->name,
-					'name' => $taxo->label,
-					'terms' => $this->taxonomyTerms($taxo->name),
-				];
-			}
-			return $return;
-		}
-		*/
-
-
-
 		?><br><div id="<?php echo $data->id; ?>" class="pr-2">
 			<div class="list-inline text-right">
 				<div class="list-inline-item">
@@ -260,13 +228,19 @@ add_action('admin_menu', function() {
 							<div class="input-group border border-primary">
 								<input type="number" class="form-control" v-model="faker.quantity" @keyup.enter="fakerGenerate();">
 								<div class="input-group-btn">
-									<button type="button" class="btn btn-primary" @click="fakerGenerate();">Gerar</button>
+									<button type="button" class="btn btn-primary" @click="fakerGenerate();">
+										<span v-if="faker.generating"><i class="fa fa-fw fa-spin fa-spinner"></i> Gerando</span>
+										<span v-else>Gerar</span>
+									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="card-footer text-right">
-						<button type="button" class="btn btn-danger pull-left" @click="fakerDelete();">Deletar fakes</button>
+						<button type="button" class="btn btn-danger pull-left" @click="fakerDelete();">
+							<span v-if="faker.deleting"><i class="fa fa-fw fa-spin fa-spinner"></i> Deletando</span>
+							<span v-else>Deletar Fakes</span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -422,7 +396,7 @@ add_action('admin_menu', function() {
 									<a href="javascript:;" class="btn btn-sm btn-danger" @click="mediaRemove(id);" style="position:absolute; top:5px; right:5px; padding:1px 3px !important;">
 										<i class="fa fa-fw fa-remove"></i>
 									</a>
-									<img :src="'?media='+id" alt="" style="height:100px;" />
+									<img :src="'?woocommerce-excel-media='+id" alt="" style="height:100px;" />
 								</div>
 							</div>
 							
@@ -443,15 +417,14 @@ add_action('admin_menu', function() {
 					$.post('<?php echo \Basementor\Basementor::action('wooxcel-save'); ?>', this.product, (resp) => {
 						this.saving == false;
 						this.products = resp.products;
-						console.log(resp);
 					}, "json");
 				},
 
 				fakerGenerate() {
 					var $=jQuery;
+					this.$set(this.faker, "generating", true);
 					$.post("<?php echo \Basementor\Basementor::action('wooxcel-faker'); ?>", this.faker, (resp) => {
-						console.clear();
-						console.log(JSON.stringify(resp, 2, ' '));
+						this.$set(this.faker, "generating", false);
 						this.products = resp.products;
 					}, "json");
 				},
@@ -459,7 +432,9 @@ add_action('admin_menu', function() {
 				fakerDelete() {
 					if (! confirm('Tem certeza que deseja deletar fakes?')) return;
 					var $=jQuery;
+					this.$set(this.faker, "deleting", true);
 					$.post("<?php echo \Basementor\Basementor::action('wooxcel-faker-delete'); ?>", this.faker, (resp) => {
+						this.$set(this.faker, "deleting", false);
 						this.products = resp.products;
 					}, "json");
 				},

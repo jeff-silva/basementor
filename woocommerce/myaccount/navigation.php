@@ -15,9 +15,7 @@
  * @version 2.6.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined('ABSPATH') || exit;
 
 $user = wp_get_current_user();
 $user->data->avatar = get_avatar_url($user->data->ID);
@@ -31,25 +29,23 @@ do_action( 'woocommerce_before_account_navigation' );
 .woocommerce-MyAccount-navigation .list-group-item.is-active {background:#ddd;}
 </style>
 
-<nav class="woocommerce-MyAccount-navigation">
-	<div class="row no-gutters align-items-center pt-5" style="background:#eee;">
-		<div class="col-3 p-3">
-			<img src="<?php echo $user->data->avatar; ?>" alt="" style="width:100%; border-radius:50%;">
-		</div>
-		<div class="col">
-			<div class="text-uppercase font-weight-bold"><?php echo $user->data->display_name; ?></div>
-			<div><?php echo $user->data->user_email; ?></div>
-		</div>
+<div class="row no-gutters align-items-center pt-5" style="background:#eee;">
+	<div class="col-3 p-3">
+		<img src="<?php echo $user->data->avatar; ?>" alt="" style="width:100%; border-radius:50%;">
 	</div>
-	<hr>
+	<div class="col">
+		<div class="text-uppercase font-weight-bold"><?php echo $user->data->display_name; ?></div>
+		<div><?php echo $user->data->user_email; ?></div>
+	</div>
+</div>
+<hr>
 
-	<ul class="list-group">
-		<?php foreach ( wc_get_account_menu_items() as $endpoint => $label ) : ?>
-			<li class="list-group-item <?php echo wc_get_account_menu_item_classes( $endpoint ); ?>">
-				<a href="<?php echo esc_url( wc_get_account_endpoint_url( $endpoint ) ); ?>"><?php echo esc_html( $label ); ?></a>
-			</li>
-		<?php endforeach; ?>
-	</ul>
-</nav>
+<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+	<?php foreach(wc_get_account_menu_items() as $endpoint => $label): ?>
+	<a href="<?php echo esc_url(wc_get_account_endpoint_url($endpoint)); ?>" class="nav-link <?php echo is_wc_endpoint_url($endpoint)? 'active': null; ?>">
+		<?php echo esc_html($label); ?>
+	</a>
+	<?php endforeach; ?>
+</div>
 
 <?php do_action( 'woocommerce_after_account_navigation' ); ?>
