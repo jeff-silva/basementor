@@ -202,9 +202,12 @@ add_action('admin_menu', function() {
 		$data->product = false;
 		$data->products = elementor_excel_products();
 		$data->faker = false;
-
+		$data->wp_editor = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>';
 
 		?><br><div id="<?php echo $data->id; ?>" class="pr-2">
+			
+			<wp-editor v-model="wp_editor"></wp-editor>
+
 			<div class="list-inline text-right">
 				<div class="list-inline-item">
 					<a href="javascript:;" class="btn btn-outline-primary btn-sm">Baixar modelo excel</a>
@@ -325,7 +328,7 @@ add_action('admin_menu', function() {
 
 			<!-- <pre>$data: {{ $data }}</pre> -->
 		</div>
-
+		
 		<script>Vue.component("media-picker", {
 			props: {
 				value: {default:() => ({})},

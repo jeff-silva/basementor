@@ -17,6 +17,7 @@ define('BASEMENTOR_CHILD', get_stylesheet_directory());
 
 /* Print data: dd($data1, $data2, $data3); */
 if (! function_exists('dd')) { function dd() { foreach(func_get_args() as $data) { echo '<pre>'. print_r($data, true) .'</pre>'; }}}
+if (! function_exists('de')) { function de() { foreach(func_get_args() as $data) { echo '<pre>'. var_export($data, true) .'</pre>'; }}}
 
 
 spl_autoload_register(function($class) {
