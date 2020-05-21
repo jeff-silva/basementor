@@ -15,25 +15,13 @@
  * @version 3.5.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined('ABSPATH') || exit;
 
 $user = wp_get_current_user();
 if ($user->data->ID==0) {
 	wc_get_template_part('global/form-login');
 	return;
 }
-
-/*
-do_action('woocommerce_before_checkout_form', $checkout );
-
-// If checkout registration is disabled and not logged in, the user cannot checkout.
-if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
-	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'woocommerce' ) ) );
-	return;
-}
-*/
 
 ?>
 
@@ -62,3 +50,25 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 </form>
 
 <?php do_action('woocommerce_after_checkout_form', $checkout ); ?>
+
+<script>jQuery(document).ready(function($) {
+	["billing_postcode", "shipping_postcode"].forEach(function(input_name) {
+		$(`input[name=${input_name}]`).on("keyup blue", function(ev) {
+			if (ev.target.value.length < 8) return;
+			$.get(`https://viacep.com.br/ws/${ev.target.value.replace(/[^0-9]/g, '')}/json/`, function(resp) {
+				if (input_name=="billing_postcode") {
+					$("input[name=billing_address_1]").val(resp.logradouro);
+					$("input[name=billing_neighborhood]").val(resp.bairro);
+					$("input[name=billing_city]").val(resp.localidade);
+					$("input[name=billing_state]").val(resp.uf);
+				}
+				else if (input_name=="shipping_postcode") {
+					$("input[name=shipping_address_1]").val(resp.logradouro);
+					$("input[name=shipping_neighborhood]").val(resp.bairro);
+					$("input[name=shipping_city]").val(resp.localidade);
+					$("input[name=shipping_state]").val(resp.uf);
+				}
+			}, "json");
+		});
+	});
+});</script>

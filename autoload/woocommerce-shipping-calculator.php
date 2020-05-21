@@ -61,8 +61,8 @@ add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=nul
 				<tbody>
 					<tr v-for="v in resp.values" :key="v">
 						<td>{{ v.title }}</td>
-						<td>R$ {{ v.value }}</td>
-						<td v-if="v.days">{{ v.days }} dias</td>
+						<td v-if="v.value>0">R$ {{ v.value }}</td>
+						<td v-if="v.days>0">{{ v.days }} dias</td>
 					</tr>
 				</tbody>
 			</table>
