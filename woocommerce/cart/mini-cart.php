@@ -42,32 +42,36 @@ do_action( 'woocommerce_before_mini_cart' ); ?>
 					$product_price     = apply_filters('woocommerce_cart_item_price', $cart->get_product_price( $_product ), $cart_item, $cart_item_key);
 					$product_permalink = apply_filters('woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key);
 					?>
-					<div class="woocommerce-mini-cart-item <?php echo esc_attr(apply_filters('woocommerce_mini_cart_item_class', 'mini_cart_item', $cart_item, $cart_item_key)); ?>">
-						<div class="row no-gutters align-items-center">
+					<div class="row no-gutters align-items-center" data-cart-item-key="<?php echo $cart_item_key; ?>">
 
-							<div class="col-2">
-								<img src="<?php echo get_the_post_thumbnail_url($_product->get_id()); ?>" alt="" style="width:100%;">
+						<div class="col-2">
+							<img src="<?php echo get_the_post_thumbnail_url($_product->get_id()); ?>" alt="" style="width:100%;">
+						</div>
+
+						<div class="col pl-2">
+							<div><a href="<?php echo $product_permalink? $product_permalink: 'javascript:;'; ?>">
+								<?php echo $product_name; ?>
+							</a></div>
+
+							<div class="text-muted">
+								<?php echo wc_get_formatted_cart_item_data($cart_item); ?>
+								<?php echo apply_filters('woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $cart_item['quantity'], $product_price ) . '</span>', $cart_item, $cart_item_key); ?>
 							</div>
+						</div>
 
-							<div class="col pl-2">
-								<div><a href="<?php echo $product_permalink? $product_permalink: 'javascript:;'; ?>">
-									<?php echo $product_name; ?>
-								</a></div>
-
-								<div class="text-muted">
-									<?php echo wc_get_formatted_cart_item_data($cart_item); ?>
-									<?php echo apply_filters('woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $cart_item['quantity'], $product_price ) . '</span>', $cart_item, $cart_item_key); ?>
-								</div>
-							</div>
-
-							<div class="col-1"><?php echo apply_filters('woocommerce_cart_item_remove_link', sprintf(
+						<div class="col-1">
+							<a href="<?php echo wc_get_cart_remove_url($cart_item_key); ?>">
+								<i class="fa fa-fw fa-remove"></i>
+							</a>
+							
+							<?php /*echo apply_filters('woocommerce_cart_item_remove_link', sprintf(
 								'<a href="%s" class="remove remove_from_cart_button pull-right" aria-label="%s" data-product_id="%s" data-cart_item_key="%s" data-product_sku="%s">&times;</a>',
 								esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 								esc_attr__( 'Remove this item', 'woocommerce' ),
 								esc_attr( $product_id ),
 								esc_attr( $cart_item_key ),
 								esc_attr( $_product->get_sku() )
-							), $cart_item_key); ?></div>
+							), $cart_item_key);*/ ?>
 						</div>
 					</div>
 				<?php endif; ?>
@@ -109,3 +113,10 @@ do_action( 'woocommerce_before_mini_cart' ); ?>
 
 	<?php do_action( 'woocommerce_after_mini_cart' ); ?>
 </div>
+
+
+<script>jQuery(document).ready(function($) {
+	$(document.body).on('removed_from_cart', function(a, b, c, d) {
+		console.log(a, b, c, d);
+	});
+});</script>

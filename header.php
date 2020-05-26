@@ -5,3 +5,6 @@
 <?php wp_head(); ?>
 </head><body <?php body_class(); ?>>
 <?php \Basementor\Basementor::elementor('header'); ?>
+<?php if (function_exists('wc_print_notices') AND wc_notice_count()>0): ?>
+<div class="container"><?php wc_print_notices(); ?></div>
+<?php endif; ?>

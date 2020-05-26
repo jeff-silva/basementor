@@ -96,16 +96,22 @@ add_action('elementor/widgets/widgets_registered', function($manager) {
 			$data = new stdClass;
 			$data->query = json_decode($set->query, true);
 			$data->query['post_type'] = 'product';
+			
+			$data->query['meta_query'] = isset($data->query['meta_query'])?
+				$data->query['meta_query']: ['relation'=>'OR'];
+
+			$data->query['tax_query'] = isset($data->query['tax_query'])?
+				$data->query['tax_query']: [];
 
 			if ($set->featured) {
-				$data->query['meta_query'][] = [
-					'key'   => '_featured',
-					'value' => 'yes'
+				$data->query['tax_query'][] = [
+					'taxonomy'   => 'product_visibility',
+					'field' => 'name',
+					'terms' => 'featured',
 				];
 			}
 
 			if ($set->sale) {
-				$data->query['meta_query']['relation'] = 'OR';
 				$data->query['meta_query'][] = [
 					'key'   => '_sale_price',
 					'value' => 0,

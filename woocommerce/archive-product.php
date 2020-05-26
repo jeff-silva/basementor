@@ -140,26 +140,24 @@ get_header( 'shop' ); ?>
 
 				?>
 				<div id="<?php echo $data->id; ?>">
-					<div class="d-block d-md-none">
-						<a href="javascript:;" class="btn btn-block btn-primary" @click="show_filter=!show_filter;">
-							Filtrar
-						</a><br>
-					</div>
-					<div class="d-md-block" :class="{'d-none':!show_filter}">
-						<div class="card">
-							<div class="card-header">Busca</div>
-							<div class="card-body">
-								<div class="input-group">
-									<input type="text" name="s" v-model="input.s" class="form-control">
-									<div class="input-group-btn">
-										<button type="submit" class="btn btn-default">
-											<i class="fa fa-fw fa-search"></i>
-										</button>
-									</div>
+					<div class="card">
+						<div class="card-header">Busca</div>
+						<div class="card-body">
+							<div class="input-group">
+								<input type="text" name="s" v-model="input.s" class="form-control">
+								<div class="input-group-btn">
+									<button type="submit" class="btn btn-default">
+										<i class="fa fa-fw fa-search"></i>
+									</button>
 								</div>
 							</div>
+						</div>
 
+						<a href="javascript:;" class="btn btn-default btn-block text-muted d-block d-md-none" @click="show_filter=!show_filter;">
+							<i class="fa fa-fw fa-plus"></i> Filtros avançados
+						</a>
 
+						<div class="d-none d-md-block" :class="{'d-block':show_filter}">
 							<div class="card-header">Preço</div>
 							<div class="card-body">
 								<input type="hidden" name="min_price" :value="input.price[0]">
@@ -185,19 +183,19 @@ get_header( 'shop' ); ?>
 								@change="input = $event;"
 							></input-woocommerce-taxonomies>
 						</div>
-
-						<br>
-						<div class="row">
-							<div class="col-6">
-								<a href="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>" class="btn btn-default btn-block">Limpar</a>
-							</div>
-
-							<div class="col-6">
-								<button type="submit" class="btn btn-primary btn-block">Buscar</button>
-							</div>
-						</div>
-						<br>
 					</div>
+
+					<br>
+					<div class="row">
+						<div class="col-6">
+							<a href="<?php echo get_permalink(woocommerce_get_page_id('shop')); ?>" class="btn btn-default btn-block">Limpar</a>
+						</div>
+
+						<div class="col-6">
+							<button type="submit" class="btn btn-primary btn-block">Buscar</button>
+						</div>
+					</div>
+					<br>
 				</div>
 
 				<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
