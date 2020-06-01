@@ -39,6 +39,13 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 			$field->class[ $i ] = $class_value;
 		}
 
+		// masks
+		if ($key=='billing_cpf') { $field->mask = '999.999.999-99'; }
+		else if ($key=='billing_cnpj') { $field->mask = '99.999.999/9999-99'; }
+		else if ($key=='billing_postcode') { $field->mask = '99999-999'; }
+		else if ($key=='billing_phone') { $field->mask = '(99) 99999-9999'; }
+		else if ($key=='billing_cellphone') { $field->mask = '(99) 99999-9999'; }
+
 		if ($field->type=='state'): ?>
 		<div class="form-group <?php echo implode(' ', $field->class); ?>">
 			<label><?php echo $field->label; ?></label>
@@ -74,9 +81,6 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 			<!-- <input type="text" class="form-control" name="<?php echo $key; ?>" value="<?php echo $value; ?>"> -->
 		</div>
 
-		<?php elseif ($field->type=='country'): ?>
-		<input type="hidden" name="<?php echo $key; ?>" value="BR">
-
 		<?php elseif ($field->type=='textarea'): ?>
 		<div class="form-group <?php echo implode(' ', $field->class); ?>">
 			<label><?php echo $field->label; ?></label>
@@ -99,16 +103,48 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 			</div>
 		</div>
 
+		<?php elseif ($field->type=='select'): ?>
+		<div class="form-group <?php echo implode(' ', $field->class); ?>">
+			<label><?php echo $field->label; ?></label>
+			<select name="<?php echo $key; ?>" class="form-control">
+				<?php foreach($field->options as $opt_value=>$opt_label): ?>
+				<option value="<?php echo $opt_value; ?>" <?php if ($opt_value==$value) { echo 'selected'; } ?>><?php echo $opt_label; ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+
 		<?php else: ?>
 		<div class="form-group <?php echo implode(' ', $field->class); ?>">
 			<label><?php echo $field->label; ?></label>
 			<input type="<?php echo $field->type; ?>"
 				class="form-control"
 				placeholder="<?php echo $field->placeholder; ?>"
-				name="<?php echo $key; ?>" value="<?php echo $value; ?>">
+				name="<?php echo $key; ?>" value="<?php echo $value; ?>"
+				<?php if ($field->mask) { echo "data-mask='{$field->mask}'"; } ?>
+			>
 		</div>
 		<?php endif;
 
 		echo '<!--', dd($field), '-->';
 	}
 }
+
+
+add_action('woocommerce_checkout_after_customer_details', function() { ?>
+<script>jQuery(document).ready(function($) {
+	var _handle = function() {
+		var persontype = $("[name=billing_persontype]").val();
+
+		if (persontype==1) {
+			$("[name=billing_cpf]").closest(".form-group").fadeIn(200);
+			$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").hide();
+		}
+		else if (persontype==2) {
+			$("[name=billing_cpf]").closest(".form-group").hide();
+			$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").fadeIn(200);
+		}
+	}
+
+	$("[name=billing_persontype]").on("change", _handle);
+	_handle();
+});</script><?php });

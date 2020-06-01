@@ -172,6 +172,13 @@ remove_action('admin_print_styles', 'print_emoji_styles');
 add_action('after_setup_theme', function() {
 	add_theme_support('post-thumbnails');
 	add_theme_support('woocommerce');
+	add_theme_support('custom-logo', [
+		'width'       => 300,
+		'height'      => 100,
+		'flex-height' => true,
+		'flex-width'  => true,
+		'header-text' => ['site-title', 'site-description'],
+	]);
 
 	register_nav_menus([
 		'primary' => 'Principal',
@@ -211,9 +218,80 @@ add_action($action, function() { ?>
 .pagination {}
 .pagination .page-item {}
 .pagination .page-link {width:40px; border:none; color:#888; text-align:center;}
+
+<?php $prefixes = [
+	(object) ['color'=>'#007bff', 'color_text'=>'#ffffff', 'prefix'=>'primary'],
+	(object) ['color'=>'#6c757d', 'color_text'=>'#666666', 'prefix'=>'secondary'],
+	(object) ['color'=>'#28a745', 'color_text'=>'#ffffff', 'prefix'=>'success'],
+	(object) ['color'=>'#dc3545', 'color_text'=>'#ffffff', 'prefix'=>'danger'],
+	(object) ['color'=>'#ffc107', 'color_text'=>'#ffffff', 'prefix'=>'warning'],
+	(object) ['color'=>'#17a2b8', 'color_text'=>'#ffffff', 'prefix'=>'info'],
+	(object) ['color'=>'#3b5999', 'color_text'=>'#ffffff', 'prefix'=>'facebook'],
+	(object) ['color'=>'#55acee', 'color_text'=>'#ffffff', 'prefix'=>'twitter'],
+	(object) ['color'=>'#0077b5', 'color_text'=>'#ffffff', 'prefix'=>'linkedin'],
+	(object) ['color'=>'#00aff0', 'color_text'=>'#ffffff', 'prefix'=>'skype'],
+	(object) ['color'=>'#007ee5', 'color_text'=>'#ffffff', 'prefix'=>'dropbox'],
+	(object) ['color'=>'#21759b', 'color_text'=>'#ffffff', 'prefix'=>'wordpress'],
+	(object) ['color'=>'#1ab7ea', 'color_text'=>'#ffffff', 'prefix'=>'vimeo'],
+	(object) ['color'=>'#4c75a3', 'color_text'=>'#ffffff', 'prefix'=>'vk'],
+	(object) ['color'=>'#34465d', 'color_text'=>'#ffffff', 'prefix'=>'tumblr'],
+	(object) ['color'=>'#410093', 'color_text'=>'#ffffff', 'prefix'=>'yahoo'],
+	(object) ['color'=>'#bd081c', 'color_text'=>'#ffffff', 'prefix'=>'pinterest'],
+	(object) ['color'=>'#cd201f', 'color_text'=>'#ffffff', 'prefix'=>'youtube'],
+	(object) ['color'=>'#ff5700', 'color_text'=>'#ffffff', 'prefix'=>'reddit'],
+	(object) ['color'=>'#b92b27', 'color_text'=>'#ffffff', 'prefix'=>'quora'],
+	(object) ['color'=>'#ff3300', 'color_text'=>'#ffffff', 'prefix'=>'soundcloud'],
+	(object) ['color'=>'#25d366', 'color_text'=>'#ffffff', 'prefix'=>'whatsapp'],
+	(object) ['color'=>'#e4405f', 'color_text'=>'#ffffff', 'prefix'=>'instagram'],
+];
+
+$_color = function($hex, $add=null) {
+	if ($add!==null) {
+		$hex = preg_replace('/[^0-9a-zA-Z]/', '', $hex);
+		$hex = str_split($hex, 2);
+		$hex = array_map(function($val) use($add) {
+			$val = hexdec($val);
+			$val += intval($add);
+			$val = min(max($val, 0), 255);
+			return str_pad(dechex($val), 2, '0', STR_PAD_LEFT);
+		}, $hex);
+		$hex = '#'. implode('', $hex);
+	}
+	return $hex;
+};
+
+$lines = [];
+$lines[] = ".input-group.form-control {padding:0px;}";
+$lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";
+$lines[] = ".input-group.form-control .form-control, .input-group.form-control .input-group-text {border:transparent!important; background:none; border-radius:0px;}";
+$lines[] = ".basementor-woocommerce-price del {}";
+$lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
+
+foreach($prefixes as $p) {
+	$prefix = $p->prefix;
+	$color = $p->color;
+	$text = $p->color_text;
+	$dark = $_color($p->color, $set->color_dark);
+	$light = $_color($p->color, $set->color_light);
+	$lines[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$color} !important;}";
+	$lines[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
+	$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
+	$lines[] = ".bg-{$prefix} {background-color:{$color} !important; color:{$text};}";
+	$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color}; color:{$text};}";
+	$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light}; color:{$text};}";
+	$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+	$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+	$lines[] = ".btn-outline-{$prefix} {border-color:{$color} !important; color:{$color};}";
+	$lines[] = ".btn-outline-{$prefix}:hover {background-color:{$color} !important; color:{$text};}";
+	$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
+	$lines[] = ".alert-{$prefix} {background-color:{$light}; color:{$text};}";
+	$lines[] = ".badge-{$prefix} {background-color:{$color}; color:{$text};}";
+}
+
+echo implode('', $lines); ?>
 </style>
 
-<?php if (is_user_logged_in()): ?>
+<?php /*if (is_user_logged_in()): ?>
 <script>jQuery(document).ready(function($) {
 	var height = parseFloat( $("#wpadminbar").height() );
 	$(".fixed-top").each(function() {
@@ -223,7 +301,8 @@ add_action($action, function() { ?>
 		$('body').prepend(`<div style="height:${hh}px;"></div>`);
 	});
 });</script>
-<?php endif; ?>
+<?php endif;*/ ?>
+
 <?php });
 endforeach;
 
@@ -265,3 +344,4 @@ add_action('wp_enqueue_scripts', function() {
 	wp_enqueue_style('aaa', get_template_directory_uri().'/style.css');
 	wp_enqueue_style('bbb', get_stylesheet_directory_uri().'/style.css');
 });
+

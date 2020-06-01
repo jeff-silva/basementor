@@ -31,6 +31,10 @@ function elementor_excel_products() {
 		$prod->meta_input->_regular_price = get_post_meta($prod->ID, '_regular_price', true);
 		$prod->meta_input->_sale_price = get_post_meta($prod->ID, '_sale_price', true);
 		$prod->meta_input->_product_image_gallery = get_post_meta($prod->ID, '_product_image_gallery', true);
+		$prod->meta_input->_width = get_post_meta($prod->ID, '_width', true);
+		$prod->meta_input->_height = get_post_meta($prod->ID, '_height', true);
+		$prod->meta_input->_length = get_post_meta($prod->ID, '_length', true);
+		$prod->meta_input->_weight = get_post_meta($prod->ID, '_weight', true);
 
 		$prod->tax_input = new \stdClass;
 		foreach(get_object_taxonomies(['post_type' => 'product']) as $taxo) {
@@ -54,6 +58,11 @@ function elementor_excel_products() {
 	if (isset($post->meta_input['_sale_price']) AND !empty($post->meta_input['_sale_price'])) {
 		$post->meta_input['_price'] = $post->meta_input['_sale_price'];
 	}
+
+	$post->meta_input['_width'] = isset($post->meta_input['_width'])? $post->meta_input['_width']: 2;
+	$post->meta_input['_height'] = isset($post->meta_input['_height'])? $post->meta_input['_height']: 11;
+	$post->meta_input['_length'] = isset($post->meta_input['_length'])? $post->meta_input['_length']: 16;
+	$post->meta_input['_weight'] = isset($post->meta_input['_weight'])? $post->meta_input['_weight']: 1;
 
 	return [
 		'saved' => wp_insert_post($post),
@@ -136,6 +145,10 @@ function elementor_excel_products() {
 				'_regular_price' => number_format(rand(10, 999), 2, '.', ''),
 				'_sale_price' => number_format(rand(0, 999), 2, '.', ''),
 				'_thumbnail_id' => $_download_image('https://picsum.photos/300/300?rand='.rand(0, 999)),
+				'_width' => rand(11, 30),
+				'_height' => rand(11, 30),
+				'_weight' => rand(11, 30),
+				'_length' => rand(11, 30),
 			],
 		];
 
@@ -261,6 +274,10 @@ add_action('admin_menu', function() {
 						<col width="50px">
 						<col width="50px">
 						<col width="50px">
+						<col width="50px">
+						<col width="50px">
+						<col width="50px">
+						<col width="50px">
 					</colgroup>
 					<thead>
 						<tr>
@@ -271,6 +288,10 @@ add_action('admin_menu', function() {
 							<th class="p-2">Status</th>
 							<th class="p-2">Preço</th>
 							<th class="p-2">Promo</th>
+							<th class="p-2">P</th>
+							<th class="p-2">L</th>
+							<th class="p-2">A</th>
+							<th class="p-2">C</th>
 							<th class="p-2">Galeria</th>
 							<th class="p-2">Save</th>
 							<th class="p-2">URL</th>
@@ -302,6 +323,18 @@ add_action('admin_menu', function() {
 							</td>
 							<td class="p-0">
 								<input type="text" class="form-control form-control-sm" v-model="p.meta_input._sale_price">
+							</td>
+							<td class="p-0">
+								<input type="number" class="form-control form-control-sm" v-model="p.meta_input._weight">
+							</td>
+							<td class="p-0">
+								<input type="number" class="form-control form-control-sm" v-model="p.meta_input._width">
+							</td>
+							<td class="p-0">
+								<input type="number" class="form-control form-control-sm" v-model="p.meta_input._height">
+							</td>
+							<td class="p-0">
+								<input type="number" class="form-control form-control-sm" v-model="p.meta_input._length">
 							</td>
 							<td class="p-0">
 								<media-picker
