@@ -125,4 +125,58 @@ class Basementor
 	static function radio($attrs=null, $label=null) {
 		echo "<label class='wpt-check'><input type='radio' {$attrs} /><div></div> {$label}</label>";
 	}
+
+	static function settings($key=null) {
+		$defaults = [
+			'basementor_bootstrap_bootswatch' => '',
+			'basementor_bootstrap_dark_percent' => '#343a40',
+			'basementor_bootstrap_light_percent' => '#343a40',
+			'basementor_bootstrap_link_color' => '#007bff',
+			'basementor_bootstrap_primary_bg' => '#007bff',
+			'basementor_bootstrap_secondary_bg' => '#6c757d',
+			'basementor_bootstrap_success_bg' => '#28a745',
+			'basementor_bootstrap_danger_bg' => '#dc3545',
+			'basementor_bootstrap_warning_bg' => '#ffc107',
+			'basementor_bootstrap_info_bg' => '#17a2b8',
+			'basementor_bootstrap_white_bg' => '#ffffff',
+			'basementor_bootstrap_light_bg' => '#f8f9fa',
+			'basementor_bootstrap_dark_bg' => '#343a40',
+			'basementor_bootstrap_transparent_bg' => '#343a40',
+			'basementor_bootstrap_facebook_bg' => '#3b5999',
+			'basementor_bootstrap_twitter_bg' => '#55acee',
+			'basementor_bootstrap_linkedin_bg' => '#0077b5',
+			'basementor_bootstrap_skype_bg' => '#00aff0',
+			'basementor_bootstrap_dropbox_bg' => '#007ee5',
+			'basementor_bootstrap_wordpress_bg' => '#21759b',
+			'basementor_bootstrap_vimeo_bg' => '#1ab7ea',
+			'basementor_bootstrap_vk_bg' => '#4c75a3',
+			'basementor_bootstrap_tumblr_bg' => '#34465d',
+			'basementor_bootstrap_yahoo_bg' => '#410093',
+			'basementor_bootstrap_pinterest_bg' => '#bd081c',
+			'basementor_bootstrap_youtube_bg' => '#cd201f',
+			'basementor_bootstrap_reddit_bg' => '#ff5700',
+			'basementor_bootstrap_quora_bg' => '#b92b27',
+			'basementor_bootstrap_soundcloud_bg' => '#ff3300',
+			'basementor_bootstrap_whatsapp_bg' => '#25d366',
+			'basementor_bootstrap_instagram_bg' => '#e4405f',
+		];
+
+
+		$settings = get_option('basementor-settings', '{}');
+		$settings = @json_decode($settings, true);
+		$settings = is_array($settings)? $settings: [];
+
+		$settings = array_merge($defaults, $settings);
+
+		if ($key !== null) {
+			return isset($settings[ $key ])? $settings[ $key ]: false;
+		}
+
+		return $settings;
+	}
+
+
+	static function settings_save($data) {
+		update_option('basementor-settings', json_encode($data));
+	}
 }

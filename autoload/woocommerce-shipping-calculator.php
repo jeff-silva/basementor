@@ -38,6 +38,8 @@
 
 
 add_shortcode('woocommerce-shipping-calculator', function($atts=[], $content=null) {
+	return;
+	
 	$data = (object) shortcode_atts([], $atts, 'bartag');
 	$data->id = uniqid('woocommerce-shipping-calculator-');
 	$data->loading = false;

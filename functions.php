@@ -93,38 +93,6 @@ if (! $autoload) {
 
 include $autoload;
 
-add_action('admin_bar_menu', function($admin_bar) {
-	$menu_id = 'basementor';
-	$admin_bar->add_menu([
-		'id'    => 'basementor',
-		'title' => 'Tema',
-		'href'  => 'javascript:;',
-	]);
-
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-settings',
-		'title' => 'Configurações',
-		'href'  => admin_url('admin.php?page=basementor-settings-default'),
-	]);
-
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-autoload',
-		'title' => 'Refresh autoload',
-		'href'  => '?basementor-autoload',
-	]);
-
-	if (BASEMENTOR_PARENT == BASEMENTOR_CHILD) {
-		$admin_bar->add_menu([
-			'parent' => $menu_id,
-			'id'    => 'basementor-theme-child',
-			'title' => 'Criar tema filho',
-			'href'  => '?basementor-theme-child',
-		]);
-	}
-}, 100);
-
 
 if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
 	add_action('init', function() {

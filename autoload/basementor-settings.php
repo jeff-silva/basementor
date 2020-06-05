@@ -17,14 +17,179 @@
 	wp_redirect($_SERVER['HTTP_REFERER']);
 });
 
-add_action('admin_menu', function() {
-	add_menu_page('Theme Settings', 'Theme Settings', 'manage_options', 'basementor-settings-default', function() { ?>
-	<br><div>Configurações do tema</div>
-	<?php }, 'dashicons-admin-generic', 10);
 
+
+add_action('admin_bar_menu', function($admin_bar) {
+	$menu_id = 'basementor';
+	$admin_bar->add_menu([
+		'id'    => 'basementor',
+		'title' => 'Tema',
+		'href'  => 'javascript:;',
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-settings',
+		'title' => 'Configurações',
+		'href'  => admin_url('admin.php?page=basementor-settings'),
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-settings-bootstrap',
+		'title' => 'Bootstrap',
+		'href'  => admin_url('admin.php?page=basementor-settings&tab=bootstrap'),
+	]);
 
 	if (BASEMENTOR_WOOCOMMERCE) {
-		add_submenu_page('basementor-settings-default', 'Woocommerce Templates', 'Woocommerce Templates', 'manage_options', 'basementor-woocommerce-templates', function() {
+		$admin_bar->add_menu([
+			'parent' => $menu_id,
+			'id'    => 'basementor-settings-wc-templates',
+			'title' => 'Woocommerce Templates',
+			'href'  => admin_url('admin.php?page=basementor-settings&tab=wc-templates'),
+		]);
+	}
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-settings-help',
+		'title' => 'Help',
+		'href'  => admin_url('admin.php?page=basementor-settings&tab=help'),
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-settings-update',
+		'title' => 'Update',
+		'href'  => admin_url('admin.php?page=basementor-settings&tab=update'),
+	]);
+
+	$admin_bar->add_menu([
+		'parent' => $menu_id,
+		'id'    => 'basementor-autoload',
+		'title' => 'Refresh autoload',
+		'href'  => '?basementor-autoload',
+	]);
+
+	if (BASEMENTOR_PARENT == BASEMENTOR_CHILD) {
+		$admin_bar->add_menu([
+			'parent' => $menu_id,
+			'id'    => 'basementor-theme-child',
+			'title' => 'Criar tema filho',
+			'href'  => '?basementor-theme-child',
+		]);
+	}
+}, 100);
+
+
+
+add_action('admin_menu', function() {
+	add_submenu_page('_doesnt_exist', 'Configurações', '', 'manage_options', 'basementor-settings', function() {
+		$data = new \stdClass;
+		$data->id = uniqid('basementor-settings-');
+		$data->tab = isset($_GET['tab'])? $_GET['tab']: null;
+		$data->settings = \Basementor\Basementor::settings();
+
+		echo '<br>';
+
+		/* Bootstrap */
+		if ($data->tab=='bootstrap') {
+
+			$data->prefix = 'primary';
+			$data->prefixes = [
+				'primary' => 'Primary',
+				'secondary' => 'Secondary',
+				'success' => 'Success',
+				'danger' => 'Danger',
+				'warning' => 'Warning',
+				'info' => 'Info',
+				'facebook' => 'Facebook',
+				'twitter' => 'Twitter',
+				'linkedin' => 'Linkedin',
+				'skype' => 'Skype',
+				'dropbox' => 'Dropbox',
+				'wordpress' => 'Wordpress',
+				'vimeo' => 'Vimeo',
+				'vk' => 'Vk',
+				'tumblr' => 'Tumblr',
+				'yahoo' => 'Yahoo',
+				'pinterest' => 'Pinterest',
+				'youtube' => 'Youtube',
+				'reddit' => 'Reddit',
+				'quora' => 'Quora',
+				'soundcloud' => 'Soundcloud',
+				'whatsapp' => 'Whatsapp',
+				'instagram' => 'Instagram',
+			];
+
+			?>
+			<div id="<?php echo $data->id; ?>">
+				<select class="form-control" v-model="prefix">
+					<option :value="pref" v-for="(prefName, pref) in prefixes">{{ prefName }}</option>
+				</select><br>
+
+				<nav class="navbar navbar-expand-lg navbar-dark mb-2" :class="`bg-${prefix}`"><a href="#" class="navbar-brand">{{ prefix }}</a> <button type="button" data-toggle="collapse" data-target="#navbar-color-primary" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> <div id="navbar-color-primary" class="collapse navbar-collapse"><ul class="navbar-nav mr-auto"><li class="nav-item active"><a href="#" class="nav-link">Home <span class="sr-only">(current)</span></a></li> <li class="nav-item"><a href="#" class="nav-link">Features</a></li> <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li> <li class="nav-item"><a href="#" class="nav-link">About</a></li></ul> 
+					<form class="input-group form-control border border-secondary" style="max-width:300px;"><input type="text" placeholder="Search" class="form-control mr-sm-2"><div class="input-group-btn"><button type="button" class="btn btn-secondary"><i class="fa fa-fw fa-search"></i></button></div></form>
+				</div></nav>
+
+				<div class="alert alert-dismissible mb-2" :class="`alert-${prefix}`"><button type="button" data-dismiss="alert" class="close">×</button> <h4 class="alert-heading">Warning!</h4> <p class="mb-0">Lorem ipsum dolor sit amet, odit magni cum qui doloribus  <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p></div>
+
+				<div class="mp-2 p-3">
+					<span class="badge" :class="`badge-${prefix}`">{{ prefix }}</span>
+					<span class="badge badge-pill" :class="`badge-${prefix}`">{{ prefix }}</span>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col"><button type="button" class="btn btn-block" :class="`btn-${prefix}`">Test</button></div>
+					<div class="col"><button type="button" class="btn btn-block" :class="`btn-outline-${prefix}`">Test</button></div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" class="progress-bar" :class="`bg-${prefix}`" style="width: 25%;"></div></div>
+					</div>
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped" :class="`bg-${prefix}`" style="width: 10%;"></div></div>
+					</div>
+					<div class="col">
+						<div class="progress"><div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped progress-bar-animated" :class="`bg-${prefix}`" style="width: 75%;"></div></div>
+					</div>
+				</div>
+
+				<div class="row mb-2">
+					<div class="col">
+						<div class="card text-white" :class="`bg-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+					</div>
+					<div class="col">
+						<div class="card" :class="`border-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+					</div>
+				</div>
+
+				<div class="d-flex">
+					<div class="mx-auto">
+						<nav aria-label="Page navigation example">
+							<ul class="pagination">
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/1/">1</a></li>
+								<li class="page-item"><a class="page-link bg-primary text-light" href="https://zpet.com.br/loja/page/2/">2</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/3/">3</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/4/">4</a></li>
+								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/5/">5</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+
+			<script>new Vue({
+				el: "#<?php echo $data->id; ?>",
+				data: <?php echo json_encode($data); ?>,
+			});</script>
+			<?php
+		}
+
+		
+		/* Woocommerce Templates */
+		else if ($data->tab=='wc-templates') {
 			if (! function_exists('basementor_settings_woocommerce_files')) {
 				function basementor_settings_woocommerce_files($dir=null, $files=[], $level=0) {
 					if ($dir===null) {
@@ -63,8 +228,6 @@ add_action('admin_menu', function() {
 				};
 			}
 
-
-			$data = new \stdClass;
 			$data->files = basementor_settings_woocommerce_files();
 			$data->vueCodemirrorOptions = [
 				'tabSize' => 4,
@@ -132,73 +295,78 @@ add_action('admin_menu', function() {
 				data: <?php echo json_encode($data); ?>,
 			});</script>
 			<?php
-		});
-	}
+		}
 
 
-	add_submenu_page('basementor-settings-default', 'Ajuda', 'Ajuda', 'manage_options', 'basementor-settings-help', function() {
+		/* Help */
+		else if ($data->tab=='help') {
+			$_data_item = function($title, $content) {
+				global $basementor_settings_default_items_index;
+				$basementor_settings_default_items_index++;
 
-		$_data_item = function($title, $content) {
-			global $basementor_settings_default_items_index;
-			$basementor_settings_default_items_index++;
+				ob_start();
+				call_user_func($content);
+				$content = ob_get_clean();
 
-			ob_start();
-			call_user_func($content);
-			$content = ob_get_clean();
+				return [
+					'id' => sanitize_title($title)."-{$basementor_settings_default_items_index}",
+					'title' => $title,
+					'content' => $content,
+				];
+			};
 
-			return [
-				'id' => sanitize_title($title)."-{$basementor_settings_default_items_index}",
-				'title' => $title,
-				'content' => $content,
-			];
-		};
+			$data->categories = [];
+			$data->items = [];
 
-		$data = new \stdClass;
-		$data->categories = [];
-		$data->items = [];
+			$data->items[] = $_data_item('Como encontar faixa de CEP?', function() { ?>
+			Acesse a <a href="http://www.buscacep.correios.com.br/sistemas/buscacep/buscaFaixaCep.cfm" target="_blank">busca de faixa de CEP dos correios</a>
+			<?php });
 
-		$data->items[] = $_data_item('Como encontar faixa de CEP?', function() { ?>
-		Acesse a <a href="http://www.buscacep.correios.com.br/sistemas/buscacep/buscaFaixaCep.cfm" target="_blank">busca de faixa de CEP dos correios</a>
-		<?php });
+			$data->items[] = $_data_item('Mensagem "Não existem métodos de entrega disponíveis"', function() { ?>
+			Talvez os correios tenham mudado NOVAMENTE seus códigos de entrega. <br>Mas isso pode ser configurado acessando as
+			<a href="<?php echo admin_url('/admin.php?page=wc-settings&tab=shipping'); ?>">configurações de entrega</a> e alterando seus respectivos códigos.
+			<br><a href="https://wordpress.org/support/topic/solucao-nao-existe-nenhum-metodo-de-entrega-disponivel/" target="_blank">Fonte</a>
+			<?php });
 
-		$data->items[] = $_data_item('Mensagem "Não existem métodos de entrega disponíveis"', function() { ?>
-		Talvez os correios tenham mudado NOVAMENTE seus códigos de entrega. <br>Mas isso pode ser configurado acessando as
-		<a href="<?php echo admin_url('/admin.php?page=wc-settings&tab=shipping'); ?>">configurações de entrega</a> e alterando seus respectivos códigos.
-		<br><a href="https://wordpress.org/support/topic/solucao-nao-existe-nenhum-metodo-de-entrega-disponivel/" target="_blank">Fonte</a>
-		<?php });
+			$data->item = $data->items[0];
+			?><br>
 
-		$data->item = $data->items[0];
-		?><br>
+			<div id="basementor-settings">
+				<div class="accordion" id="accordionExample">
+					<div class="card" v-for="i in items">
+						<div class="card-header">
+							<h2 class="mb-0">
+								<button class="btn btn-link" type="button" @click="item=i;">
+									{{ i.title }}
+								</button>
+							</h2>
+						</div>
 
-		<div id="basementor-settings">
-			<div class="accordion" id="accordionExample">
-				<div class="card" v-for="i in items">
-					<div class="card-header">
-						<h2 class="mb-0">
-							<button class="btn btn-link" type="button" @click="item=i;">
-								{{ i.title }}
-							</button>
-						</h2>
-					</div>
-
-					<div class="collapse" :class="{'show':i.id==item.id}">
-						<div class="card-body" v-html="i.content"></div>
+						<div class="collapse" :class="{'show':i.id==item.id}">
+							<div class="card-body" v-html="i.content"></div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<script>new Vue({
-			el: "#basementor-settings",
-			data: <?php echo json_encode($data); ?>,
-		});</script>
-		<?php
-	});
-
+			<script>new Vue({
+				el: "#basementor-settings",
+				data: <?php echo json_encode($data); ?>,
+			});</script>
+			<?php
+		}
 
 
-	add_submenu_page('basementor-settings-default', 'Update', 'Update', 'manage_options', 'basementor-settings-update', function() {
-		echo '<br><a href="?page=basementor&basementor-update" class="btn btn-success">Update</a>';
+		/* Basementor update */
+		else if ($data->tab=='update') {
+			?><a href="?page=basementor&basementor-update" class="btn btn-success">Update</a><?php
+		}
+
+
+		/* Main */
+		else {
+			?>Main<?php
+		}
 	});
 });
 
