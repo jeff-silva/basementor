@@ -25,16 +25,15 @@ function elementor_excel_products() {
 	$products = array_map(function($prod) {
 		$prod->_permalink = get_the_permalink($prod);
 
-		$prod->meta_input = new \stdClass;
-		$prod->meta_input->_thumbnail_id = get_post_meta($prod->ID, '_thumbnail_id', true);
-		$prod->meta_input->_sku = get_post_meta($prod->ID, '_sku', true);
-		$prod->meta_input->_regular_price = get_post_meta($prod->ID, '_regular_price', true);
-		$prod->meta_input->_sale_price = get_post_meta($prod->ID, '_sale_price', true);
-		$prod->meta_input->_product_image_gallery = get_post_meta($prod->ID, '_product_image_gallery', true);
-		$prod->meta_input->_width = get_post_meta($prod->ID, '_width', true);
-		$prod->meta_input->_height = get_post_meta($prod->ID, '_height', true);
-		$prod->meta_input->_length = get_post_meta($prod->ID, '_length', true);
-		$prod->meta_input->_weight = get_post_meta($prod->ID, '_weight', true);
+		$prod->meta_input = (object) array_map(function($value) {
+			$value = $value[0];
+
+			if (is_array($value2 = @json_decode($value))) {
+				$value = $value2;
+			}
+
+			return $value;
+		}, get_post_meta($prod->ID, '', true));
 
 		$prod->tax_input = new \stdClass;
 		foreach(get_object_taxonomies(['post_type' => 'product']) as $taxo) {
@@ -113,7 +112,6 @@ function elementor_excel_products() {
 		$uploaddir = wp_upload_dir();
 		$data->uploadfile = $uploaddir['path'] . '/' . $data->filename;
 		file_put_contents($data->uploadfile, file_get_contents($url));
-		// dd($data); die;
 
 		$wp_filetype = wp_check_filetype(basename($data->filename), null );
 		$attach_id = wp_insert_attachment([
@@ -145,10 +143,10 @@ function elementor_excel_products() {
 				'_regular_price' => number_format(rand(10, 999), 2, '.', ''),
 				'_sale_price' => number_format(rand(0, 999), 2, '.', ''),
 				'_thumbnail_id' => $_download_image('https://picsum.photos/300/300?rand='.rand(0, 999)),
-				'_width' => rand(11, 30),
-				'_height' => rand(11, 30),
-				'_weight' => rand(11, 30),
-				'_length' => rand(11, 30),
+				'_width' => 11,
+				'_height' => 2,
+				'_weight' => 16,
+				'_length' => 1,
 			],
 		];
 
@@ -217,7 +215,11 @@ add_action('admin_menu', function() {
 		$data->faker = false;
 		$data->wp_editor = '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>';
 
-		?><br><div id="<?php echo $data->id; ?>" class="pr-2">
+		?><br>
+		<style>
+		.form-control {border:none !important; background:none !important;}
+		</style>
+		<div id="<?php echo $data->id; ?>" class="pr-2 d-none">
 			
 			<wp-editor v-model="wp_editor"></wp-editor>
 
@@ -278,6 +280,7 @@ add_action('admin_menu', function() {
 						<col width="50px">
 						<col width="50px">
 						<col width="50px">
+						<col width="50px">
 					</colgroup>
 					<thead>
 						<tr>
@@ -293,6 +296,7 @@ add_action('admin_menu', function() {
 							<th class="p-2">A</th>
 							<th class="p-2">C</th>
 							<th class="p-2">Galeria</th>
+							<th class="p-2">Attrs</th>
 							<th class="p-2">Save</th>
 							<th class="p-2">URL</th>
 						</tr>
@@ -342,6 +346,7 @@ add_action('admin_menu', function() {
 									:multiple="true"
 								></media-picker>
 							</td>
+							<td class="p-0"><field-modal label="Attrs" v-model="p"></field-modal></td>
 							<td class="p-0">
 								<button type="button" class="btn btn-primary btn-sm btn-block" @click="productSave();">
 									<i class="fa fa-fw fa-spin fa-spinner" v-if="saving"></i>
@@ -362,7 +367,42 @@ add_action('admin_menu', function() {
 			<!-- <pre>$data: {{ $data }}</pre> -->
 		</div>
 		
-		<script>Vue.component("media-picker", {
+		<script>
+		Vue.component("field-modal", {
+			props: {
+				value: {default:() => ({})},
+				icon: {default:'fa-cog'},
+			},
+
+			data() {
+				return {
+					modal: false,
+				};
+			},
+
+			mounted() {
+				window.addEventListener('keyup', (ev) => {
+					if (ev.key=='Escape') { this.modal = false; }
+				});
+			},
+
+			template: `<div>
+				<button type="button" class="btn btn-primary btn-sm btn-block" @click="modal=true;">
+					<i class="fa fa-fw" :class="icon"></i>
+				</button>
+
+				<div v-if="modal" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:#00000044; z-index:9; display: flex; align-items: center; justify-content: center;" @click.self="modal=false;">
+					<div class="card" style="max-width:800px;">
+						<div class="card-header">Atributos</div>
+						<div class="card-body" style="max-height:85vh; overflow:auto;">
+							<pre>value: {{ value }}</pre>
+						</div>
+					</div>
+				</div>
+			</div>`,
+		});
+
+		Vue.component("media-picker", {
 			props: {
 				value: {default:() => ({})},
 				multiple: {default:false},
@@ -475,11 +515,12 @@ add_action('admin_menu', function() {
 					}, "json");
 				},
 			},
-		});</script>
 
-		<style>
-		.form-control {border:none !important; background:none !important;}
-		</style><?php
+			mounted() {
+				jQuery(this.$el).removeClass("d-none");
+			},
+		});</script>
+		<?php
 
 		wp_enqueue_media();
 	});
