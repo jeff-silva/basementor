@@ -29,15 +29,12 @@ spl_autoload_register(function($class) {
 
 function basementor_autoload_generate() {
 	$date = date('Y-m-d H:i:s');
-	$themepaths = [];
+	$themepaths = [BASEMENTOR_PARENT];
 
-	if ($path = get_template_directory()) {
-		$themepaths[] = $path;
+	if (BASEMENTOR_PARENT != BASEMENTOR_CHILD) {
+		$themepaths[] = BASEMENTOR_CHILD;
 	}
 
-	if ($path = get_stylesheet_directory()) {
-		$themepaths[] = $path;
-	}
 
 	foreach($themepaths as $themepath) {
 		if ($autoload = realpath("{$themepath}/autoload/")) {
@@ -59,22 +56,22 @@ function basementor_autoload_generate() {
 			
 			file_put_contents("{$themepath}/autoload.php", $file);
 
-			if (isset($_GET['autoload'])) {
-				$url = ($_SERVER['HTTPS'] || $_SERVER['HTTPS']=='on')? 'https://': 'http://';
-				$url .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				$url = (object) parse_url($url);
-				parse_str($url->query, $url->query);
-				if (isset($url->query['autoload'])) {
-					unset($url->query['autoload']);
-				}
-				if (!empty($url->query)) {
-					$url->path .= '?'. http_build_query($url->query);
-				}
-				$url = "{$url->scheme}://{$url->host}{$url->path}";
-				header("Location: {$url}"); die;
-			}
-
 		}
+	}
+	
+	if (isset($_GET['autoload'])) {
+		$url = ($_SERVER['HTTPS'] || $_SERVER['HTTPS']=='on')? 'https://': 'http://';
+		$url .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$url = (object) parse_url($url);
+		parse_str($url->query, $url->query);
+		if (isset($url->query['autoload'])) {
+			unset($url->query['autoload']);
+		}
+		if (!empty($url->query)) {
+			$url->path .= '?'. http_build_query($url->query);
+		}
+		$url = "{$url->scheme}://{$url->host}{$url->path}";
+		header("Location: {$url}"); die;
 	}
 }
 
@@ -110,6 +107,12 @@ if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
 			'Template:       basementor-master',
 			'Version:        1.0',
 			'*/',
+		]));
+
+		file_put_contents("{$theme_folder}/functions.php", implode("\n", [
+			'<?php',
+			'',
+			'include __DIR__ .\'/autoload.php\';',
 		]));
 
 		wp_redirect($_SERVER['HTTP_REFERER']); die;
@@ -313,3 +316,9 @@ add_action('wp_enqueue_scripts', function() {
 	wp_enqueue_style('bbb', get_stylesheet_directory_uri().'/style.css');
 });
 
+add_action('admin_head-post.php', function() {
+	global $post;
+	if (\Elementor\Plugin::$instance->db->is_built_with_elementor($post->ID)) {
+		wp_redirect(admin_url("/post.php?post={$post->ID}&action=elementor"));
+	}
+});
