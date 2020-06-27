@@ -1,5 +1,15 @@
 <?php
 
+\Basementor\Basementor::action('basementor-settings-save', function($post) {
+	// dd($post->settings); die;
+	// $post->settings = stripslashes($post->settings);
+	update_option('basementor-settings', $post->settings);
+	wp_redirect($_SERVER['HTTP_REFERER']);
+	return $post;
+});
+
+
+
 \Basementor\Basementor::action('basementor-settings-woocommerce-template-save', function($post) {
 	if ($post->delete) {
 		unlink($post->file);
@@ -88,6 +98,7 @@ add_action('admin_menu', function() {
 		$data = new \stdClass;
 		$data->id = uniqid('basementor-settings-');
 		$data->tab = isset($_GET['tab'])? $_GET['tab']: null;
+		$data->settingsDefault = \Basementor\Basementor::settingsDefault();
 		$data->settings = \Basementor\Basementor::settings();
 
 		echo '<br>';
@@ -124,65 +135,180 @@ add_action('admin_menu', function() {
 
 			?>
 			<div id="<?php echo $data->id; ?>">
-				<select class="form-control" v-model="prefix">
-					<option :value="pref" v-for="(prefName, pref) in prefixes">{{ prefName }}</option>
-				</select><br>
+				<form action="<?php echo \Basementor\Basementor::action('basementor-settings-save'); ?>" method="post">
+					<div class="text-right mt-3">
+						<textarea name="settings" style="display:none;">{{ settings }}</textarea>
+						<button type="submit" class="btn btn-primary">
+							<i class="fa fa-fw fa-save"></i> Salvar
+						</button>
+					</div><br>
 
-				<nav class="navbar navbar-expand-lg navbar-dark mb-2" :class="`bg-${prefix}`"><a href="#" class="navbar-brand">{{ prefix }}</a> <button type="button" data-toggle="collapse" data-target="#navbar-color-primary" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> <div id="navbar-color-primary" class="collapse navbar-collapse"><ul class="navbar-nav mr-auto"><li class="nav-item active"><a href="#" class="nav-link">Home <span class="sr-only">(current)</span></a></li> <li class="nav-item"><a href="#" class="nav-link">Features</a></li> <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li> <li class="nav-item"><a href="#" class="nav-link">About</a></li></ul> 
-					<form class="input-group form-control border border-secondary" style="max-width:300px;"><input type="text" placeholder="Search" class="form-control mr-sm-2"><div class="input-group-btn"><button type="button" class="btn btn-secondary"><i class="fa fa-fw fa-search"></i></button></div></form>
-				</div></nav>
+					<div class="row">
+						<div class="col-6">
+							<select class="form-control" v-model="prefix">
+								<option :value="pref" v-for="(prefName, pref) in prefixes">{{ prefName }}</option>
+							</select>
+						</div>
 
-				<div class="alert alert-dismissible mb-2" :class="`alert-${prefix}`"><button type="button" data-dismiss="alert" class="close">×</button> <h4 class="alert-heading">Warning!</h4> <p class="mb-0">Lorem ipsum dolor sit amet, odit magni cum qui doloribus  <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p></div>
+						<div class="col-6">
+							<select class="form-control" v-model="settings.basementor_bootstrap_bootswatch">
+								<option value="">Sem bootswatch</option>
+								<option value="cerulean">Cerulean</option>
+								<option value="cosmo">Cosmo</option>
+								<option value="cyborg">Cyborg</option>
+								<option value="darkly">Darkly</option>
+								<option value="flatly">Flatly</option>
+								<option value="journal">Journal</option>
+								<option value="litera">Litera</option>
+								<option value="lumen">Lumen</option>
+								<option value="lux">Lux</option>
+								<option value="materia">Materia</option>
+								<option value="minty">Minty</option>
+								<option value="pulse">Pulse</option>
+								<option value="sandstone">Sandstone</option>
+								<option value="simplex">Simplex</option>
+								<option value="sketchy">Sketchy</option>
+								<option value="slate">Slate</option>
+								<option value="solar">Solar</option>
+								<option value="spacelab">Spacelab</option>
+								<option value="superhero">Superhero</option>
+								<option value="united">United</option>
+								<option value="yeti">Yeti</option>
+							</select>
+						</div>
+					</div><br>
 
-				<div class="mp-2 p-3">
-					<span class="badge" :class="`badge-${prefix}`">{{ prefix }}</span>
-					<span class="badge badge-pill" :class="`badge-${prefix}`">{{ prefix }}</span>
-				</div>
+					<nav class="navbar navbar-expand-lg navbar-dark mb-2" :class="`bg-${prefix}`"><a href="#" class="navbar-brand">{{ prefix }}</a> <button type="button" data-toggle="collapse" data-target="#navbar-color-primary" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> <div id="navbar-color-primary" class="collapse navbar-collapse"><ul class="navbar-nav mr-auto"><li class="nav-item active"><a href="#" class="nav-link">Home <span class="sr-only">(current)</span></a></li> <li class="nav-item"><a href="#" class="nav-link">Features</a></li> <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li> <li class="nav-item"><a href="#" class="nav-link">About</a></li></ul> 
+						<div class="input-group form-control border border-secondary" style="max-width:300px;"><input type="text" placeholder="Search" class="form-control mr-sm-2"><div class="input-group-btn"><button type="button" class="btn btn-secondary"><i class="fa fa-fw fa-search"></i></button></div></div>
+					</div></nav>
 
-				<div class="row mb-2">
-					<div class="col"><button type="button" class="btn btn-block" :class="`btn-${prefix}`">Test</button></div>
-					<div class="col"><button type="button" class="btn btn-block" :class="`btn-outline-${prefix}`">Test</button></div>
-				</div>
+					<div class="alert alert-dismissible mb-2" :class="`alert-${prefix}`"><button type="button" data-dismiss="alert" class="close">×</button> <h4 class="alert-heading">Warning!</h4> <p class="mb-0">Lorem ipsum dolor sit amet, odit magni cum qui doloribus  <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p></div>
 
-				<div class="row mb-2">
-					<div class="col">
-						<div class="progress"><div role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" class="progress-bar" :class="`bg-${prefix}`" style="width: 25%;"></div></div>
+					<div class="mp-2 p-3">
+						<span class="badge" :class="`badge-${prefix}`">{{ prefix }}</span>
+						<span class="badge badge-pill" :class="`badge-${prefix}`">{{ prefix }}</span>
 					</div>
-					<div class="col">
-						<div class="progress"><div role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped" :class="`bg-${prefix}`" style="width: 10%;"></div></div>
-					</div>
-					<div class="col">
-						<div class="progress"><div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped progress-bar-animated" :class="`bg-${prefix}`" style="width: 75%;"></div></div>
-					</div>
-				</div>
 
-				<div class="row mb-2">
-					<div class="col">
-						<div class="card text-white" :class="`bg-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+					<div class="row mb-2">
+						<div class="col"><button type="button" class="btn btn-block" :class="`btn-${prefix}`">Test</button></div>
+						<div class="col"><button type="button" class="btn btn-block" :class="`btn-outline-${prefix}`">Test</button></div>
 					</div>
-					<div class="col">
-						<div class="card" :class="`border-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
-					</div>
-				</div>
 
-				<div class="d-flex">
-					<div class="mx-auto">
-						<nav aria-label="Page navigation example">
-							<ul class="pagination">
-								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/1/">1</a></li>
-								<li class="page-item"><a class="page-link bg-primary text-light" href="https://zpet.com.br/loja/page/2/">2</a></li>
-								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/3/">3</a></li>
-								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/4/">4</a></li>
-								<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/5/">5</a></li>
-							</ul>
-						</nav>
+					<div class="row mb-2">
+						<div class="col">
+							<div class="progress"><div role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" class="progress-bar" :class="`bg-${prefix}`" style="width: 25%;"></div></div>
+						</div>
+						<div class="col">
+							<div class="progress"><div role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped" :class="`bg-${prefix}`" style="width: 10%;"></div></div>
+						</div>
+						<div class="col">
+							<div class="progress"><div role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-striped progress-bar-animated" :class="`bg-${prefix}`" style="width: 75%;"></div></div>
+						</div>
 					</div>
-				</div>
+
+					<div class="row mb-2">
+						<div class="col">
+							<div class="card text-white" :class="`bg-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+						</div>
+						<div class="col">
+							<div class="card" :class="`border-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
+						</div>
+					</div>
+
+					<div class="d-flex">
+						<div class="mx-auto">
+							<nav aria-label="Page navigation example">
+								<ul class="pagination">
+									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/1/">1</a></li>
+									<li class="page-item"><a class="page-link bg-primary text-light" href="https://zpet.com.br/loja/page/2/">2</a></li>
+									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/3/">3</a></li>
+									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/4/">4</a></li>
+									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/5/">5</a></li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-8">
+							<input-code v-model="settings.basementor_css"></input-code>
+						</div>
+						<div class="col-4">
+							<div class="row">
+								<div class="col-6">
+									<label>Dark percent</label>
+									<div class="input-group">
+										<input type="number" class="form-control" v-model="settings.basementor_bootstrap_dark_percent">
+										<div class="input-group-append"><div class="input-group-btn">
+											<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_dark_percent');">
+												<i class="fa fa-fw fa-refresh"></i>
+											</button>
+										</div></div>
+									</div>
+								</div>
+
+								<div class="col-6">
+									<label>Light percent</label>
+									<div class="input-group">
+										<input type="number" class="form-control" v-model="settings.basementor_bootstrap_light_percent">
+										<div class="input-group-append"><div class="input-group-btn">
+											<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_light_percent');">
+												<i class="fa fa-fw fa-refresh"></i>
+											</button>
+										</div></div>
+									</div>
+								</div>
+
+								<?php foreach($data->prefixes as $prefix=>$name): ?>
+								<div class="col-6 mb-2">
+									<?php echo $name; ?> bg
+									<input-color v-model="settings.basementor_bootstrap_<?php echo $prefix; ?>_bg">
+										<template #append><div class="input-group-append">
+											<div class="input-group-btn">
+												<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_bg');">
+													<i class="fa fa-fw fa-refresh"></i>
+												</button>
+											</div>
+										</div></template>
+									</input-color>
+								</div>
+
+								<div class="col-6 mb-2">
+									<?php echo $name; ?> text
+									<input-color v-model="settings.basementor_bootstrap_<?php echo $prefix; ?>_text">
+										<template #append><div class="input-group-append">
+											<div class="input-group-btn">
+												<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_text');">
+													<i class="fa fa-fw fa-refresh"></i>
+												</button>
+											</div>
+										</div></template>
+									</input-color>
+								</div>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					</div>
+
+					<div class="text-right mt-3">
+						<textarea name="settings" style="display:none;">{{ settings }}</textarea>
+						<button type="submit" class="btn btn-primary">
+							<i class="fa fa-fw fa-save"></i> Salvar
+						</button>
+					</div>
+				</form>
 			</div>
 
+			<?php do_action('vue'); ?>
 			<script>new Vue({
 				el: "#<?php echo $data->id; ?>",
 				data: <?php echo json_encode($data); ?>,
+				methods: {
+					basementorSettingsDefault(kname) {
+						this.$set(this.settings, kname, this.settingsDefault[kname]||false);
+						this.$forceUpdate();
+					},
+				},
 			});</script>
 			<?php
 		}

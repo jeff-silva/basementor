@@ -13,7 +13,8 @@ class Basementor
 		if (isset($_GET['basementor-action']) AND $_GET['basementor-action']==$action) {
 			add_action('init', function() use($callback) {
 				$resp = new \stdClass;
-				try { $resp = call_user_func($callback, (object) $_POST); }
+				$post = array_map('stripslashes', $_POST);
+				try { $resp = call_user_func($callback, (object) $post); }
 				catch(\Exception $e) { $resp->error = $e->getMessage(); }
 				echo json_encode($resp); die;
 			});
@@ -126,41 +127,72 @@ class Basementor
 		echo "<label class='wpt-check'><input type='radio' {$attrs} /><div></div> {$label}</label>";
 	}
 
-	static function settings($key=null) {
-		$defaults = [
+	static function settingsDefault() {
+		return [
 			'basementor_bootstrap_bootswatch' => '',
-			'basementor_bootstrap_dark_percent' => '#343a40',
-			'basementor_bootstrap_light_percent' => '#343a40',
+			'basementor_bootstrap_dark_percent' => '-30',
+			'basementor_bootstrap_light_percent' => '30',
 			'basementor_bootstrap_link_color' => '#007bff',
 			'basementor_bootstrap_primary_bg' => '#007bff',
+			'basementor_bootstrap_primary_text' => '#ffffff',
 			'basementor_bootstrap_secondary_bg' => '#6c757d',
+			'basementor_bootstrap_secondary_text' => '#ffffff',
 			'basementor_bootstrap_success_bg' => '#28a745',
+			'basementor_bootstrap_success_text' => '#ffffff',
 			'basementor_bootstrap_danger_bg' => '#dc3545',
+			'basementor_bootstrap_danger_text' => '#ffffff',
 			'basementor_bootstrap_warning_bg' => '#ffc107',
+			'basementor_bootstrap_warning_text' => '#ffffff',
 			'basementor_bootstrap_info_bg' => '#17a2b8',
+			'basementor_bootstrap_info_text' => '#ffffff',
 			'basementor_bootstrap_white_bg' => '#ffffff',
+			'basementor_bootstrap_white_text' => '#ffffff',
 			'basementor_bootstrap_light_bg' => '#f8f9fa',
+			'basementor_bootstrap_light_text' => '#ffffff',
 			'basementor_bootstrap_dark_bg' => '#343a40',
+			'basementor_bootstrap_dark_text' => '#ffffff',
 			'basementor_bootstrap_transparent_bg' => '#343a40',
+			'basementor_bootstrap_transparent_text' => '#ffffff',
 			'basementor_bootstrap_facebook_bg' => '#3b5999',
+			'basementor_bootstrap_facebook_text' => '#ffffff',
 			'basementor_bootstrap_twitter_bg' => '#55acee',
+			'basementor_bootstrap_twitter_text' => '#ffffff',
 			'basementor_bootstrap_linkedin_bg' => '#0077b5',
+			'basementor_bootstrap_linkedin_text' => '#ffffff',
 			'basementor_bootstrap_skype_bg' => '#00aff0',
+			'basementor_bootstrap_skype_text' => '#ffffff',
 			'basementor_bootstrap_dropbox_bg' => '#007ee5',
+			'basementor_bootstrap_dropbox_text' => '#ffffff',
 			'basementor_bootstrap_wordpress_bg' => '#21759b',
+			'basementor_bootstrap_wordpress_text' => '#ffffff',
 			'basementor_bootstrap_vimeo_bg' => '#1ab7ea',
+			'basementor_bootstrap_vimeo_text' => '#ffffff',
 			'basementor_bootstrap_vk_bg' => '#4c75a3',
+			'basementor_bootstrap_vk_text' => '#ffffff',
 			'basementor_bootstrap_tumblr_bg' => '#34465d',
+			'basementor_bootstrap_tumblr_text' => '#ffffff',
 			'basementor_bootstrap_yahoo_bg' => '#410093',
+			'basementor_bootstrap_yahoo_text' => '#ffffff',
 			'basementor_bootstrap_pinterest_bg' => '#bd081c',
+			'basementor_bootstrap_pinterest_text' => '#ffffff',
 			'basementor_bootstrap_youtube_bg' => '#cd201f',
+			'basementor_bootstrap_youtube_text' => '#ffffff',
 			'basementor_bootstrap_reddit_bg' => '#ff5700',
+			'basementor_bootstrap_reddit_text' => '#ffffff',
 			'basementor_bootstrap_quora_bg' => '#b92b27',
+			'basementor_bootstrap_quora_text' => '#ffffff',
 			'basementor_bootstrap_soundcloud_bg' => '#ff3300',
+			'basementor_bootstrap_soundcloud_text' => '#ffffff',
 			'basementor_bootstrap_whatsapp_bg' => '#25d366',
+			'basementor_bootstrap_whatsapp_text' => '#ffffff',
 			'basementor_bootstrap_instagram_bg' => '#e4405f',
+			'basementor_bootstrap_instagram_text' => '#ffffff',
+			'basementor_css' => '* {transition: all 300ms ease;}',
 		];
+	}
 
+	static function settings($key=null) {
+		$defaults = self::settingsDefault();
 
 		$settings = get_option('basementor-settings', '{}');
 		$settings = @json_decode($settings, true);
@@ -178,5 +210,68 @@ class Basementor
 
 	static function settings_save($data) {
 		update_option('basementor-settings', json_encode($data));
+	}
+
+	static function style() {
+		$settings = \Basementor\Basementor::settings();
+
+		$prefixes = [
+			'primary', 'secondary', 'success', 'danger', 'warning',
+			'info', 'facebook', 'twitter', 'linkedin', 'skype',
+			'dropbox', 'wordpress', 'vimeo', 'vk', 'tumblr',
+			'yahoo', 'pinterest', 'youtube', 'reddit', 'quora',
+			'soundcloud', 'whatsapp', 'instagram',
+		];
+
+		$_color = function($hex, $add=null) {
+			if ($add!==null) {
+				$hex = preg_replace('/[^0-9a-zA-Z]/', '', $hex);
+				$hex = str_split($hex, 2);
+				$hex = array_map(function($val) use($add) {
+					$val = hexdec($val);
+					$val += intval($add);
+					$val = min(max($val, 0), 255);
+					return str_pad(dechex($val), 2, '0', STR_PAD_LEFT);
+				}, $hex);
+				$hex = '#'. implode('', $hex);
+			}
+			return $hex;
+		};
+
+		$lines = [];
+
+		if ($settings['basementor_bootstrap_bootswatch']) {
+			$lines[] = "@import url('https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.5.0/{$settings['basementor_bootstrap_bootswatch']}/bootstrap.min.css');";
+		}
+
+		$lines[] = $settings['basementor_css'];
+		$lines[] = ".input-group.form-control {padding:0px;}";
+		$lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";
+		$lines[] = ".input-group.form-control .form-control, .input-group.form-control .input-group-text {border:transparent!important; background:none; border-radius:0px;}";
+		$lines[] = ".basementor-woocommerce-price del {}";
+		$lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
+
+		foreach($prefixes as $prefix) {
+			$color = isset($settings["basementor_bootstrap_{$prefix}_bg"])? $settings["basementor_bootstrap_{$prefix}_bg"]: '#ffffff';
+			$text = isset($settings["basementor_bootstrap_{$prefix}_text"])? $settings["basementor_bootstrap_{$prefix}_text"]: '#ffffff';
+			$dark = $_color($color, intval($settings['basementor_bootstrap_dark_percent']));
+			$light = $_color($color, intval($settings['basementor_bootstrap_light_percent']));
+
+			$lines[] = ".text-{$prefix}, .text-{$prefix}:hover {color:{$color} !important;}";
+			$lines[] = ".bg-{$prefix} {background-color:{$color} !important; color:{$text};}";
+			$lines[] = ".bg-{$prefix}-light {background-color:{$light} !important;}";
+			$lines[] = ".bg-{$prefix}-dark {background-color:{$dark} !important;}";
+			$lines[] = ".btn-{$prefix} {background-color:{$color} !important; border-color:{$color}; color:{$text} !important;}";
+			$lines[] = ".btn-{$prefix}-light {background-color:{$light} !important; border-color:{$light}; color:{$text};}";
+			$lines[] = ".btn-{$prefix}-dark {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+			$lines[] = ".btn-{$prefix}:hover, .btn-{$prefix}:active {background-color:{$dark} !important; border-color:{$dark}; color:{$text};}";
+			$lines[] = ".btn-outline-{$prefix} {border-color:{$color} !important; color:{$color};}";
+			$lines[] = ".btn-outline-{$prefix}:hover {background-color:{$color} !important; color:{$text};}";
+			$lines[] = ".border-{$prefix} {border-color:{$color} !important;}";
+			$lines[] = ".alert-{$prefix} {background-color:{$light}; color:{$text};}";
+			$lines[] = ".badge-{$prefix} {background-color:{$color}; color:{$text};}";
+		}
+
+		return implode('', $lines);
 	}
 }

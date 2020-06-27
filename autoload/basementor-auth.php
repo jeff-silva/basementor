@@ -1,5 +1,11 @@
 <?php
 
+// {user_login:'', user_password:''}
+\Basementor\Basementor::action('login', function($post) {
+	return wp_signon((array) $post);
+});
+
+
 add_shortcode('basementor-auth', function($data=[], $content=null) {
 	$data = (object) shortcode_atts([
 		'login_show' => true,
