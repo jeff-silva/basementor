@@ -1,8 +1,7 @@
 <?php
 
 \Basementor\Basementor::action('basementor-settings-save', function($post) {
-	// dd($post->settings); die;
-	// $post->settings = stripslashes($post->settings);
+	$post->settings = stripslashes($post->settings);
 	update_option('basementor-settings', $post->settings);
 	wp_redirect($_SERVER['HTTP_REFERER']);
 	return $post;
@@ -108,29 +107,54 @@ add_action('admin_menu', function() {
 
 			$data->prefix = 'primary';
 			$data->prefixes = [
-				'primary' => 'Primary',
-				'secondary' => 'Secondary',
-				'success' => 'Success',
-				'danger' => 'Danger',
-				'warning' => 'Warning',
-				'info' => 'Info',
-				'facebook' => 'Facebook',
-				'twitter' => 'Twitter',
-				'linkedin' => 'Linkedin',
-				'skype' => 'Skype',
-				'dropbox' => 'Dropbox',
-				'wordpress' => 'Wordpress',
-				'vimeo' => 'Vimeo',
-				'vk' => 'Vk',
-				'tumblr' => 'Tumblr',
-				'yahoo' => 'Yahoo',
-				'pinterest' => 'Pinterest',
-				'youtube' => 'Youtube',
-				'reddit' => 'Reddit',
-				'quora' => 'Quora',
-				'soundcloud' => 'Soundcloud',
-				'whatsapp' => 'Whatsapp',
-				'instagram' => 'Instagram',
+				['id'=>'primary', 'label'=>'Primary'],
+				['id'=>'secondary', 'label'=>'Secondary'],
+				['id'=>'success', 'label'=>'Success'],
+				['id'=>'danger', 'label'=>'Danger'],
+				['id'=>'warning', 'label'=>'Warning'],
+				['id'=>'info', 'label'=>'Info'],
+				['id'=>'facebook', 'label'=>'Facebook'],
+				['id'=>'twitter', 'label'=>'Twitter'],
+				['id'=>'linkedin', 'label'=>'Linkedin'],
+				['id'=>'skype', 'label'=>'Skype'],
+				['id'=>'dropbox', 'label'=>'Dropbox'],
+				['id'=>'wordpress', 'label'=>'Wordpress'],
+				['id'=>'vimeo', 'label'=>'Vimeo'],
+				['id'=>'vk', 'label'=>'Vk'],
+				['id'=>'tumblr', 'label'=>'Tumblr'],
+				['id'=>'yahoo', 'label'=>'Yahoo'],
+				['id'=>'pinterest', 'label'=>'Pinterest'],
+				['id'=>'youtube', 'label'=>'Youtube'],
+				['id'=>'reddit', 'label'=>'Reddit'],
+				['id'=>'quora', 'label'=>'Quora'],
+				['id'=>'soundcloud', 'label'=>'Soundcloud'],
+				['id'=>'whatsapp', 'label'=>'Whatsapp'],
+				['id'=>'instagram', 'label'=>'Instagram'],
+			];
+
+			$data->bootswatch = [
+				['id'=>'', 'label'=>'Sem estilo'],
+				['id'=>'cerulean', 'label'=>'Cerulean'],
+				['id'=>'cosmo', 'label'=>'Cosmo'],
+				['id'=>'cyborg', 'label'=>'Cyborg'],
+				['id'=>'darkly', 'label'=>'Darkly'],
+				['id'=>'flatly', 'label'=>'Flatly'],
+				['id'=>'journal', 'label'=>'Journal'],
+				['id'=>'litera', 'label'=>'Litera'],
+				['id'=>'lumen', 'label'=>'Lumen'],
+				['id'=>'lux', 'label'=>'Lux'],
+				['id'=>'materia', 'label'=>'Materia'],
+				['id'=>'minty', 'label'=>'Minty'],
+				['id'=>'pulse', 'label'=>'Pulse'],
+				['id'=>'sandstone', 'label'=>'Sandstone'],
+				['id'=>'simplex', 'label'=>'Simplex'],
+				['id'=>'sketchy', 'label'=>'Sketchy'],
+				['id'=>'slate', 'label'=>'Slate'],
+				['id'=>'solar', 'label'=>'Solar'],
+				['id'=>'spacelab', 'label'=>'Spacelab'],
+				['id'=>'superhero', 'label'=>'Superhero'],
+				['id'=>'united', 'label'=>'United'],
+				['id'=>'yeti', 'label'=>'Yeti'],
 			];
 
 			?>
@@ -144,42 +168,34 @@ add_action('admin_menu', function() {
 					</div><br>
 
 					<div class="row">
-						<div class="col-6">
-							<select class="form-control" v-model="prefix">
-								<option :value="pref" v-for="(prefName, pref) in prefixes">{{ prefName }}</option>
-							</select>
+						<div class="col-4">
+							<input-select v-model="prefix"
+								:options="prefixes"
+								option-id="id"
+								option-label="label"
+								placeholder="Prefixo"
+							>
+								<template #option="{option, value}">{{ option.label }}</template>
+							</input-select>
 						</div>
 
-						<div class="col-6">
-							<select class="form-control" v-model="settings.basementor_bootstrap_bootswatch">
-								<option value="">Sem bootswatch</option>
-								<option value="cerulean">Cerulean</option>
-								<option value="cosmo">Cosmo</option>
-								<option value="cyborg">Cyborg</option>
-								<option value="darkly">Darkly</option>
-								<option value="flatly">Flatly</option>
-								<option value="journal">Journal</option>
-								<option value="litera">Litera</option>
-								<option value="lumen">Lumen</option>
-								<option value="lux">Lux</option>
-								<option value="materia">Materia</option>
-								<option value="minty">Minty</option>
-								<option value="pulse">Pulse</option>
-								<option value="sandstone">Sandstone</option>
-								<option value="simplex">Simplex</option>
-								<option value="sketchy">Sketchy</option>
-								<option value="slate">Slate</option>
-								<option value="solar">Solar</option>
-								<option value="spacelab">Spacelab</option>
-								<option value="superhero">Superhero</option>
-								<option value="united">United</option>
-								<option value="yeti">Yeti</option>
-							</select>
+						<div class="col-4">
+							<input-select v-model="settings.basementor_bootstrap_bootswatch"
+								:options="bootswatch"
+								option-id="id"
+								option-label="label"
+								placeholder="Estilo Bootswatch"
+							>
+								<template #option="{option, value}">{{ option.label }}</template>
+							</input-select>
 						</div>
 					</div><br>
 
 					<nav class="navbar navbar-expand-lg navbar-dark mb-2" :class="`bg-${prefix}`"><a href="#" class="navbar-brand">{{ prefix }}</a> <button type="button" data-toggle="collapse" data-target="#navbar-color-primary" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> <div id="navbar-color-primary" class="collapse navbar-collapse"><ul class="navbar-nav mr-auto"><li class="nav-item active"><a href="#" class="nav-link">Home <span class="sr-only">(current)</span></a></li> <li class="nav-item"><a href="#" class="nav-link">Features</a></li> <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li> <li class="nav-item"><a href="#" class="nav-link">About</a></li></ul> 
-						<div class="input-group form-control border border-secondary" style="max-width:300px;"><input type="text" placeholder="Search" class="form-control mr-sm-2"><div class="input-group-btn"><button type="button" class="btn btn-secondary"><i class="fa fa-fw fa-search"></i></button></div></div>
+						<div class="input-group form-control p-0 border-0" style="max-width:300px;">
+							<input type="text" placeholder="Search" class="form-control border-0 bg-transparent mr-sm-2">
+							<div class="input-group-btn"><button type="button" :class="`btn btn-${prefix}-light`"><i class="fa fa-fw fa-search"></i></button></div>
+						</div>
 					</div></nav>
 
 					<div class="alert alert-dismissible mb-2" :class="`alert-${prefix}`"><button type="button" data-dismiss="alert" class="close">×</button> <h4 class="alert-heading">Warning!</h4> <p class="mb-0">Lorem ipsum dolor sit amet, odit magni cum qui doloribus  <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p></div>
@@ -206,7 +222,7 @@ add_action('admin_menu', function() {
 						</div>
 					</div>
 
-					<div class="row mb-2">
+					<div class="row mb-4">
 						<div class="col">
 							<div class="card text-white" :class="`bg-${prefix}`"><div class="card-header">Header</div> <div class="card-body"><h4 class="card-title">Primary card title</h4> <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p></div></div>
 						</div>
@@ -215,15 +231,39 @@ add_action('admin_menu', function() {
 						</div>
 					</div>
 
+					<div class="row mb-4">
+						<div class="col-4">
+							<input type="text" class="form-control" placeholder="Placeholder">
+						</div>
+
+						<div class="col-4">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Placeholder">
+								<div class="input-group-append"><div class="input-group-text">
+									Append
+								</div></div>
+							</div>
+						</div>
+
+						<div class="col-4">
+							<div class="input-group form-control p-0">
+								<input type="text" class="form-control border-0 bg-transparent" placeholder="Placeholder">
+								<div class="input-group-append"><div class="input-group-text border-0 bg-transparent">
+									Append
+								</div></div>
+							</div>
+						</div>
+					</div>
+
 					<div class="d-flex">
 						<div class="mx-auto">
 							<nav aria-label="Page navigation example">
 								<ul class="pagination">
-									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/1/">1</a></li>
-									<li class="page-item"><a class="page-link bg-primary text-light" href="https://zpet.com.br/loja/page/2/">2</a></li>
-									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/3/">3</a></li>
-									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/4/">4</a></li>
-									<li class="page-item"><a class="page-link " href="https://zpet.com.br/loja/page/5/">5</a></li>
+									<li class="page-item"><a href="javascript:;" class="page-link">1</a></li>
+									<li class="page-item"><a href="javascript:;" class="page-link bg-primary text-light">2</a></li>
+									<li class="page-item"><a href="javascript:;" class="page-link">3</a></li>
+									<li class="page-item"><a href="javascript:;" class="page-link">4</a></li>
+									<li class="page-item"><a href="javascript:;" class="page-link">5</a></li>
 								</ul>
 							</nav>
 						</div>
@@ -237,8 +277,8 @@ add_action('admin_menu', function() {
 							<div class="row">
 								<div class="col-6">
 									<label>Dark percent</label>
-									<div class="input-group">
-										<input type="number" class="form-control" v-model="settings.basementor_bootstrap_dark_percent">
+									<div class="input-group form-control" style="padding:0px !important;">
+										<input type="number" class="form-control border-0 bg-transparent" v-model="settings.basementor_bootstrap_dark_percent">
 										<div class="input-group-append"><div class="input-group-btn">
 											<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_dark_percent');">
 												<i class="fa fa-fw fa-refresh"></i>
@@ -249,8 +289,8 @@ add_action('admin_menu', function() {
 
 								<div class="col-6">
 									<label>Light percent</label>
-									<div class="input-group">
-										<input type="number" class="form-control" v-model="settings.basementor_bootstrap_light_percent">
+									<div class="input-group form-control" style="padding:0px !important;">
+										<input type="number" class="form-control border-0 bg-transparent" v-model="settings.basementor_bootstrap_light_percent">
 										<div class="input-group-append"><div class="input-group-btn">
 											<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_light_percent');">
 												<i class="fa fa-fw fa-refresh"></i>
@@ -265,7 +305,7 @@ add_action('admin_menu', function() {
 									<input-color v-model="settings.basementor_bootstrap_<?php echo $prefix; ?>_bg">
 										<template #append><div class="input-group-append">
 											<div class="input-group-btn">
-												<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_bg');">
+												<button type="button" class="btn border-0 bg-transparent" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_bg');">
 													<i class="fa fa-fw fa-refresh"></i>
 												</button>
 											</div>
@@ -278,7 +318,7 @@ add_action('admin_menu', function() {
 									<input-color v-model="settings.basementor_bootstrap_<?php echo $prefix; ?>_text">
 										<template #append><div class="input-group-append">
 											<div class="input-group-btn">
-												<button type="button" class="btn" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_text');">
+												<button type="button" class="btn border-0 bg-transparent" @click="basementorSettingsDefault('basementor_bootstrap_<?php echo $prefix; ?>_text');">
 													<i class="fa fa-fw fa-refresh"></i>
 												</button>
 											</div>

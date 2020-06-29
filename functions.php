@@ -241,3 +241,38 @@ add_action('admin_head-post.php', function() {
 		wp_redirect(admin_url("/post.php?post={$post->ID}&action=elementor"));
 	}
 });
+
+
+
+function basementor_register_class_api($class) {
+	$data = new \stdClass;
+	$data->class = str_replace('\\', '.', $class);
+	$data->methods = [];
+
+	foreach(get_class_methods($class) as $method) {
+		\Basementor\Basementor::action($method, [$class, $method]);
+		$data->methods[ $method ] = [
+			'param' => (new ReflectionParameter([$class, $method], 0))->getDefaultValue(),
+		];
+	}
+
+	foreach(['wp_footer', 'admin_footer'] as $action) {
+		add_action($action, function() use($data) { ?><script>
+		window.Basementor = window.Basementor||{};
+		window.<?php echo $data->class; ?> = {
+			<?php foreach($data->methods as $method=>$item): ?> 
+			<?php echo $method; ?>(post={}) {
+				return new Promise((resolve, reject) => {
+					post = Object.assign(<?php echo json_encode($item['param']); ?>, post||{});
+					jQuery.post('<?php echo \Basementor\Basementor::action($method); ?>', post, (resp) => {
+						resolve(resp);
+					}, "json");
+				});
+			},
+			<?php endforeach; ?> 
+		};
+		</script><?php });
+	}
+}
+
+basementor_register_class_api(\Basementor\ApiWc::class);

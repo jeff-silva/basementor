@@ -51,7 +51,7 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 <style>
 /*.basementor-product-carousel-align {display: flex; align-items: center; justify-content: center;}*/
 .basementor-product-carousel {position:relative;}
-.basementor-product-carousel .slick-arrow {position:absolute; top:0px; width:50px; height:100%; z-index:2; text-align:center; padding:0px; background:none; border:none; text-shadow:0px 0px #fff; font-size:30px; outline:0!important; box-shadow:none !important;}
+.basementor-product-carousel .slick-arrow {position:absolute; top:0px; width:50px; height:100%; z-index:2; text-align:center; padding:0px; background:none; border:none; text-shadow:0px 0px #fff; font-size:30px; outline:0!important; box-shadow:none !important; cursor:pointer;}
 .basementor-product-carousel .slick-prev {left:0px;}
 .basementor-product-carousel .slick-next {right:0px;}
 .basementor-product-carousel .slick-dots {list-style-type:none; margin:0px; padding:0px; text-align:center;}

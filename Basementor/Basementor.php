@@ -4,21 +4,33 @@ namespace Basementor;
 
 class Basementor
 {
-	
 	static function action($action, $callback=null) {
 		if ($callback===null) {
-			return site_url("?basementor-action={$action}");
+			$nonce = wp_create_nonce('wp_rest');
+			return site_url("/wp-json/basementor/v1/{$action}?_wpnonce={$nonce}");
 		}
 
-		if (isset($_GET['basementor-action']) AND $_GET['basementor-action']==$action) {
-			add_action('init', function() use($callback) {
-				$resp = new \stdClass;
-				$post = array_map('stripslashes', $_POST);
-				try { $resp = call_user_func($callback, (object) $post); }
-				catch(\Exception $e) { $resp->error = $e->getMessage(); }
-				echo json_encode($resp); die;
-			});
-		}
+		add_action('rest_api_init', function() use($action, $callback) {
+			register_rest_route('basementor/v1', $action, [
+				'methods' => 'POST',
+				'callback' => function() use($callback) {
+					$resp = new \stdClass;
+					try {
+						$post = json_decode(json_encode($_POST));
+						$resp = call_user_func($callback, $post);
+					}
+					catch(\Exception $e) { $resp->error = nl2br($e->getMessage()); }
+
+					if (isset($_POST['_redirect'])) {
+						$url = ('back'==$_POST['_redirect'])? $_SERVER['HTTP_REFERER']: $_POST['_redirect'];
+						wp_redirect($url);
+					}
+
+					return $resp;
+				},
+				'permission_callback' => function() { return true; },
+			]);
+		});
 	}
 
 
@@ -187,7 +199,7 @@ class Basementor
 			'basementor_bootstrap_whatsapp_text' => '#ffffff',
 			'basementor_bootstrap_instagram_bg' => '#e4405f',
 			'basementor_bootstrap_instagram_text' => '#ffffff',
-			'basementor_css' => '* {transition: all 300ms ease;}',
+			'basementor_css' => '',
 		];
 	}
 
@@ -245,11 +257,12 @@ class Basementor
 		}
 
 		$lines[] = $settings['basementor_css'];
-		$lines[] = ".input-group.form-control {padding:0px;}";
-		$lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";
-		$lines[] = ".input-group.form-control .form-control, .input-group.form-control .input-group-text {border:transparent!important; background:none; border-radius:0px;}";
-		$lines[] = ".basementor-woocommerce-price del {}";
-		$lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
+		
+		// $lines[] = ".input-group.form-control {padding:0px;}";
+		// $lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";
+		// $lines[] = ".input-group.form-control .form-control, .input-group.form-control .input-group-text {border:transparent!important; background:none; border-radius:0px;}";
+		// $lines[] = ".basementor-woocommerce-price del {}";
+		// $lines[] = ".basementor-woocommerce-price ins {text-decoration: none;}";
 
 		foreach($prefixes as $prefix) {
 			$color = isset($settings["basementor_bootstrap_{$prefix}_bg"])? $settings["basementor_bootstrap_{$prefix}_bg"]: '#ffffff';
