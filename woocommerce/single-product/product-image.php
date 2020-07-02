@@ -24,11 +24,12 @@ if ( ! function_exists( 'wc_get_gallery_image_html' ) ) {
 
 global $post, $product;
 
-
-$images = [];
+$data = new \stdClass;
+$data->id = uniqid('single-product-slider-');
+$data->images = [];
 
 if ($url = get_the_post_thumbnail_url($post->ID, 'full')) {
-	$images[] = (object) [
+	$data->images[] = (object) [
 		'url' => $url,
 		'title' => '',
 	];
@@ -38,7 +39,7 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 	$img_ids = explode(',', $img_ids);
 	foreach($img_ids as $img_id) {
 		if ($img_id AND $image = wp_get_attachment_image_src($img_id, 'full')) {
-			$images[] = (object) [
+			$data->images[] = (object) [
 				'url' => $image[0],
 				'title' => '',
 			];
@@ -48,46 +49,33 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 
 ?>
 
-<style>
-/*.basementor-product-carousel-align {display: flex; align-items: center; justify-content: center;}*/
-.basementor-product-carousel {position:relative;}
-.basementor-product-carousel .slick-arrow {position:absolute; top:0px; width:50px; height:100%; z-index:2; text-align:center; padding:0px; background:none; border:none; text-shadow:0px 0px #fff; font-size:30px; outline:0!important; box-shadow:none !important; cursor:pointer;}
-.basementor-product-carousel .slick-prev {left:0px;}
-.basementor-product-carousel .slick-next {right:0px;}
-.basementor-product-carousel .slick-dots {list-style-type:none; margin:0px; padding:0px; text-align:center;}
-.basementor-product-carousel .slick-dots li {display:inline-block;}
-.basementor-product-carousel .slick-dots li.slick-active {}
-.basementor-product-carousel .slick-dots li button {border:none; background:#eee; color:#eee; border:solid 1px #444; font-size:0px; padding:0px; width:10px; height:10px; margin-right:5px; border-radius:50%;}
-.basementor-product-carousel .slick-dots li.slick-active button {background:#444; color:#444;}
-</style>
+<div id="<?php echo $data->id; ?>">
+	<vue-slider ref="slider" :items="images">
+		<template #slide="{slide, index}">
+			<img :src="slide.url" alt="" style="width:100%;">
+		</template>
+	</vue-slider>
 
-<div class="basementor-product-carousel basementor-product-carousel-big" data-slick-settings='{slidesToShow:1, slidesToScroll:1, fade:true, adaptiveHeight:true, asNavFor:".basementor-product-carousel-small"}'>
-	<?php foreach($images as $image): ?>
-	<div><img src="<?php echo $image->url; ?>" alt="" style="width:100%;"></div>
-	<?php endforeach; ?>
+	<div class="row no-gutters">
+		<template v-if="images.length==2">
+			<div class="col-6 p-2 text-right">
+				<img :src="images[0].url" alt="" style="width:80px; cursor:pointer;" @click="$refs.slider.slickGoTo(0, false);">
+			</div>
+			<div class="col-6 p-2 text-left">
+				<img :src="images[1].url" alt="" style="width:80px; cursor:pointer;" @click="$refs.slider.slickGoTo(1, false);">
+			</div>
+		</template>
+
+		<template v-else-if="images.length>2">
+			<div class="col-3 p-2" v-for="(i, index) in images">
+				<img :src="i.url" alt="" style="width:100%; cursor:pointer;" @click="$refs.slider.slickGoTo(index, false);">
+			</div>
+		</template>
+	</div>
 </div>
 
-
-<?php if (sizeof($images)>1): ?>
-<br>
-<div class="basementor-product-carousel basementor-product-carousel-small" data-slick-settings='{slidesToShow:3, slidesToScroll:1, arrows:false, asNavFor:".basementor-product-carousel-big", dots:true, centerMode:true, focusOnSelect:true}'>
-	<?php foreach($images as $image): ?>
-	<div class="px-1"><img src="<?php echo $image->url; ?>" alt="" style="width:100%;"></div>
-	<?php endforeach; ?>
-</div>
-<?php endif; ?>
-
-
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script>jQuery(document).ready(function($) {
-	$("[data-slick-settings]").each(function() {
-		var sets = $(this).attr("data-slick-settings")||"{}";
-		try { eval('sets = '+sets); } catch(e) { sets = {}; }
-		sets.prevArrow = sets.prevArrow||`<button type="button" class="slick-arrow slick-prev"><i class="fa fa-fw fa-chevron-left"></i></button>`;
-		sets.nextArrow = sets.nextArrow||`<button type="button" class="slick-arrow slick-next"><i class="fa fa-fw fa-chevron-right"></i></button>`;
-		$(this).slick(sets);
-	});
+<?php do_action('vue'); ?>
+<script>new Vue({
+	el: "#<?php echo $data->id; ?>",
+	data: <?php echo json_encode($data); ?>,
 });</script>
-
-<br><br>

@@ -25,6 +25,6 @@ if ($product->is_on_sale()) {
 	$price = floatval($product->get_regular_price());
 	$sale = floatval($product->get_sale_price());
 	$percent = round(($price - $sale) / $price * 100 ).'%';
-	echo "<div class='badge badge-primary'>{$percent}</div>";
+	echo "<div class='badge badge-primary basementor-products-each-sale'>{$percent}</div>";
 }
 
