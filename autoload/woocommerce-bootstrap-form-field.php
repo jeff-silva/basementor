@@ -124,8 +124,6 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 			>
 		</div>
 		<?php endif;
-
-		echo '<!--', dd($field), '-->';
 	}
 }
 

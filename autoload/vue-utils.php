@@ -1,9 +1,6 @@
 <?php
 
 add_action('vue', function() { ?>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js"></script>
-
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/theme/ambiance.min.css">
 <style>.CodeMirror {min-height:500px;}</style>
@@ -354,4 +351,12 @@ add_action('vue', function() { ?>
 .vue-slider .slick-prev {left:0px;}
 .vue-slider .slick-next {right:0px;}
 </style>
+
+
+<script>Vue.component("vue-draggable", function(resolve, reject) {
+	head.load([
+		'//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js',
+		'//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js',
+	], function() { resolve(vuedraggable); });
+});</script>
 <?php });

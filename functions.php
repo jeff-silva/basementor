@@ -89,6 +89,7 @@ if (! $autoload) {
 }
 
 include $autoload;
+include __DIR__ . '/woocommerce-checkout-fields/woocommerce-checkout-fields.php';
 
 
 if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
@@ -167,6 +168,7 @@ foreach(['wp_enqueue_scripts', 'admin_enqueue_scripts'] as $action) {
 		wp_enqueue_style('bootstrap', '//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
 		wp_enqueue_style('font-awesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
 		wp_enqueue_style('animate-css', '//cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css');
+		wp_enqueue_script('head-load', '//cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js');
 	});
 }
 
