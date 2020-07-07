@@ -211,6 +211,7 @@ add_action('vue', function() { ?>
 	jQuery.getScript('//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js', function() {
 		resolve({
 			props: {
+				value: {default: 0},
 				items: {default: () => ([])},
 				options: {default: () => ({})},
 				optionsXs: {default: () => ({})},
@@ -239,7 +240,6 @@ add_action('vue', function() { ?>
 
 					if (options.asNavFor) {
 						options.asNavFor = document.querySelector(options.asNavFor).querySelector('.vue-slider-slider');
-						console.log(options.asNavFor);
 					}
 
 					return options;
@@ -247,6 +247,10 @@ add_action('vue', function() { ?>
 			},
 
 			methods: {
+				emit() {
+					this.$emit('input', this.value);
+					this.$emit('change', this.value);
+				},
 				slickCurrentSlide() {},
 				slickGoTo(index, animate) { this.$slider.slick('slickGoTo', index, animate); },
 				slickNext() { this.$slider.slick('slickNext'); },
@@ -260,6 +264,12 @@ add_action('vue', function() { ?>
 			mounted() {
 				this.$slider = jQuery(this.$refs.slider);
 				this.$slider.slick(this.compOptions);
+
+				this.$slider.on('afterChange', (ev, slick, index, nextIndex) => {
+					this.value = index;
+					this.emit();
+				});
+
 				// ['swipe', 'edge', 'afterChange', 'beforeChange'].forEach((evt) => {
 				// 	$slider.on(evt, () => {
 				// 		this.$emit.apply(this, [evt].concat(Array.from(arguments)));
@@ -290,61 +300,6 @@ add_action('vue', function() { ?>
 	});
 });</script>
 
-<script>Vue.component('vue-slider2', {
-	props: {
-		items: {default: () => ([])},
-		options: {default: () => ({})},
-		optionsXs: {default: () => ({})},
-	},
-
-	computed: {
-		compOptions() {
-			return Object.assign({
-				infinite: true,
-				slidesToShow: 1,
-				slidesToScroll: 1,
-				arrows: true,
-				autoplay: false,
-				autoplaySpeed: true,
-				centerMode: false,
-				cssEase: 'ease',
-				dots: false,
-				lazyLoad: 'ondemand',
-				prevArrow: this.$refs.prevArrow,
-				nextArrow: this.$refs.nextArrow,
-				speed: 300,
-				vertical: false,
-				responsive: [],
-			}, this.options||{});
-		},
-	},
-
-	mounted() {
-		console.log('window.Slick', window.Slick);
-		jQuery(this.$refs.slider).slick(this.compOptions);
-	},
-
-	template: `<div class="vue-slider">
-		<button type="button" ref="prevArrow" class="slick-arrow slick-prev">
-			<slot name="prev">
-				<i class="fa fa-fw fa-chevron-left" style="font-size:30px;"></i>
-			</slot>
-		</button>
-
-		<button type="button" ref="nextArrow" class="slick-arrow slick-next">
-			<slot name="next">
-				<i class="fa fa-fw fa-chevron-right" style="font-size:30px;"></i>
-			</slot>
-		</button>
-
-		<div ref="slider">
-			<div v-for="(it, index) in items">
-				<slot name="slide" v-bind="{slide:it, index:index}"></slot>
-			</div>
-		</div>
-	</div>`,
-});</script>
-
 <style>
 .vue-slider {position:relative;}
 .vue-slider .slick-arrow {position:absolute; top:0px; height:100%; border:none; background:none; cursor:pointer; z-index:3; min-width:50px; outline:none!important;}
@@ -359,4 +314,8 @@ add_action('vue', function() { ?>
 		'//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js',
 	], function() { resolve(vuedraggable); });
 });</script>
+
+
+<!-- <script src="//unpkg.com/vue-lazyload/vue-lazyload.js"></script>
+<script>Vue.use(VueLazyload);</script> -->
 <?php });

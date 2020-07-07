@@ -258,6 +258,12 @@ class Basementor
 		if ($settings['basementor_bootstrap_bootswatch']) {
 			$lines[] = "@import url('https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.5.0/{$settings['basementor_bootstrap_bootswatch']}/bootstrap.min.css');";
 		}
+
+		$lines[] = '.basementor-checkbox {display:inline-block; cursor:pointer; user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -o-user-select:none;}';
+		$lines[] = '.basementor-checkbox input {display:none;}';
+		$lines[] = '.basementor-checkbox > * {display:inline-block;}';
+		$lines[] = '.basementor-checkbox > *:before {content:"\f096"; font-family:FontAwesome; display:inline-block; width:20px; font-size:12pt;}';
+		$lines[] = '.basementor-checkbox input:checked ~ *:before {content:"\f046";}';
 		
 		// $lines[] = ".input-group.form-control {padding:0px !important;}";
 		// $lines[] = ".input-group.form-control .btn {border:transparent!important; border-radius:0px; display:inline-block!important;}";

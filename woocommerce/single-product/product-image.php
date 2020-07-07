@@ -26,6 +26,7 @@ global $post, $product;
 
 $data = new \stdClass;
 $data->id = uniqid('single-product-slider-');
+$data->image = 0;
 $data->images = [];
 
 if ($url = get_the_post_thumbnail_url($post->ID, 'full')) {
@@ -50,24 +51,26 @@ if ($img_ids = get_post_meta($post->ID, '_product_image_gallery', true)) {
 ?>
 
 <div id="<?php echo $data->id; ?>">
-	<vue-slider ref="slider" :items="images">
+	<vue-slider ref="slider" :items="images" v-model="image">
 		<template #slide="{slide, index}">
-			<img :src="slide.url" alt="" style="width:100%;">
+			<div class="p-2">
+				<img :src="slide.url" alt="" style="width:100%;">
+			</div>
 		</template>
 	</vue-slider>
 
 	<div class="row no-gutters">
 		<template v-if="images.length==2">
-			<div class="col-6 p-2 text-right">
+			<div class="col-6 p-2 text-right" :style="{opacity:(0==image? 1: .5)}">
 				<img :src="images[0].url" alt="" style="width:80px; cursor:pointer;" @click="$refs.slider.slickGoTo(0, false);">
 			</div>
-			<div class="col-6 p-2 text-left">
+			<div class="col-6 p-2 text-left" :style="{opacity:(1==image? 1: .5)}">
 				<img :src="images[1].url" alt="" style="width:80px; cursor:pointer;" @click="$refs.slider.slickGoTo(1, false);">
 			</div>
 		</template>
 
 		<template v-else-if="images.length>2">
-			<div class="col-3 p-2" v-for="(i, index) in images">
+			<div class="col-3 p-2" v-for="(i, index) in images" :style="{opacity:(index==image? 1: .5)}">
 				<img :src="i.url" alt="" style="width:100%; cursor:pointer;" @click="$refs.slider.slickGoTo(index, false);">
 			</div>
 		</template>
