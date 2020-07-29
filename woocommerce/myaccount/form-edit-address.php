@@ -17,6 +17,20 @@
 
 defined( 'ABSPATH' ) || exit;
 
+
+$address_old = $address;
+$address = THWCFD_Utils::get_fields($load_address);
+foreach($address as $key=>$field) {
+	$field['value'] = $address_old[$key]['value'];
+
+	if (!$field['value']) {
+		$field['value'] = get_user_meta( get_current_user_id(), $key, true );
+	}
+
+	$address[$key]['value'] = $field['value'];
+}
+
+
 $page_title = ( 'billing' === $load_address ) ? esc_html__( 'Billing address', 'woocommerce' ) : esc_html__( 'Shipping address', 'woocommerce' );
 
 do_action( 'woocommerce_before_edit_account_address_form' ); ?>

@@ -242,6 +242,16 @@ add_action('admin_head-post.php', function() {
 });
 
 
+/* Save any Woocommerce user post field */
+add_action('woocommerce_customer_save_address', function($user_id, $load_address) {
+    $ignore = ['save_address', 'woocommerce-edit-address-nonce', '_wp_http_referer', 'action'];
+    foreach($_POST as $key=>$value) {
+        if (in_array($key, $ignore)) continue;
+        update_user_meta(get_current_user_id(), $key, $value);
+    }
+}, 10, 2);
+
+
 
 function basementor_register_class_api($class) {
 	$data = new \stdClass;

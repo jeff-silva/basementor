@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 
 		<h3 id="ship-to-different-address">
 			<label class="basementor-checkbox">
-				<input type="checkbox" name="ship_to_different_address" value="1"
+				<input type="checkbox" name="ship_to_different_address" value="1" id="ship_to_different_address"
 					<?php checked( apply_filters( 'woocommerce_ship_to_different_address_checked', 'shipping' === get_option( 'woocommerce_ship_to_destination' ) ? 1 : 0 ), 1 ); ?> />
 				<div><?php esc_html_e( 'Ship to a different address?', 'woocommerce' ); ?></div>
 			</label>
