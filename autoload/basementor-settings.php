@@ -682,7 +682,51 @@ add_action('admin_menu', function() {
 
 		/* Main */
 		else {
-			?>Main<?php
+			$data->id = uniqid('basementor-settings-');
+			$data->vueCodemirrorOptions = [
+				'tabSize' => 4,
+				'mode' => 'application/x-httpd-php',
+				'theme' => 'ambiance',
+				'lineNumbers' => true,
+				'line' => 'true',
+				'indentUnit' => 4,
+				'indentWithTabs' => true,
+			];
+			
+			?><div id="<?php echo $data->id; ?>">
+				<form action="<?php echo \Basementor\Basementor::action('basementor-settings-save'); ?>" method="post">
+					<div class="form-group">
+						<label>Conteúdo head</label>
+						<codemirror :options="vueCodemirrorOptions" v-model="settings.basementor_head"></codemirror>
+					</div>
+
+					<div class="form-group">
+						<label>Conteúdo body</label>
+						<codemirror :options="vueCodemirrorOptions" v-model="settings.basementor_body"></codemirror>
+					</div>
+
+					<div class="text-right">
+						<textarea name="settings" style="display:none;">{{ settings }}</textarea>
+						<button type="submit" class="btn btn-primary">Salvar</button>
+					</div>
+				</form>
+			</div>
+
+			<style>.CodeMirror {min-height:200px;}</style>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.js"></script>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.css">
+			<script src="https://cdn.jsdelivr.net/npm/vue-codemirror@4.0.6/dist/vue-codemirror.js"></script>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/theme/<?php echo $data->vueCodemirrorOptions['theme']; ?>.min.css">
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/htmlmixed/htmlmixed.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/xml/xml.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/javascript/javascript.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/css/css.js"></script>
+			<script>
+			Vue.use(window.VueCodemirror, <?php echo json_encode($data->vueCodemirrorOptions); ?>);
+			new Vue({
+				el: "#<?php echo $data->id; ?>",
+				data: <?php echo json_encode($data); ?>,
+			});</script><?php
 		}
 	});
 });

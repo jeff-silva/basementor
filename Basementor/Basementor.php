@@ -203,6 +203,8 @@ class Basementor
 			'basementor_loader_icon' => '',
 			'basementor_loader_icon_color' => '#444444',
 			'basementor_loader_bg_color' => '#ffffff',
+			'basementor_head' => '',
+			'basementor_body' => '',
 		];
 	}
 
