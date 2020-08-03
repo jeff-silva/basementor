@@ -63,6 +63,46 @@ add_action('vue', function() { ?>
 
 
 
+<script>Vue.component("ui-modal", {
+	props: {
+		value: {default:''},
+	},
+
+	methods: {
+		valueEmit(value) {
+			this.value = value;
+			this.$emit('input', this.value);
+			this.$emit('value', this.value);
+			this.$emit('change', this.value);
+		},
+	},
+
+	template: `<div>
+		<transition name="ui-modal-transition"
+			enter-active-class="animated fadeIn"
+			leave-active-class="animated fadeOut"
+		>
+			<div v-if="value" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:#00000088; z-index:9; animation-duration:300ms; display:flex; align-items:center; justify-content:center;" @click.self="valueEmit(false);">
+				<div class="card" style="min-width:400px;">
+					<div class="card-header" v-if="$slots.header">
+						<slot name="header">Header</slot>
+					</div>
+
+					<div class="card-body" style="max-height:80vh; overflow:auto;">
+						<slot name="body">body</slot>
+					</div>
+
+					<div class="card-footer text-right">
+						<slot name="footer">
+							<button type="button" class="btn btn-secondary" @click="valueEmit('');">Fechar</button>
+						</slot>
+					</div>
+				</div>
+			</div>
+		</transition>
+	</div>`,
+});</script>
+
 
 
 

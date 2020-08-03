@@ -159,22 +159,46 @@ if (! function_exists('woocommerce_bootstrap_form_field')) {
 	}
 }
 
+foreach(['woocommerce_checkout_after_customer_details', 'woocommerce_after_edit_address_form_billing', 'woocommerce_after_edit_address_form_shipping'] as $action):
+	add_action($action, function() { ?>
+	<script>jQuery(document).ready(function($) {
+		var _handle = function() {
+			var persontype = $("[name=billing_persontype]").val();
 
-add_action('woocommerce_checkout_after_customer_details', function() { ?>
-<script>jQuery(document).ready(function($) {
-	var _handle = function() {
-		var persontype = $("[name=billing_persontype]").val();
-
-		if (persontype==1) {
-			$("[name=billing_cpf]").closest(".form-group").fadeIn(200);
-			$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").hide();
+			if (persontype==1) {
+				$("[name=billing_cpf]").closest(".form-group").fadeIn(200);
+				$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").hide();
+			}
+			else if (persontype==2) {
+				$("[name=billing_cpf]").closest(".form-group").hide();
+				$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").fadeIn(200);
+			}
 		}
-		else if (persontype==2) {
-			$("[name=billing_cpf]").closest(".form-group").hide();
-			$("[name=billing_cnpj], [name=billing_company]").closest(".form-group").fadeIn(200);
-		}
-	}
 
-	$("[name=billing_persontype]").on("change", _handle);
-	_handle();
-});</script><?php });
+		$("[name=billing_persontype]").on("change", _handle);
+		_handle();
+
+
+		["billing_postcode", "shipping_postcode"].forEach(function(input_name) {
+			$(`input[name=${input_name}]`).on("keyup blue", function(ev) {
+				if (ev.target.value.length < 8) return;
+				$.get(`https://viacep.com.br/ws/${ev.target.value.replace(/[^0-9]/g, '')}/json/`, function(resp) {
+					if (input_name=="billing_postcode") {
+						$("input[name=billing_address_1]").val(resp.logradouro);
+						$("input[name=billing_neighborhood]").val(resp.bairro);
+						$("input[name=billing_city]").val(resp.localidade);
+						$("select[name=billing_state]").val(resp.uf);
+					}
+					else if (input_name=="shipping_postcode") {
+						$("input[name=shipping_address_1]").val(resp.logradouro);
+						$("input[name=shipping_neighborhood]").val(resp.bairro);
+						$("input[name=shipping_city]").val(resp.localidade);
+						$("select[name=shipping_state]").val(resp.uf);
+					}
+				}, "json");
+			});
+		});
+	});</script><?php });
+endforeach;
+
+

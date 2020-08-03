@@ -1,32 +1,19 @@
 <?php
 
-add_action('init', function() {
-	$post_types = get_option('basementor-post-types');
-	$post_types = json_decode(json_encode($post_types), true);
-	$post_types = is_array($post_types)? $post_types: [];
-	foreach($post_types as $post_type) {
-		register_post_type($post_type['slug'], $post_type);
-	}
-	// die;
+add_filter('basementor-settings-menu', function($admin_bar) {
+	$admin_bar->add_menu([
+		'parent' => 'basementor',
+		'id'    => 'basementor-settings-posttypes',
+		'title' => 'Post types',
+		'href'  => admin_url('admin.php?page=basementor-settings&tab=posttypes'),
+    ]);
+    
+    return $admin_bar;
 });
 
 
-
-\Basementor\Basementor::action('basementor-post-type-save', function($post) {
-	$post->post_types = stripslashes($post->post_types);
-	$post->post_types = json_decode($post->post_types);
-	update_option('basementor-post-types', $post->post_types);
-	wp_redirect($_SERVER['HTTP_REFERER']);
-	return $post;
-});
-
-
-add_action('admin_menu', function() {
-	add_submenu_page('tools.php', 'Post Types', 'Post Types', 'manage_options', 'basementor-post-type', function() {
-
-	$data = new \stdClass;
-
-	$data->post_type_new = ['singular' => '', 'plural' => '', 'slug' => ''];
+add_action('basementor-settings-posttypes', function($data) {
+    $data->post_type_new = ['singular' => '', 'plural' => '', 'slug' => ''];
 	$data->post_type_edit = false;
 	$data->post_types = get_option('basementor-post-types');
 	$data->post_types = is_array($data->post_types)? $data->post_types: [];
@@ -37,14 +24,18 @@ add_action('admin_menu', function() {
 	$data->taxonomies = get_option('basementor-taxonomies');
 	$data->taxonomies = is_array($data->taxonomies)? $data->taxonomies: [];
 
+	$data->all_post_types = [];
+	foreach(get_post_types([], 'objects') as $post_type=>$type) {
+		$data->all_post_types[$post_type] = $type->label;
+	}
 
 	?>
-	<br><div id="basementor-post-types">
+	<br><div id="<?php echo $data->id; ?>">
 		<div class="row">
 			<div class="col-12 col-md-6">
 				<form action="<?php echo \Basementor\Basementor::action('basementor-post-type-save'); ?>" method="post">
 					<div class="card">
-						<div class="card-header p-2">Post types</div>
+						<div class="card-header p-2 font-weight-bold">POST TYPES</div>
 						
 						<div class="card-body p-2">
 							<div class="row">
@@ -146,7 +137,7 @@ add_action('admin_menu', function() {
 			<div class="col-12 col-md-6">
 				<form action="<?php echo \Basementor\Basementor::action('basementor-taxonomy-save'); ?>" method="post">
 					<div class="card">
-						<div class="card-header p-2">Taxonomias</div>
+						<div class="card-header p-2 font-weight-bold">TAXONOMIAS</div>
 						<div class="card-body p-2">
 							<div class="row">
 								<div class="col-4 form-group">
@@ -173,7 +164,72 @@ add_action('admin_menu', function() {
 							</div>
 
 							<ui-modal v-model="taxonomy_edit">
-								<pre>taxonomy_edit: {{ taxonomy_edit }}</pre>
+								<template #body><div style="max-width:500px;">
+									<div class="row">
+										<div class="col-6 form-group">
+											<label>Slug</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.rewrite.slug">
+										</div>
+
+										<div class="col-6 form-group">
+											<label>Nome plural</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.name">
+										</div>
+
+										<div class="col-6 form-group">
+											<label>Nome singular</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.singular_name">
+										</div>
+
+										<div class="col-6 form-group">
+											<label>Busca</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.search_items">
+										</div>
+
+										<div class="col-6 form-group">
+											<label>Todos</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.all_items">
+										</div>
+										
+										<div class="col-6 form-group">
+											<label>Editar</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.edit_item">
+										</div>
+										
+										<div class="col-6 form-group">
+											<label>Novo item</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.add_new_item">
+										</div>
+										
+										<div class="col-6 form-group">
+											<label>Nome "novo"</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.new_item_name">
+										</div>
+										
+										<div class="col-6 form-group">
+											<label>Nome no menu</label>
+											<input type="text" class="form-control" v-model="taxonomy_edit.labels.menu_name">
+										</div>
+
+										<div class="col-12 form-group">
+											<label class="input-group">
+												<div class="input-group-prepend"><div class="input-group-text">
+													<input type="checkbox" v-model="taxonomy_edit.hierarchical" :true-value="true" :false-value="false">
+												</div></div>
+												<div class="form-control">Hierárquico</div>
+											</label>
+										</div>
+
+										<div class="col-12 form-group">
+											<label class="input-group">
+												<div class="input-group-prepend"><div class="input-group-text">
+													<input type="checkbox" v-model="taxonomy_edit.public" :true-value="true" :false-value="false">
+												</div></div>
+												<div class="form-control">Público</div>
+											</label>
+										</div>
+									</div>
+								</div></template>
 							</ui-modal>
 
 							<table class="table table-bordered">
@@ -184,9 +240,15 @@ add_action('admin_menu', function() {
 								</colgroup>
 								<tbody>
 									<tr v-for="t in taxonomies" :key="t">
-										<td>{{ t.labels.name }}</td>
+										<td>
+											<div class="mb-2 text-uppercase font-weight-bold">{{ t.labels.name }}</div>
+											<label v-for="(pname, ptype) in all_post_types" class="pr-3">
+												<input type="checkbox" v-model="t.post_types" :value="ptype">
+												<span>{{ pname }}</span>
+											</label>
+										</td>
 										<td class="p-1"><a href="javascript:;" class="btn btn-primary" @click="taxonomy_edit=t;"><i class="fa fa-fw fa-pencil"></i></a></td>
-										<td class="p-1"><a href="javascript:;" class="btn btn-danger" @click="taxonomyRemove(pt);"><i class="fa fa-fw fa-remove"></i></a></td>
+										<td class="p-1"><a href="javascript:;" class="btn btn-danger" @click="taxonomyRemove(t);"><i class="fa fa-fw fa-remove"></i></a></td>
 									</tr>
 								</tbody>
 							</table>
@@ -197,58 +259,23 @@ add_action('admin_menu', function() {
 							</button>
 						</div>
 					</div>
-					<textarea name="taxonomies" style="display:block;">{{ taxonomies }}</textarea>
+					<textarea name="taxonomies" style="display:none;">{{ taxonomies }}</textarea>
 				</form>
 			</div>
 		</div>
 	</div>
 
-	<script>
-	Vue.component("ui-modal", {
-		props: {
-			value: {default:''},
-		},
-
-		methods: {
-			valueEmit(value) {
-				this.value = value;
-				this.$emit('input', this.value);
-				this.$emit('value', this.value);
-				this.$emit('change', this.value);
-			},
-		},
-
-		template: `<div>
-			<transition name="ui-modal-transition"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut"
-			>
-				<div v-if="value" style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:#00000088; z-index:9; animation-diration:300ms !important; display:flex; align-items:center; justify-content:center;" @click.self="valueEmit(false);">
-					<div class="card" style="min-width:400px;">
-						<div class="card-header" v-if="$slots.header">
-							<slot name="header">Header</slot>
-						</div>
-
-						<div class="card-body" style="max-height:80vh; overflow:auto;">
-							<slot name="body">body</slot>
-						</div>
-
-						<div class="card-footer text-right">
-							<slot name="footer">
-								<button type="button" class="btn btn-secondary" @click="valueEmit('');">Fechar</button>
-							</slot>
-						</div>
-					</div>
-				</div>
-			</transition>
-		</div>`,
-	});
-
-	new Vue({
-		el: "#basementor-post-types",
+	<?php do_action('vue'); ?>
+	<script>new Vue({
+		el: "#<?php echo $data->id; ?>",
 		data: <?php echo json_encode($data); ?>,
 		methods: {
 			posttypeAdd() {
+				if (!this.post_type_new.slug || !this.post_type_new.singular || !this.post_type_new.plural) {
+					alert('É preciso informar nome singular, plural e slug do post type.');
+					return false;
+				}
+
 				this.post_types.push({
 					slug: this.post_type_new.slug,
 					label: `${this.post_type_new.plural}`,
@@ -303,6 +330,11 @@ add_action('admin_menu', function() {
 
 
 			taxonomyAdd() {
+				if (!this.taxonomy_new.slug || !this.taxonomy_new.singular || !this.taxonomy_new.plural) {
+					alert('É preciso informar nome singular, plural e slug da taxonomia.');
+					return false;
+				}
+
 				this.taxonomies.push({
 					hierarchical: true,
 					public: true,
@@ -311,7 +343,7 @@ add_action('admin_menu', function() {
 					query_var: true,
 					rewrite: {slug:this.taxonomy_new.slug},
 					labels: {
-						name: `Categorias de ${this.taxonomy_new.singular}`,
+						name: `${this.taxonomy_new.singular}`,
 						singular_name: `${this.taxonomy_new.singular}`,
 						search_items: `Procurar ${this.taxonomy_new.singular}`,
 						all_items: `Todas as ${this.taxonomy_new.plural}`,
@@ -321,12 +353,19 @@ add_action('admin_menu', function() {
 						update_item: ``,
 						add_new_item: `Adicionar ${this.taxonomy_new.singular}`,
 						new_item_name: `Nova ${this.taxonomy_new.singular}`,
-						menu_name: `Categorias`,
+						menu_name: `${this.taxonomy_new.plural}`,
 					},
+					post_types: [],
 				});
 				this.taxonomy_new.singular = "";
 				this.taxonomy_new.plural = "";
 				this.taxonomy_new.slug = "";
+			},
+			
+			taxonomyRemove(taxo) {
+				if (! confirm('Confirmar a ação de deletar taxonomia?')) return;
+				var index = this.taxonomies.indexOf(taxo);
+				this.taxonomies.splice(index, 1);
 			},
 		},
 
@@ -350,6 +389,40 @@ add_action('admin_menu', function() {
 		},
 	});</script>
 	<?php
+});
 
-	}, 'dashicons-admin-users', 10);
+
+
+add_action('init', function() {
+	$post_types = get_option('basementor-post-types');
+	$post_types = json_decode(json_encode($post_types), true);
+	$post_types = is_array($post_types)? $post_types: [];
+	foreach($post_types as $post_type) {
+		register_post_type($post_type['slug'], $post_type);
+	}
+	
+	$taxonomies = get_option('basementor-taxonomies');
+	$taxonomies = json_decode(json_encode($taxonomies), true);
+	$taxonomies = is_array($taxonomies)? $taxonomies: [];
+	foreach($taxonomies as $tax) {
+		register_taxonomy($tax['rewrite']['slug'], $tax['post_types'], $tax);
+	}
+});
+
+
+\Basementor\Basementor::action('basementor-post-type-save', function($post) {
+	$post->post_types = stripslashes($post->post_types);
+	$post->post_types = json_decode($post->post_types);
+	update_option('basementor-post-types', $post->post_types);
+	wp_redirect($_SERVER['HTTP_REFERER']);
+	return $post;
+});
+
+
+\Basementor\Basementor::action('basementor-taxonomy-save', function($post) {
+	$post->taxonomies = stripslashes($post->taxonomies);
+	$post->taxonomies = json_decode($post->taxonomies);
+	update_option('basementor-taxonomies', $post->taxonomies);
+	wp_redirect($_SERVER['HTTP_REFERER']);
+	return $post;
 });

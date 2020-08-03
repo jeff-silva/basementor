@@ -51,24 +51,3 @@ if ($user->data->ID==0) {
 
 <?php do_action('woocommerce_after_checkout_form', $checkout ); ?>
 
-<script>jQuery(document).ready(function($) {
-	["billing_postcode", "shipping_postcode"].forEach(function(input_name) {
-		$(`input[name=${input_name}]`).on("keyup blue", function(ev) {
-			if (ev.target.value.length < 8) return;
-			$.get(`https://viacep.com.br/ws/${ev.target.value.replace(/[^0-9]/g, '')}/json/`, function(resp) {
-				if (input_name=="billing_postcode") {
-					$("input[name=billing_address_1]").val(resp.logradouro);
-					$("input[name=billing_neighborhood]").val(resp.bairro);
-					$("input[name=billing_city]").val(resp.localidade);
-					$("input[name=billing_state]").val(resp.uf);
-				}
-				else if (input_name=="shipping_postcode") {
-					$("input[name=shipping_address_1]").val(resp.logradouro);
-					$("input[name=shipping_neighborhood]").val(resp.bairro);
-					$("input[name=shipping_city]").val(resp.localidade);
-					$("input[name=shipping_state]").val(resp.uf);
-				}
-			}, "json");
-		});
-	});
-});</script>
