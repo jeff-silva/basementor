@@ -1,17 +1,27 @@
 <?php
 
 add_action('vue', function() { ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/theme/ambiance.min.css">
-<style>.CodeMirror {min-height:500px;}</style>
+
+
+<style>.CodeMirror {min-height:200px;}</style>
 <script>Vue.component("input-code", (resolve, reject) => {
+	// Themes: 3024-day, 3024-night, abcdef, ambiance-mobile, ambiance, ayu-dark, ayu-mirage, base16-dark, base16-light, bespin, blackboard, cobalt,
+	// colorforth, darcula, dracula, duotone-dark, duotone-light, eclipse, elegant, erlang-dark, gruvbox-dark, hopscotch, icecoder, idea,
+	// isotope, lesser-dark, liquibyte, lucario, material-darker, material-ocean, material-palenight, material, mbo, mdn-like, midnight, monokai, moxer,
+	// neat, neo, night, nord, oceanic-next, panda-syntax, paraiso-dark, paraiso-light, pastel-on-dark, railscasts, rubyblue, seti
+	// shadowfox, solarized, ssms, the-matrix, tomorrow-night-bright, tomorrow-night-eighties, ttcn, twilight, vibrant-ink, xq-dark,
+	// xq-light, yeti, yonce, zenburn
+	
+	var theme = 'darcula';
 	head.load([
-		'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.js',
-		'https://cdn.jsdelivr.net/npm/vue-codemirror@4.0.6/dist/vue-codemirror.js',
-		'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/htmlmixed/htmlmixed.js',
-		'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/xml/xml.js',
-		'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/javascript/javascript.js',
-		'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/css/css.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.js',
+		'//cdn.jsdelivr.net/npm/vue-codemirror@4.0.6/dist/vue-codemirror.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/htmlmixed/htmlmixed.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/xml/xml.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/javascript/javascript.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/mode/css/css.js',
+		'//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/codemirror.min.css',
+		`//cdnjs.cloudflare.com/ajax/libs/codemirror/5.50.2/theme/${theme}.min.css`,
 	], () => {
 		Vue.use(window.VueCodemirror);
 		resolve({
@@ -34,7 +44,7 @@ add_action('vue', function() { ?>
 			        return Object.assign({}, {
 			            tabSize: 4,
 			            mode: 'application/x-httpd-php',
-			            theme: 'ambiance',
+			            theme: theme,
 			            lineNumbers: true,
 			            line: true,
 			            indentUnit: 4,
@@ -314,6 +324,7 @@ add_action('vue', function() { ?>
 		'//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js',
 	], function() { resolve(vuedraggable); });
 });</script>
+
 
 
 <!-- <script src="//unpkg.com/vue-lazyload/vue-lazyload.js"></script>
