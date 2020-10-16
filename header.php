@@ -6,7 +6,9 @@
 <?php echo \Basementor\Basementor::settings('basementor_head'); ?>
 </head><body <?php body_class(); ?>>
 <?php echo \Basementor\Basementor::loader(); ?>
-<?php \Basementor\Basementor::elementor('header'); ?>
+<?php if ($post->post_type!='elementor_library') {
+    \Basementor\Basementor::elementor('header');
+} ?>
 <?php if (function_exists('wc_print_notices') AND wc_notice_count()>0): ?>
 <div class="container"><?php wc_print_notices(); ?></div>
 <?php endif; ?>

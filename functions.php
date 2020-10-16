@@ -143,7 +143,7 @@ endforeach;
 
 
 
-add_action('admin_head', function() { ?><style>
+add_action('admin_head', function() { return; ?><style>
 ul.subsubsub {}
 ul.subsubsub li {padding:0px 5px;}
 ul.subsubsub li a {color:inherit !important;}
@@ -230,3 +230,29 @@ function basementor_register_class_api($class) {
 }
 
 basementor_register_class_api(\Basementor\ApiWc::class);
+
+
+
+// add_action( 'elementor/element/before_section_start', function( $element, $section_id, $args ) {
+//    /** @var \Elementor\Element_Base $element */
+//    if ( 'section' === $element->get_name() && 'section_background' === $section_id ) {
+
+//    	$element->start_controls_section(
+//    		'custom_section',
+//    		[
+//    			'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+//    			'label' => __( 'Custom Section', 'plugin-name' ),
+//    		]
+//    	);
+
+//    	$element->add_control(
+//    		'custom_control',
+//    		[
+//    		'type' => \Elementor\Controls_Manager::NUMBER,
+//    		'label' => __( 'Custom Control', 'plugin-name' ),
+//    		]
+//    	);
+
+//    	$element->end_controls_section();
+//    }
+// }, 10, 3 );
