@@ -102,14 +102,14 @@ https://www.columbiasportswear.com.br/
         
         if ($data->user->ID): ?>
         <div style="position:relative;">
-            <div class="d-flex align-items-center p-1" style="cursor:pointer;" onclick="jQuery('#<?php echo $set->id; ?>_dropdown').fadeToggle(200);">
+            <div class="d-flex align-items-center p-1 elementor-auth-user-dropdown-dropdown-card" style="cursor:pointer;" onclick="jQuery('#<?php echo $set->id; ?>_dropdown').fadeToggle(200);">
                 <div class="flex-grow-1">
                     <?php echo $data->user->display_name; ?>
                 </div>
                 <div><img src="<?php echo $data->user->photo; ?>" alt="" style="height:40px; border-radius:50%;"></div>
             </div>
 
-            <div class="bg-white shadow-sm" id="<?php echo $set->id; ?>_dropdown" style="position:absolute; top:100%; left:0px; width:100%; display:<?php echo $data->display; ?>;">
+            <div class="bg-white shadow-sm elementor-auth-user-dropdown-dropdown" id="<?php echo $set->id; ?>_dropdown" style="position:absolute; top:100%; left:0px; width:100%; display:<?php echo $data->display; ?>;">
                 <div class="nav flex-column nav-pills">
                     <?php foreach($set->nav_items as $item):
                         echo $me->htmlLink($item->link, ['class'=>'nav-link'], "<i class='{$item->icon->value}'></i> &nbsp; {$item->title}");
