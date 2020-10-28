@@ -17,15 +17,15 @@ function basementor_plugins() {
 }
 
 
-add_filter('basementor-settings-menu', function($admin_bar) {
-	$admin_bar->add_menu([
-		'parent' => 'basementor',
+add_filter('basementor-settings-menu', function($items) {
+
+    $items['basementor']['children'][] = [
 		'id'    => 'basementor-settings-plugins',
 		'title' => 'Plugins',
 		'href'  => admin_url('admin.php?page=basementor-settings&tab=plugins'),
-    ]);
+    ];
     
-    return $admin_bar;
+    return $items;
 });
 
 

@@ -131,8 +131,24 @@ class Elementor
                     return json_decode(json_encode(\$sets));
                 }
 
-                public function link() {
-                    return 'Helper to generate link with follow and target attributes';
+                public function htmlLink(\$link, \$attrs=[], \$content='[empty]') {
+                    \$link->url = str_replace('@', site_url(), \$link->url);
+                    
+                    if (is_callable(\$content)) {
+                        ob_start();
+                        call_user_func(\$content, \$link, \$attrs=[]);
+                        \$content = ob_get_clean();
+                    }
+
+                    \$attrs = implode(' ', array_map(function(\$value, \$key) {
+                        return "{\$key}=\"{\$value}\"";
+                    }, \$attrs, array_keys(\$attrs)));
+
+                    if (\$link->is_external) {
+                        \$attrs['target'] = '_blank';
+                    }
+
+                    return "<a href=\"{\$link->url}\" {\$attrs}>{\$content}</a>";
                 }
 
                 public function _register_controls() {
@@ -161,7 +177,7 @@ class Elementor
                     \$set->is_edit = \Elementor\Plugin::\$instance->editor->is_edit_mode();
                     \$set->is_preview = \Elementor\Plugin::\$instance->preview->is_preview_mode();
                     echo '<!-- Elementor: {$metaparams['class']} -->';
-                    echo \\Basementor\\Elementor::template('{$metaparams['class']}', \$set);
+                    echo \\Basementor\\Elementor::template('{$metaparams['class']}', \$set, \$this);
                 }
             }
 EOF;
@@ -173,12 +189,12 @@ EOF;
     }
 
 
-    static function template($class, $set=[]) {
+    static function template($class, $set=[], $me) {
         if (isset(self::$elements[$class]) AND is_callable(self::$elements[$class]['render'])) {
             ob_start();
             $set->style = str_replace(':id', "#{$set->id}", $set->style);
             echo "<style>{$set->style}</style><div id=\"{$set->id}\">";
-            call_user_func(self::$elements[$class]['render'], $set);
+            call_user_func(self::$elements[$class]['render'], $set, $me);
             echo '</div>';
             $content = ob_get_clean();
 

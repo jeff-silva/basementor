@@ -1,14 +1,14 @@
 <?php
 
-add_filter('basementor-settings-menu', function($admin_bar) {
-	$admin_bar->add_menu([
-		'parent' => 'basementor',
+add_filter('basementor-settings-menu', function($items) {
+
+    $items['basementor']['children'][] = [
 		'id'    => 'basementor-settings-wc-files',
 		'title' => 'Woocommerce files',
 		'href'  => admin_url('admin.php?page=basementor-settings&tab=wc-files'),
-    ]);
+    ];
     
-    return $admin_bar;
+    return $items;
 });
 
 

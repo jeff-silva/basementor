@@ -29,73 +29,63 @@
 
 
 add_action('admin_bar_menu', function($admin_bar) {
-	$menu_id = 'basementor';
-	$admin_bar->add_menu([
-		'id'    => 'basementor',
+	global $post;
+	$items = [];
+
+	$items['basementor'] = [
 		'title' => 'Tema',
 		'href'  => 'javascript:;',
-	]);
-	
-	
-	$admin_bar = apply_filters('basementor-settings-menu', $admin_bar);
+		'children' => [
+			[
+				'id'    => 'basementor-settings-update',
+				'title' => 'Update',
+				'href'  => admin_url('admin.php?page=basementor-settings&tab=update'),
+			],
+		],
+	];
 
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-settings-update',
-		'title' => 'Update',
-		'href'  => admin_url('admin.php?page=basementor-settings&tab=update'),
-	]);
 
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-autoload',
-		'title' => 'Refresh autoload',
-		'href'  => '?basementor-autoload',
-	]);
-	
-	/*
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-settings',
-		'title' => 'Configurações',
-		'href'  => admin_url('admin.php?page=basementor-settings'),
-	]);
+	$items['basementor-elementor'] = [
+		'title' => 'Elementor',
+		'href' => 'javascript:;',
+		'children' => [],
+	];
 
-	if (BASEMENTOR_WOOCOMMERCE) {
-		$admin_bar->add_menu([
-			'parent' => $menu_id,
-			'id'    => 'basementor-settings-wc-templates',
-			'title' => 'Woocommerce Templates',
-			'href'  => admin_url('admin.php?page=basementor-settings&tab=wc-templates'),
-		]);
+	if ($post AND $post->ID) {
+		$items['basementor-elementor']['children'][] = [
+			'id'    => 'basementor-elementor-page',
+			'title' => 'Editar página atual',
+			'href'  => admin_url("/post.php?post={$post->ID}&action=elementor"),
+		];
 	}
 
-	$admin_bar->add_menu([
-		'parent' => $menu_id,
-		'id'    => 'basementor-settings-help',
-		'title' => 'Help',
-		'href'  => admin_url('admin.php?page=basementor-settings&tab=help'),
-	]);
-
+	$postid = get_option('theme-elementor-header');
+	$items['basementor-elementor']['children'][] = [
+		'id'    => 'basementor-elementor-header',
+		'title' => 'Editar página atual',
+		'href'  => admin_url("/post.php?post={$postid}&action=elementor"),
+	];
 	
+	$postid = get_option('theme-elementor-footer');
+	$items['basementor-elementor']['children'][] = [
+		'id'    => 'basementor-elementor-footer',
+		'title' => 'Editar página atual',
+		'href'  => admin_url("/post.php?post={$postid}&action=elementor"),
+	];
 
-	if (BASEMENTOR_PARENT == BASEMENTOR_CHILD) {
-		$admin_bar->add_menu([
-			'parent' => $menu_id,
-			'id'    => 'basementor-theme-child',
-			'title' => 'Criar tema filho',
-			'href'  => '?basementor-theme-child',
-		]);
+	$items = apply_filters('basementor-settings-menu', $items);
+
+	foreach($items as $id=>$item) {
+		$item['id'] = $id;
+		$admin_bar->add_menu($item);
+
+		if (isset($item['children']) AND is_array($item['children'])) {
+			foreach($item['children'] as $iitem) {
+				$iitem['parent'] = $item['id'];
+				$admin_bar->add_menu($iitem);
+			}
+		}
 	}
-	else {
-		$admin_bar->add_menu([
-			'parent' => $menu_id,
-			'id'    => 'basementor-theme-child',
-			'title' => 'Download child theme',
-			'href'  => '?basementor-theme-child-download',
-		]);
-	}
-	*/
 }, 100);
 
 
