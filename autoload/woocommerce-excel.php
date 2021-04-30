@@ -14,41 +14,42 @@ if (isset($_GET['woocommerce-excel-media'])) {
 	});
 }
 
-
-function elementor_excel_products() {
-	$products = get_posts([
-		'post_type' => 'product',
-		'posts_per_page' => -1,
-		'post_status' => 'any',
-	]);
-
-	$products = array_map(function($prod) {
-		$prod->_permalink = get_the_permalink($prod);
-
-		$prod->meta_input = (object) array_map(function($value) {
-			$value = $value[0];
-
-			if (is_array($value2 = @json_decode($value))) {
-				$value = $value2;
+if (! function_exists('elementor_excel_products')) {
+	function elementor_excel_products() {
+		$products = get_posts([
+			'post_type' => 'product',
+			'posts_per_page' => -1,
+			'post_status' => 'any',
+		]);
+	
+		$products = array_map(function($prod) {
+			$prod->_permalink = get_the_permalink($prod);
+	
+			$prod->meta_input = (object) array_map(function($value) {
+				$value = $value[0];
+	
+				if (is_array($value2 = @json_decode($value))) {
+					$value = $value2;
+				}
+	
+				return $value;
+			}, get_post_meta($prod->ID, '', true));
+	
+			$prod->tax_input = new \stdClass;
+			foreach(get_object_taxonomies(['post_type' => 'product']) as $taxo) {
+				$prod->tax_input->{$taxo} = [];
+				if ($terms = get_the_terms($prod->ID, $taxo) AND is_array($terms)) {
+					$prod->tax_input->{$taxo} = array_map(function($term) {
+						return $term->term_id;
+					}, $terms);
+				}
 			}
-
-			return $value;
-		}, get_post_meta($prod->ID, '', true));
-
-		$prod->tax_input = new \stdClass;
-		foreach(get_object_taxonomies(['post_type' => 'product']) as $taxo) {
-			$prod->tax_input->{$taxo} = [];
-			if ($terms = get_the_terms($prod->ID, $taxo) AND is_array($terms)) {
-				$prod->tax_input->{$taxo} = array_map(function($term) {
-					return $term->term_id;
-				}, $terms);
-			}
-		}
-
-		return $prod;
-	}, $products);
-
-	return $products;
+	
+			return $prod;
+		}, $products);
+	
+		return $products;
+	}
 }
 
 

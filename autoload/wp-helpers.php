@@ -77,44 +77,45 @@ add_action('admin_menu', function() {
 	});
 });
 
-
-class Hp_Helpers_Api
-{
-	static function url($method) {
-		return site_url("/wp-json/wp-helpers/v1/{$method}");
-	}
-
-	static function repo_search() {
-		$input = (object) $_GET;
-
-		$c = curl_init();
-		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($c, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Content-Type: application/json', 'User-Agent: Awesome-Octocat-App']);
-		curl_setopt($c, CURLOPT_URL, 'https://api.github.com/repos/jeff-silva/wp-helpers/contents');
-		$data = json_decode(curl_exec($c));
-		curl_close($c);
-
-		$return = [];
-		if (is_array($data)) {
-			foreach($data as $item) {
-				if (in_array($item->name, ['wp-helpers.php', 'README.md'])) continue;
-				$item->downloaded = file_exists(__DIR__ . "/{$item->name}");
-				$return[] = $item;
-			}
+if (! class_exists('Hp_Helpers_Api')) {
+	class Hp_Helpers_Api
+	{
+		static function url($method) {
+			return site_url("/wp-json/wp-helpers/v1/{$method}");
 		}
-
-		return $return;
-	}
-
-	static function repo_download() {
-		$input = (object) $_GET;
-		$content = file_get_contents("https://raw.githubusercontent.com/jeff-silva/wp-helpers/master/{$input->name}");
-		return file_put_contents(__DIR__ ."/{$input->name}", $content);
-	}
-
-	static function repo_delete() {
-		$input = (object) $_GET;
-		return unlink(__DIR__ ."/{$input->name}");
+	
+		static function repo_search() {
+			$input = (object) $_GET;
+	
+			$c = curl_init();
+			curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($c, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Content-Type: application/json', 'User-Agent: Awesome-Octocat-App']);
+			curl_setopt($c, CURLOPT_URL, 'https://api.github.com/repos/jeff-silva/wp-helpers/contents');
+			$data = json_decode(curl_exec($c));
+			curl_close($c);
+	
+			$return = [];
+			if (is_array($data)) {
+				foreach($data as $item) {
+					if (in_array($item->name, ['wp-helpers.php', 'README.md'])) continue;
+					$item->downloaded = file_exists(__DIR__ . "/{$item->name}");
+					$return[] = $item;
+				}
+			}
+	
+			return $return;
+		}
+	
+		static function repo_download() {
+			$input = (object) $_GET;
+			$content = file_get_contents("https://raw.githubusercontent.com/jeff-silva/wp-helpers/master/{$input->name}");
+			return file_put_contents(__DIR__ ."/{$input->name}", $content);
+		}
+	
+		static function repo_delete() {
+			$input = (object) $_GET;
+			return unlink(__DIR__ ."/{$input->name}");
+		}
 	}
 }
 

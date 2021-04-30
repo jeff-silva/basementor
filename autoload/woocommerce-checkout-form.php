@@ -1,29 +1,31 @@
 <?php return;
 
-function woocommerce_checkout_form_fields() {
-	$fields = get_option('basementor-form-checkout-fields');
-	$fields = json_decode($fields, true);
-	$fields = is_array($fields)? $fields: [];
-
-	if (empty($fields)) {
-		$country = new \WC_Countries();
-
-		$fields['billing'] = $country->get_address_fields($country->get_base_country(), 'billing_');
-		$fields['billing'] = array_map(function($field, $field_name) {
-			$field['name'] = $field_name;
-			$field['class'] = implode(' ', $field['class']);
-			return $field;
-		}, $fields['billing'], array_keys($fields['billing']));
-
-		$fields['shipping'] = $country->get_address_fields($country->get_base_country(), 'shipping_');
-		$fields['shipping'] = array_map(function($field, $field_name) {
-			$field['name'] = $field_name;
-			$field['class'] = implode(' ', $field['class']);
-			return $field;
-		}, $fields['shipping'], array_keys($fields['shipping']));
+if (! function_exists('woocommerce_checkout_form_fields')) {
+	function woocommerce_checkout_form_fields() {
+		$fields = get_option('basementor-form-checkout-fields');
+		$fields = json_decode($fields, true);
+		$fields = is_array($fields)? $fields: [];
+	
+		if (empty($fields)) {
+			$country = new \WC_Countries();
+	
+			$fields['billing'] = $country->get_address_fields($country->get_base_country(), 'billing_');
+			$fields['billing'] = array_map(function($field, $field_name) {
+				$field['name'] = $field_name;
+				$field['class'] = implode(' ', $field['class']);
+				return $field;
+			}, $fields['billing'], array_keys($fields['billing']));
+	
+			$fields['shipping'] = $country->get_address_fields($country->get_base_country(), 'shipping_');
+			$fields['shipping'] = array_map(function($field, $field_name) {
+				$field['name'] = $field_name;
+				$field['class'] = implode(' ', $field['class']);
+				return $field;
+			}, $fields['shipping'], array_keys($fields['shipping']));
+		}
+	
+		return $fields;
 	}
-
-	return $fields;
 }
 
 

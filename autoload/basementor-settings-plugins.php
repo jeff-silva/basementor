@@ -1,19 +1,21 @@
 <?php
 
-function basementor_plugins() {
-    return [
-        'googleanalytics' => [
-            'name'      => 'Google Analytics',
-            'slug'      => 'googleanalytics',
-            'required'  => false,
-        ],
-
-        'woocommerce' => [
-            'name'      => 'Woocommerce',
-            'slug'      => 'woocommerce',
-            'required'  => false,
-        ],
-    ];
+if (! function_exists('basementor_plugins')) {
+    function basementor_plugins() {
+        return [
+            'googleanalytics' => [
+                'name'      => 'Google Analytics',
+                'slug'      => 'googleanalytics',
+                'required'  => false,
+            ],
+    
+            'woocommerce' => [
+                'name'      => 'Woocommerce',
+                'slug'      => 'woocommerce',
+                'required'  => false,
+            ],
+        ];
+    }
 }
 
 

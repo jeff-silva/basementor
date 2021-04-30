@@ -1,29 +1,30 @@
 <?php
 
-class BasementorDatabase
-{
-	static function tables() {
-		global $wpdb;
-
-		$tables = [];
-		foreach($wpdb->get_results("SHOW TABLES LIKE '{$wpdb->prefix}%'") as $row) {
-			$table = ['name' => reset(array_values((array) $row))];
-			
-			$table['fields'] = [];
-			foreach($wpdb->get_results("DESCRIBE {$table['name']}") as $field) {
-				$table['fields'][] = [
-					'name' => $field->Field,
-					'type' => $field->Type,
-					'null' => $field->Null,
-				];
+if (! class_exists('BasementorDatabase')) {
+	class BasementorDatabase {
+		static function tables() {
+			global $wpdb;
+	
+			$tables = [];
+			foreach($wpdb->get_results("SHOW TABLES LIKE '{$wpdb->prefix}%'") as $row) {
+				$table = ['name' => reset(array_values((array) $row))];
+				
+				$table['fields'] = [];
+				foreach($wpdb->get_results("DESCRIBE {$table['name']}") as $field) {
+					$table['fields'][] = [
+						'name' => $field->Field,
+						'type' => $field->Type,
+						'null' => $field->Null,
+					];
+				}
+	
+				$table['data'] = [];
+	
+				$tables[] = $table;
 			}
-
-			$table['data'] = [];
-
-			$tables[] = $table;
+	
+			return $tables;
 		}
-
-		return $tables;
 	}
 }
 
