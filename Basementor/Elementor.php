@@ -56,128 +56,130 @@ class Elementor
             $metaparams_controls = var_export($metaparams['controls'], true);
             
             $code = <<<EOF
-            class {$metaparams['class']} extends \Elementor\Widget_Base {
-
-                public function __construct(\$data=[], \$args=null) {
-                    parent::__construct(\$data, \$args);
-                    \$this->globalSettings = (new \Elementor\Core\Kits\Manager)->get_current_settings();
-                }
-                
-                public function get_name() {
-                    return __CLASS__;
-                }
-
-                public function get_title() {
-                    return '{$metaparams['title']}';
-                }
-
-                // https://ecomfe.github.io/eicons/demo/demo.html
-                public function get_icon() {
-                    return '{$metaparams['icon']}';
-                }
-
-                public function get_categories() {
-                    //return \$this->metaparams['categories'];
-                    return ['categories'];
-                }
-
-                public function get_script_depends() {
-                    return [];
-                }
-
-                public function get_style_depends() {
-                    return [];
-                }
-
-                public function get_global_color(\$id) {
-                    \$id = str_replace('globals/colors?id=', '', \$id);
-                    if (!\$id) return;
-
-                    foreach(\$this->globalSettings['system_colors'] as \$color) {
-                        if (\$id==\$color['_id']) {
-                            return \$color['color'];
-                        }
-                    }
-
-                    foreach(\$this->globalSettings['custom_colors'] as \$color) {
-                        if (\$id==\$color['_id']) {
-                            return \$color['color'];
-                        }
-                    }
-
-                    return null;
-                }
-
-                public function parsed_settings_globals(\$sets) {
-                    if (isset(\$sets['__globals__'])) {
-                        \$sets['__globals__'] = (array) \$sets['__globals__'];
-                        foreach(\$sets['__globals__'] as \$key=>\$value) {
-                            if (!\$value) continue;
-                            \$sets[\$key] = \$this->get_global_color(\$value);
-                        }
-                    }
-
-                    foreach(\$sets as \$key=>\$value) {
-                        \$sets[\$key] = \$this->parsed_settings_globals(\$value);
+            if (! class_exists('{$metaparams['class']}')) {
+                class {$metaparams['class']} extends \Elementor\Widget_Base {
+    
+                    public function __construct(\$data=[], \$args=null) {
+                        parent::__construct(\$data, \$args);
+                        \$this->globalSettings = (new \Elementor\Core\Kits\Manager)->get_current_settings();
                     }
                     
-                    return \$sets;
-                }
-
-                public function parsed_settings() {
-                    \$sets = \$this->get_settings_for_display();
-                    \$sets = \$this->parsed_settings_globals(\$sets);
-                    // dd(\$sets);
-                    return json_decode(json_encode(\$sets));
-                }
-
-                public function htmlLink(\$link, \$attrs=[], \$content='[empty]') {
-                    \$link->url = str_replace('@', site_url(), \$link->url);
-                    
-                    if (is_callable(\$content)) {
-                        ob_start();
-                        call_user_func(\$content, \$link, \$attrs=[]);
-                        \$content = ob_get_clean();
+                    public function get_name() {
+                        return __CLASS__;
                     }
-
-                    \$attrs = implode(' ', array_map(function(\$value, \$key) {
-                        return "{\$key}=\"{\$value}\"";
-                    }, \$attrs, array_keys(\$attrs)));
-
-                    if (\$link->is_external) {
-                        \$attrs['target'] = '_blank';
+    
+                    public function get_title() {
+                        return '{$metaparams['title']}';
                     }
-
-                    return "<a href=\"{\$link->url}\" {\$attrs}>{\$content}</a>";
-                }
-
-                public function _register_controls() {
-                    foreach($metaparams_controls as \$section_id=>\$section) {
-                        \$this->start_controls_section(\$section_id, \$section);
-                        foreach(\$section['fields'] as \$field_id=>\$field) {
-                            if (\$field['type']==\Elementor\Controls_Manager::REPEATER) {
-                                \$repeater = new \Elementor\Repeater();
-                                foreach(\$field['fields'] as \$ffield_id=>\$ffield) {
-                                    \$repeater->add_control(\$ffield_id, \$ffield);
-                                }
-                                \$field['fields'] = \$repeater->get_controls();
-                                \$field['prevent_empty'] = false;
-                                \$this->add_control(\$field_id, \$field);
-                                continue;
+    
+                    // https://ecomfe.github.io/eicons/demo/demo.html
+                    public function get_icon() {
+                        return '{$metaparams['icon']}';
+                    }
+    
+                    public function get_categories() {
+                        //return \$this->metaparams['categories'];
+                        return ['categories'];
+                    }
+    
+                    public function get_script_depends() {
+                        return [];
+                    }
+    
+                    public function get_style_depends() {
+                        return [];
+                    }
+    
+                    public function get_global_color(\$id) {
+                        \$id = str_replace('globals/colors?id=', '', \$id);
+                        if (!\$id) return;
+    
+                        foreach(\$this->globalSettings['system_colors'] as \$color) {
+                            if (\$id==\$color['_id']) {
+                                return \$color['color'];
                             }
-                            \$this->add_control(\$field_id, \$field);
                         }
-                        \$this->end_controls_section();
+    
+                        foreach(\$this->globalSettings['custom_colors'] as \$color) {
+                            if (\$id==\$color['_id']) {
+                                return \$color['color'];
+                            }
+                        }
+    
+                        return null;
                     }
-                }
-
-                public function render() {
-                    \$set = \$this->parsed_settings();
-                    \$set->id = uniqid(__CLASS__.'_');
-                    \$set->is_edit = \Elementor\Plugin::\$instance->editor->is_edit_mode();
-                    \$set->is_preview = \Elementor\Plugin::\$instance->preview->is_preview_mode();
-                    echo '<!-- Elementor: {$metaparams['class']} -->';
-                    echo \\Basementor\\Elementor::template('{$metaparams['class']}', \$set, \$this);
+    
+                    public function parsed_settings_globals(\$sets) {
+                        if (isset(\$sets['__globals__'])) {
+                            \$sets['__globals__'] = (array) \$sets['__globals__'];
+                            foreach(\$sets['__globals__'] as \$key=>\$value) {
+                                if (!\$value) continue;
+                                \$sets[\$key] = \$this->get_global_color(\$value);
+                            }
+                        }
+    
+                        foreach(\$sets as \$key=>\$value) {
+                            \$sets[\$key] = \$this->parsed_settings_globals(\$value);
+                        }
+                        
+                        return \$sets;
+                    }
+    
+                    public function parsed_settings() {
+                        \$sets = \$this->get_settings_for_display();
+                        \$sets = \$this->parsed_settings_globals(\$sets);
+                        // dd(\$sets);
+                        return json_decode(json_encode(\$sets));
+                    }
+    
+                    public function htmlLink(\$link, \$attrs=[], \$content='[empty]') {
+                        \$link->url = str_replace('@', site_url(), \$link->url);
+                        
+                        if (is_callable(\$content)) {
+                            ob_start();
+                            call_user_func(\$content, \$link, \$attrs=[]);
+                            \$content = ob_get_clean();
+                        }
+    
+                        \$attrs = implode(' ', array_map(function(\$value, \$key) {
+                            return "{\$key}=\"{\$value}\"";
+                        }, \$attrs, array_keys(\$attrs)));
+    
+                        if (\$link->is_external) {
+                            \$attrs['target'] = '_blank';
+                        }
+    
+                        return "<a href=\"{\$link->url}\" {\$attrs}>{\$content}</a>";
+                    }
+    
+                    public function _register_controls() {
+                        foreach($metaparams_controls as \$section_id=>\$section) {
+                            \$this->start_controls_section(\$section_id, \$section);
+                            foreach(\$section['fields'] as \$field_id=>\$field) {
+                                if (\$field['type']==\Elementor\Controls_Manager::REPEATER) {
+                                    \$repeater = new \Elementor\Repeater();
+                                    foreach(\$field['fields'] as \$ffield_id=>\$ffield) {
+                                        \$repeater->add_control(\$ffield_id, \$ffield);
+                                    }
+                                    \$field['fields'] = \$repeater->get_controls();
+                                    \$field['prevent_empty'] = false;
+                                    \$this->add_control(\$field_id, \$field);
+                                    continue;
+                                }
+                                \$this->add_control(\$field_id, \$field);
+                            }
+                            \$this->end_controls_section();
+                        }
+                    }
+    
+                    public function render() {
+                        \$set = \$this->parsed_settings();
+                        \$set->id = uniqid(__CLASS__.'_');
+                        \$set->is_edit = \Elementor\Plugin::\$instance->editor->is_edit_mode();
+                        \$set->is_preview = \Elementor\Plugin::\$instance->preview->is_preview_mode();
+                        echo '<!-- Elementor: {$metaparams['class']} -->';
+                        echo \\Basementor\\Elementor::template('{$metaparams['class']}', \$set, \$this);
+                    }
                 }
             }
 EOF;

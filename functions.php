@@ -9,6 +9,7 @@
 [ ] - Put title inside thumbnail for loop elements height bugfix
 */
 
+/* Se for tema filho, para por aqui para não redeclarar funções */
 if (defined('BASEMENTOR_PARENT')) return;
 
 define('BASEMENTOR_ELEMENTOR', did_action('elementor/loaded'));
@@ -20,6 +21,11 @@ define('BASEMENTOR_CHILD', get_stylesheet_directory());
 /* Print data: dd($data1, $data2, $data3); */
 if (! function_exists('dd')) { function dd() { foreach(func_get_args() as $data) { echo '<pre>'. print_r($data, true) .'</pre>'; }}}
 if (! function_exists('de')) { function de() { foreach(func_get_args() as $data) { echo '<pre>'. var_export($data, true) .'</pre>'; }}}
+
+
+if (isset($_GET['test'])) {
+	dd(BASEMENTOR_PARENT, BASEMENTOR_CHILD); die;
+}
 
 
 spl_autoload_register(function($class) {
@@ -43,6 +49,7 @@ if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
 		$folder = wp_get_current_user();
 		$folder = $folder->data->user_login;
 		$theme_folder = get_theme_root() ."/{$folder}";
+		$current_folder = pathinfo(__DIR__, PATHINFO_FILENAME);
 		@mkdir($theme_folder, 0755, true);
 		@mkdir($theme_folder.'/autoload', 0755, true);
 		file_put_contents("{$theme_folder}/style.css", implode("\n", [
@@ -51,7 +58,7 @@ if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
 			"Description:    {$folder} Theme",
 			'Author:         Jeferson Siqueira',
 			'Author URI:     https://jsiqueira.com',
-			'Template:       basementor-master',
+			"Template:       {$current_folder}",
 			'Version:        1.0',
 			'*/',
 		]));
@@ -59,7 +66,6 @@ if (isset($_GET['basementor-theme-child']) AND is_user_logged_in()) {
 		file_put_contents("{$theme_folder}/functions.php", implode("\n", [
 			'<?php',
 			'',
-			'include __DIR__ .\'/autoload.php\';',
 		]));
 
 		wp_redirect($_SERVER['HTTP_REFERER']); die;
@@ -193,6 +199,14 @@ add_action('admin_bar_menu', function($admin_bar) {
 			],
 		]
 	];
+
+	if (BASEMENTOR_PARENT==BASEMENTOR_CHILD) {
+		$items[0]['children'][] = [
+			'id'    => 'basementor-elementor-child',
+			'title' => 'Criar e ativar tema filho',
+			'href'  => admin_url('admin.php?basementor-theme-child'),
+		];
+	}
 
 	foreach($items as $item) {
 		$admin_bar->add_menu($item);
